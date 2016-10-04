@@ -80,11 +80,11 @@ public class TabActivity extends AppCompatActivity {
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFrag(new MainFragment(), "Главная");
-        adapter.addFrag(new CatalogFragment(), "Каталог");
-        adapter.addFrag(new PlayerFragment(), "Плеер");
-        adapter.addFrag(new MyBooks(), "Мои книги");
-        adapter.addFrag(new OtherInfoFragment(), "Еще");
+        adapter.addFrag(new MainFragment(), "");
+        adapter.addFrag(new CatalogFragment(), "");
+        adapter.addFrag(new PlayerFragment(), "");
+        adapter.addFrag(new MyBooks(), "");
+        adapter.addFrag(new OtherInfoFragment(), "");
         viewPager.setAdapter(adapter);
     }
 
