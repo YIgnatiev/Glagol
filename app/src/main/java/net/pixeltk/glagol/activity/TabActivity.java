@@ -1,6 +1,6 @@
 package net.pixeltk.glagol.activity;
 
-import android.support.design.widget.TabLayout;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -9,12 +9,10 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.TextView;
-
 
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
 
@@ -43,6 +41,12 @@ public class TabActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         viewPager = (ViewPager) findViewById(R.id.viewpager);
+        viewPager.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View view, MotionEvent motionEvent) {
+                return true;
+            }
+        });
         setupViewPager(viewPager);
 
         viewPagerTab = (SmartTabLayout) findViewById(R.id.viewpagertab);
@@ -129,5 +133,6 @@ public class TabActivity extends AppCompatActivity {
             return mFragmentTitleList.get(position);
         }
     }
+
 }
 
