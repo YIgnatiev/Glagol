@@ -1,4 +1,32 @@
 <resources>
     <string name="app_name">Glagol</string>
     <string name="search_hint">Поиск</string>
+
+    <array name="nav_drawer_icons">
+        <item>@drawable/ic_home_list</item>
+        <item>@drawable/ic_favorite_location</item>
+        <item>@drawable/ic_my_location</item>
+        <item>@drawable/ic_about</item>
+    </array>
+
+    <string-array name="nav_drawer_items">
+        <item>Аудиоспектакли</item>
+        <item>Бизнес-книги</item>
+        <item>Детективы</item>
+        <item>Для детей</item>
+        <item>Дом и семья</item>
+        <item>Зарубежная проза</item>
+        <item>Иностранные языки</item>
+        <item>Красота и здоровье</item>
+        <item>Учебная литература</item>
+        <item>Религиозная литература</item>
+        <item>Фантастика</item>
+        <item>Философия</item>
+        <item>Автобиография</item>
+        <item>Расказы</item>
+        <item>Историческая литература</item>
+        <item>Русская классика</item>
+        <item>Приключения</item>
+    </string-array>
+
 </resources>

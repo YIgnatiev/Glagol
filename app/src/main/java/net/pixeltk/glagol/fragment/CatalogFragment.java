@@ -1,12 +1,18 @@
 package net.pixeltk.glagol.fragment;
 
+import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 
 import net.pixeltk.glagol.R;
+import net.pixeltk.glagol.adapter.NavDrawerItem;
+import net.pixeltk.glagol.adapter.NavDrawerListAdapter;
+
+import java.util.ArrayList;
 
 /**
  * Created by root on 04.10.16.
@@ -17,6 +23,11 @@ public class CatalogFragment extends Fragment{
     public CatalogFragment() {
         // Required empty public constructor
     }
+    private String[] navMenuTitles;
+    private TypedArray navMenuIcons;
+    private ListView mDrawerList;
+    private ArrayList<NavDrawerItem> navDrawerItems;
+    private NavDrawerListAdapter adapter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -27,7 +38,27 @@ public class CatalogFragment extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.catalog_fragment, container, false);
+        View view = inflater.inflate(R.layout.catalog_fragment, container, false);
+
+        navMenuTitles = getResources().getStringArray(R.array.nav_drawer_items);
+
+        // nav drawer icons from resources
+        navMenuIcons = getResources()
+                .obtainTypedArray(R.array.nav_drawer_icons);
+
+        mDrawerList = (ListView) view.findViewById(R.id.list_view);
+
+        navDrawerItems = new ArrayList<NavDrawerItem>();
+
+        for (int i = 0; i < navMenuIcons.length(); i++) {
+            navDrawerItems.add(new NavDrawerItem(navMenuIcons.getResourceId(i, -1), navMenuTitles[i], R.mipmap.back_icon));
+        }
+
+        adapter = new NavDrawerListAdapter(getActivity(),
+                navDrawerItems);
+        mDrawerList.setAdapter(adapter);
+
+        return view;
     }
 
 }
