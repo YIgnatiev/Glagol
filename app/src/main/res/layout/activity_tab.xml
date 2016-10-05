@@ -5,7 +5,7 @@
     android:id="@+id/activity_tab"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#2F2F2F"
+    android:background="#1f1f1f"
     tools:context="net.pixeltk.glagol.activity.TabActivity">
     <include android:id="@+id/toolbar"
         layout="@layout/toolbar" />
