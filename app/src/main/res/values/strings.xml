@@ -2,12 +2,6 @@
     <string name="app_name">Glagol</string>
     <string name="search_hint">Поиск</string>
 
-    <array name="nav_drawer_icons">
-        <item>@drawable/search</item>
-        <item>@drawable/search</item>
-        <item>@drawable/search</item>
-        <item>@drawable/search</item>
-    </array>
 
     <string-array name="nav_drawer_items">
         <item>Аудиоспектакли</item>
