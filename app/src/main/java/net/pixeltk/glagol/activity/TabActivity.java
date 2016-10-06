@@ -1,6 +1,7 @@
 package net.pixeltk.glagol.activity;
 
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -13,8 +14,10 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Switch;
+import android.widget.TableRow;
 
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
 
@@ -81,7 +84,7 @@ public class TabActivity extends AppCompatActivity {
             }
         });
 
-        viewPagerTab = (SmartTabLayout) findViewById(R.id.viewpagertab);
+       viewPagerTab = (SmartTabLayout) findViewById(R.id.viewpagertab);
 
         final LayoutInflater inflater = LayoutInflater.from(viewPagerTab.getContext());
         viewPagerTab.setCustomTabView(new SmartTabLayout.TabProvider() {
@@ -109,8 +112,40 @@ public class TabActivity extends AppCompatActivity {
             }
         });
 
-
         viewPagerTab.setViewPager(viewPager);
+
+        viewPagerTab.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+                Log.d("MyLog", String.valueOf(position));
+                switch (position) {
+                    case 0:
+                        Log.d("MyLog", String.valueOf(position));
+                        toolbar.setLogo(R.drawable.glagollogogrn);
+                        toolbar.setTitle("");
+                        return;
+                    case 1:
+                        Log.d("MyLog", String.valueOf(position));
+                        toolbar.setLogo(null);
+                        toolbar.setTitle("Каталог");
+                        return;
+                    default:
+                        return;
+                }
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
     }
 
     private void setupViewPager(ViewPager viewPager) {
