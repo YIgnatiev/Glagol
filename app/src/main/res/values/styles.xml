@@ -19,4 +19,9 @@
         <item name="queryHint">@string/search_hint</item>
     </style>
 
+    <style name="CustomListView" parent="@android:style/Widget.ListView">
+        <item name="android:background">#2F2F2F</item>
+        <item name="android:fastScrollEnabled">true</item>
+    </style>
+
 </resources>

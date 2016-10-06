@@ -7,8 +7,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.Toolbar;
 
 import net.pixeltk.glagol.R;
+import net.pixeltk.glagol.activity.TabActivity;
 import net.pixeltk.glagol.adapter.NavDrawerItem;
 import net.pixeltk.glagol.adapter.NavDrawerListAdapter;
 
@@ -57,6 +59,8 @@ public class CatalogFragment extends Fragment{
         adapter = new NavDrawerListAdapter(getActivity(),
                 navDrawerItems);
         mDrawerList.setAdapter(adapter);
+
+
 
         return view;
     }

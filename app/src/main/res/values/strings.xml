@@ -2,6 +2,25 @@
     <string name="app_name">Glagol</string>
     <string name="search_hint">Поиск</string>
 
+    <string-array name="nav_drawer_icons">
+        <item>@mipmap/theatre</item>
+        <item>@mipmap/teacher_briefcase</item>
+        <item>@mipmap/loupe</item>
+        <item>@mipmap/puzzle</item>
+        <item>@mipmap/family_room</item>
+        <item>@mipmap/globe_grid</item>
+        <item>@mipmap/language</item>
+        <item>@mipmap/mirror</item>
+        <item>@mipmap/teacher_pointing_at_blackboard</item>
+        <item>@mipmap/ufo</item>
+        <item>@mipmap/castle</item>
+        <item>@mipmap/laughing</item>
+        <item>@mipmap/gavel</item>
+        <item>@mipmap/baseball_cap</item>
+        <item>@mipmap/church</item>
+        <item>@mipmap/kremlin</item>
+    </string-array>
+
 
     <string-array name="nav_drawer_items">
         <item>Аудиоспектакли</item>
@@ -13,14 +32,13 @@
         <item>Иностранные языки</item>
         <item>Красота и здоровье</item>
         <item>Учебная литература</item>
-        <item>Религиозная литература</item>
         <item>Фантастика</item>
-        <item>Философия</item>
-        <item>Автобиография</item>
-        <item>Расказы</item>
-        <item>Историческая литература</item>
-        <item>Русская классика</item>
-        <item>Приключения</item>
+        <item>Фентези</item>
+        <item>Юмор и развлечения</item>
+        <item>Юредическая литература</item>
+        <item>Подростковая литература</item>
+        <item>Религиозная литература</item>
+        <item>Политика</item>
     </string-array>
 
 </resources>

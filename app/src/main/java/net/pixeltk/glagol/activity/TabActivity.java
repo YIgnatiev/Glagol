@@ -8,11 +8,13 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.Switch;
 
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
 
@@ -48,6 +50,36 @@ public class TabActivity extends AppCompatActivity {
             }
         });
         setupViewPager(viewPager);
+        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                Log.d("MyLog", String.valueOf(position));
+                switch (position) {
+                    case 0:
+                        Log.d("MyLog", String.valueOf(position));
+                        toolbar.setLogo(R.drawable.glagollogogrn);
+                        toolbar.setTitle("");
+                        return;
+                    case 1:
+                        Log.d("MyLog", String.valueOf(position));
+                        toolbar.setLogo(null);
+                        toolbar.setTitle("Каталог");
+                        return;
+                    default:
+                        return;
+                }
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
 
         viewPagerTab = (SmartTabLayout) findViewById(R.id.viewpagertab);
 
@@ -81,7 +113,6 @@ public class TabActivity extends AppCompatActivity {
         viewPagerTab.setViewPager(viewPager);
     }
 
-
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFrag(new MainFragment(), "");
@@ -104,10 +135,13 @@ public class TabActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             switch (position){
                 case 0:
+                    Log.d("MyLog", String.valueOf(position));
                     return new MainFragment();
                 case 1:
+                    Log.d("MyLog", String.valueOf(position));
                     return new CatalogFragment();
                 case 2:
+                    Log.d("MyLog", String.valueOf(position));
                     return new PlayerFragment();
                 case 3:
                     return new MyBooks();
