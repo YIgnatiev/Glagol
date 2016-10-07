@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:gravity="center"
+    android:layout_height="match_parent">
+     <TextView
+     android:text="@string/login_for"
+     android:gravity="center_vertical|center_horizontal"
+     android:layout_width="match_parent"
+     android:layout_marginLeft="20dp"
+     android:textColor="#646464"
+     android:layout_marginRight="20dp"
+     android:layout_height="wrap_content"
+     android:id="@+id/textView2" />
+
+ <Button
+     android:text="@string/login"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:layout_marginRight="15dp"
+     android:textSize="18sp"
+     android:layout_marginLeft="15dp"
+     android:textAllCaps="false"
+     android:background="@drawable/background"
+     android:layout_below="@+id/textView2"
+     android:layout_centerHorizontal="true"
+     android:layout_marginTop="19dp"
+     android:id="@+id/login" />
+
+ <Button
+     android:text="@string/sign_in"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:layout_marginRight="15dp"
+     android:textAllCaps="false"
+     android:textColor="#FFFFFF"
+     android:textSize="18sp"
+     android:layout_marginLeft="15dp"
+     android:background="@drawable/backsearch"
+     android:layout_below="@+id/login"
+     android:layout_centerHorizontal="true"
+     android:layout_marginTop="19dp"
+     android:id="@+id/sign" />
+
+</RelativeLayout>

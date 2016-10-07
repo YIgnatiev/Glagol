@@ -5,12 +5,9 @@
     android:layout_height="match_parent">
 
 
-    <ListView
-        android:id="@+id/list_view"
+    <FrameLayout
         android:layout_width="match_parent"
-        style="@style/CustomListView"
-        android:dividerHeight="2dp"
-        android:listSelector="#2B2B2B"
-        android:divider="#2B2B2B"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:id="@+id/catalog_frame">
+    </FrameLayout>
 </LinearLayout>

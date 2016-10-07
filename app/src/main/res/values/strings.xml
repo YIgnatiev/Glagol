@@ -1,6 +1,31 @@
 <resources>
     <string name="app_name">Glagol</string>
     <string name="search_hint">Поиск</string>
+    <string name="login">Зарегистрироваться</string>
+    <string name="alredy">Я уже зарегестрирован</string>
+    <string name="login_for">Для доступа в личный кабинет требуется регистрация в приложении</string>
+    <string name="sign_in">Войти под своим логином и паролем</string>
+    <string name="text_enter_mail">Укажите свой e-mail</string>
+    <string name="example_mail">example@gmail.com</string>
+    <string name="text_info_registration">Регистрация необходима для совершения покупок, синхронизации личного кабинета на разных устройствах и востановления доступа к приложению</string>
+    <string name="text_mail_pass">Укажите свой e-mail и пароль</string>
+    <string name="text_info_login">Укажите пароль, который был отправлен на ваш e-mail после регистрации</string>
+    <string name="button_login">Войти</string>
+    <string name="send_pass">Выслать пароль еще раз</string>
+    <string name="res_pass">Вам будет отправлен новый пароль</string>
+    <string name="get_pass">Получить пароль</string>
+    <string name="news">Вы еще не оформили ни одну подписку \n
+    \n
+    В приложении можно подписаться на: \n
+    - новинки автора \n
+        - новинки чтеца \n
+        - новики издательства \n
+        - новинки в подборах книг
+    </string>
+    <string name="recover">Востановить доступ</string>
+    <string name="info_app">О приложении</string>
+    <string name="question">Задать вопрос</string>
+    <string name="contact">Контакты</string>
 
     <string-array name="nav_drawer_icons">
         <item>@mipmap/theatre</item>
