@@ -23,6 +23,7 @@ import android.widget.TableRow;
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
 
 import net.pixeltk.glagol.R;
+import net.pixeltk.glagol.fargment_catalog.OnBackPressedListener;
 import net.pixeltk.glagol.fragment.CatalogFragment;
 import net.pixeltk.glagol.fragment.MainFragment;
 import net.pixeltk.glagol.fragment.MyBooks;
@@ -100,15 +101,65 @@ public class TabActivity extends AppCompatActivity {
                         Log.d("MyLog", String.valueOf(position));
                         toolbar.setLogo(R.drawable.glagollogogrn);
                         toolbar.setTitle("");
+                        setSupportActionBar(toolbar);
+                        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
                         return;
                     case 1:
                         Log.d("MyLog", String.valueOf(position));
                         toolbar.setLogo(null);
                         toolbar.setTitle("Каталог");
+                        setSupportActionBar(toolbar);
+                        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                        getSupportActionBar().setDisplayShowHomeEnabled(true);
+                        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                onBackPressed();
+                            }
+                        });
+
+
+                        return;
+                    case 2:
+                        Log.d("MyLog", String.valueOf(position));
+                        toolbar.setLogo(null);
+                        toolbar.setTitle("Плеер");
+                        setSupportActionBar(toolbar);
+                        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                        getSupportActionBar().setDisplayShowHomeEnabled(true);
+                        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                onBackPressed();
+                            }
+                        });
                         return;
                     case 3:
                         toolbar.setLogo(null);
                         toolbar.setTitle("Мои книги");
+                        setSupportActionBar(toolbar);
+                        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                        getSupportActionBar().setDisplayShowHomeEnabled(true);
+                        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                onBackPressed();
+                            }
+                        });
+                        return;
+                    case 4:
+                        Log.d("MyLog", String.valueOf(position));
+                        toolbar.setLogo(null);
+                        toolbar.setTitle("Еще");
+                        setSupportActionBar(toolbar);
+                        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+                        getSupportActionBar().setDisplayShowHomeEnabled(true);
+                        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                onBackPressed();
+                            }
+                        });
                         return;
                     default:
                         return;
@@ -121,6 +172,28 @@ public class TabActivity extends AppCompatActivity {
 
             }
         });
+    }
+    @Override
+    public void onBackPressed() {
+        FragmentManager fm = getSupportFragmentManager();
+        OnBackPressedListener backPressedListener = null;
+        for (Fragment fragment: fm.getFragments()) {
+            if (fragment instanceof  OnBackPressedListener) {
+                backPressedListener = (OnBackPressedListener) fragment;
+                break;
+            }
+        }
+
+        if (backPressedListener != null) {
+            backPressedListener.onBackPressed();
+        } else {
+            viewPager.setCurrentItem(0);
+        }
+    }
+
+    public void player()
+    {
+        viewPager.setCurrentItem(2);
     }
 
     private void setupViewPager(ViewPager viewPager) {
@@ -145,13 +218,10 @@ public class TabActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             switch (position){
                 case 0:
-                    Log.d("MyLog", String.valueOf(position));
                     return new MainFragment();
                 case 1:
-                    Log.d("MyLog", String.valueOf(position));
                     return new CatalogFragment();
                 case 2:
-                    Log.d("MyLog", String.valueOf(position));
                     return new PlayerFragment();
                 case 3:
                     return new MyBooks();

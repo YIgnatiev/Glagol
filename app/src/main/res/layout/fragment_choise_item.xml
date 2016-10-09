@@ -1,6 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:background="#4d545e"
+        android:layout_height="wrap_content">
+        <SearchView
+            android:id="@+id/searchView"
+            android:layout_width="match_parent"
+            android:iconifiedByDefault="false"
+            android:background="@drawable/backsearch"
+            android:layout_margin="10dp"
+            android:layout_height="wrap_content">
+        </SearchView>
+
+
+    </LinearLayout>
+
+    <Spinner
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/background"
+        android:layout_margin="15dp"
+        android:id="@+id/spinner" />
+
+    <ListView
+        android:layout_width="match_parent"
+        android:id="@+id/list_choice_item"
+
+        android:layout_height="match_parent" />
+
 
 </LinearLayout>

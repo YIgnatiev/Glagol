@@ -31,6 +31,7 @@
         android:background="@android:color/transparent"
         android:layout_below="@+id/line1"
         android:layout_margin="15dp"
+        android:textColorHint="#6e6e6e"
         android:hint="@string/example_mail"
         android:gravity="center"
         />

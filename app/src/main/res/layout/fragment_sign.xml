@@ -30,6 +30,7 @@
         android:id="@+id/enter_mail"
         android:background="@android:color/transparent"
         android:layout_below="@+id/line1"
+        android:textColorHint="#6e6e6e"
         android:layout_margin="15dp"
         android:hint="@string/example_mail"
         android:gravity="center"

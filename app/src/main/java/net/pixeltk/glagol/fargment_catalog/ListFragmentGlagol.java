@@ -63,7 +63,7 @@ public class ListFragmentGlagol extends Fragment {
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                fragment = new ChoiseItemList();
+                fragment = new ChoiceItemList();
                 if (fragment != null) {
                     android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
                     fragmentManager.beginTransaction()

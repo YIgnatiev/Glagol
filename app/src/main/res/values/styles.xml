@@ -6,6 +6,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">#2F2F2F</item>
+
     </style>
 
     <style name="SearchViewStyle" parent="Widget.AppCompat.SearchView">
@@ -23,5 +24,11 @@
         <item name="android:background">#2F2F2F</item>
         <item name="android:fastScrollEnabled">true</item>
     </style>
+
+    <style name="MyTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorAccent">#4d545e</item>
+        <item name="android:colorForeground">#FFFFFF</item>
+    </style>
+
 
 </resources>

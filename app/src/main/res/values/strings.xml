@@ -27,6 +27,24 @@
     <string name="question">Задать вопрос</string>
     <string name="contact">Контакты</string>
 
+    <string name="text_payment">Данные банковской карты</string>
+    <string name="number">Номер</string>
+    <string name="period">Срок</string>
+    <string name="user_name">Имя</string>
+    <string name="cvc">CVC/CVV</string>
+
+    <string name="hint_number">1234 1234 1234 1234</string>
+    <string name="hint_period">ДД/ГГ</string>
+    <string name="hint_user_name">Ivanov Ivan</string>
+    <string name="hint_cvc">123</string>
+
+    <string name="info_cvc">CVC/CVV - последние три цифры на обратной стороне вашей карты</string>
+    <string name="text_button">Оплатить</string>
+    <string name="description">Мы сохраним данные карты на вашем смартфоне. При следующих покупках вводить данные не потребуется. \n\n
+    Платеж будет зщищен и обработан сервисом Яндекс.Касса</string>
+
+
+
     <string-array name="nav_drawer_icons">
         <item>@mipmap/theatre</item>
         <item>@mipmap/teacher_briefcase</item>
