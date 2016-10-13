@@ -191,11 +191,6 @@ public class TabActivity extends AppCompatActivity {
         }
     }
 
-    public void player()
-    {
-        viewPager.setCurrentItem(2);
-    }
-
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
         adapter.addFrag(new MainFragment(), "");

@@ -29,6 +29,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/enter_mail"
         android:background="@android:color/transparent"
+        android:textColor="#FFFFFF"
         android:layout_below="@+id/line1"
         android:layout_margin="15dp"
         android:textColorHint="#6e6e6e"

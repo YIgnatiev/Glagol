@@ -19,7 +19,7 @@ import net.pixeltk.glagol.fragment.PlayerFragment;
  * Created by Yaroslav on 09.10.2016.
  */
 
-public class CardBook extends Fragment implements OnBackPressedListener{
+public class CardBook extends Fragment implements OnBackPressedListener {
 
     public CardBook() {
         // Required empty public constructor
@@ -28,7 +28,6 @@ public class CardBook extends Fragment implements OnBackPressedListener{
     Button buy, download, listen;
     Fragment fragment = null;
     SharedPreferences sharedPreferences;
-    TabActivity tabActivity;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -42,8 +41,6 @@ public class CardBook extends Fragment implements OnBackPressedListener{
         View view = inflater.inflate(R.layout.lauoyt_card_book, container, false);
 
         sharedPreferences = getActivity().getSharedPreferences("Payment", Context.MODE_PRIVATE);
-
-        tabActivity = new TabActivity();
 
         buy = (Button) view.findViewById(R.id.buy);
         download = (Button) view.findViewById(R.id.download);
@@ -67,7 +64,6 @@ public class CardBook extends Fragment implements OnBackPressedListener{
         listen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                tabActivity.player();
             }
         });
 
@@ -96,4 +92,5 @@ public class CardBook extends Fragment implements OnBackPressedListener{
         }
 
     }
+
 }

@@ -51,19 +51,19 @@
             android:gravity="center"
             android:layout_height="wrap_content">
             <Button
-                android:layout_width="25dp"
-                android:layout_height="25dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:id="@+id/fast_left"
                 android:layout_marginLeft="15dp"
-                android:background="@mipmap/fast_arrow_left"
+                android:background="@mipmap/back"
                 />
             <Space
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"/>
             <TextView
-                android:layout_width="45dp"
-                android:layout_height="45dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:id="@+id/left_30"
                 android:layout_gravity="center"
                 android:background="@mipmap/refresh"
@@ -76,10 +76,10 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"/>
             <Button
-                android:layout_width="60dp"
-                android:layout_height="60dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
                 android:id="@+id/play_pause"
-                android:background="@mipmap/play_button"
+                android:background="@mipmap/play_button_player"
                 />
             <Space
                 android:layout_width="wrap_content"
@@ -87,11 +87,11 @@
                 android:layout_weight="1"/>
 
             <TextView
-                android:layout_width="45dp"
-                android:layout_height="45dp"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
                 android:id="@+id/right_30"
                 android:layout_gravity="center"
-                android:background="@mipmap/refresh_right"
+                android:background="@mipmap/refresh_copy"
                 android:textSize="15sp"
                 android:text="30"
                 android:textColor="#FFFFFF"
@@ -102,11 +102,11 @@
                 android:layout_weight="1"/>
 
             <Button
-                android:layout_width="25dp"
-                android:layout_height="25dp"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
                 android:layout_marginRight="15dp"
                 android:id="@+id/listen"
-                android:background="@mipmap/fast_forward_arrows"
+                android:background="@mipmap/back_copy"
                 />
         </LinearLayout>
         <LinearLayout
