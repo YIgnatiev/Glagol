@@ -96,7 +96,16 @@ public class Sigin extends Fragment {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    editor.putInt("id", id).apply();
+                    if (id != 0) {
+                        editor.putInt("id", id).apply();
+
+                    }
+                    else
+                    {
+                        Toast toast = Toast.makeText(getActivity(),
+                                "Пользователь с таким e-mail существует!", Toast.LENGTH_SHORT);
+                        toast.show();
+                    }
                     fragment = new Login();
                     if (fragment != null) {
                         android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();

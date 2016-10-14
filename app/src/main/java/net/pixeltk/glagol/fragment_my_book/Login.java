@@ -1,5 +1,7 @@
 package net.pixeltk.glagol.fragment_my_book;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v4.app.Fragment;
@@ -32,6 +34,8 @@ public class Login extends Fragment {
     getHttpGet request = new getHttpGet();
     String mail, pass;
     Fragment fragment = null;
+    SharedPreferences sharedPreferences;
+    SharedPreferences.Editor editor;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -48,6 +52,10 @@ public class Login extends Fragment {
         login = (Button) view.findViewById(R.id.login);
         enter_mail = (EditText) view.findViewById(R.id.enter_mail);
         enter_pass = (EditText) view.findViewById(R.id.enter_password);
+
+        sharedPreferences = getActivity().getSharedPreferences("Sign", Context.MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+
 
         login.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,6 +78,11 @@ public class Login extends Fragment {
                         Log.d("myLogs", "jsonObj " + jsonObj);
                         String id = jsonObj.getString("id");
                         Log.d("myLogs", "id " + id);
+
+                        if (!sharedPreferences.contains("id"))
+                        {
+                            editor.putString("id", id).apply();
+                        }
 
                         if (fragment != null) {
                             android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
