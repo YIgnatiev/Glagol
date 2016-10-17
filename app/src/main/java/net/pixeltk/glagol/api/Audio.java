@@ -10,92 +10,100 @@ import java.util.ArrayList;
  */
 public class Audio {
 
-
-
-
-    @SerializedName("question") String question;
-    @SerializedName("answers") String answers;
-
-
-  /* public String getId() {
+    @SerializedName("id") String id;
+    public String getId() {
         return id;
     }
     public void setId(String id) {
         this.id = id;
     }
 
-    public String getQuestion() {
-        return question;
+    @SerializedName("name") String name_book;
+    public String getName_book(){
+        return name_book;
     }
 
-    public void setQuestion(String question) {
-        this.question = question;
+    public void setName_book(String name) {
+        this.name_book = name;
     }
 
-
-    public String getAnswers() {
-        return answers;
+    @SerializedName("authors") String name_authors;
+    public String getName_authors(){
+        return name_authors;
     }
 
-    public void setAnswers(String answers) {
-        this.answers = answers;
-    }
-*/
-
-    //-------------------------Картинки для DeteilInfo-----------------------------------//
-
-    public class StudioData {
-
-        @SerializedName("id") String id;
-        public String getId() {
-            return id;
-        }
-        public void setId(String id) {
-            this.id = id;
-        }
-        @SerializedName("name") String name;
-        public String getName(){
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
-        }
-        @SerializedName("lastname") String lastname;
-        public String getLastname(){
-            return lastname;
-        }
-
-        public void setLastname(String lastname) {
-            this.lastname = lastname;
-        }
-        @SerializedName("image") String imageURL;
-        public String getImageURL() {
-            return imageURL;
-        }
-
-        public void setImageURL(String imageURL) {
-            this.imageURL = imageURL;
-        }
-        @SerializedName("middlename") String middlename;
-        public String getMiddlename() {
-            return middlename;
-        }
-
-        public void setMiddlename(String middlename) {
-            this.middlename = middlename;
-        }
-
+    public void setName_authors(String name_authors) {
+        this.name_authors = name_authors;
     }
 
-    @SerializedName("data") ArrayList<StudioData> audiodata;
-    public ArrayList<StudioData> getaudiodata() {
-        return audiodata;
+    @SerializedName("icon") String icon;
+    public String getIcon(){
+        return icon;
     }
 
-    public void setaudiodata(ArrayList<StudioData>audiodataa) {
-        this.audiodata = audiodata;
+    public void setIcon(String icon) {
+        this.icon = icon;
     }
+
+    @SerializedName("price") String price;
+    public String getPrice(){
+        return price;
+    }
+
+    public void setPrice(String price) {
+        this.price = price;
+    }
+    @SerializedName("readers") String readers;
+    public String getReaders(){
+        return readers;
+    }
+
+    public void setReaders(String readers) {
+        this.readers = readers;
+    }
+    @SerializedName("categorys") String categorys;
+    public String getCategorys(){
+        return categorys;
+    }
+
+    public void setCategorys(String categorys) {
+        this.categorys = categorys;
+    }
+    @SerializedName("publisher") String publisher;
+    public String getPublisher(){
+        return publisher;
+    }
+
+    public void setPublisher(String publisher) {
+        this.publisher = publisher;
+    }
+
+    @SerializedName("duration") String duration;
+    public String getDuration(){
+        return duration;
+    }
+
+    public void setDuration(String duration) {
+        this.duration = duration;
+    }
+
+    @SerializedName("size") String size;
+    public String getSize(){
+        return size;
+    }
+
+    public void setSize(String size) {
+        this.size = size;
+    }
+    @SerializedName("description") String description;
+    public String getDescription(){
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
 
 
 }

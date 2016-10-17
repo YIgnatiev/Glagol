@@ -12,6 +12,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 
 import net.pixeltk.glagol.R;
+import net.pixeltk.glagol.api.Audio;
 
 import java.util.ArrayList;
 
@@ -19,9 +20,9 @@ import java.util.ArrayList;
 public class ChoiceListAdapter extends BaseAdapter {
 
 	private Context context;
-	private ArrayList<ChoiceItemFromCatalog> choiceItemFromCatalogs;
+	private ArrayList<Audio> choiceItemFromCatalogs;
 
-	public ChoiceListAdapter(Context context, ArrayList<ChoiceItemFromCatalog> choiceItemFromCatalogs){
+	public ChoiceListAdapter(Context context, ArrayList<Audio> choiceItemFromCatalogs){
 		this.context = context;
 		this.choiceItemFromCatalogs = choiceItemFromCatalogs;
 	}
@@ -57,10 +58,10 @@ public class ChoiceListAdapter extends BaseAdapter {
 		TextView price = (TextView) convertView.findViewById(R.id.price);
 
 		Glide.with(context).load(choiceItemFromCatalogs.get(position).getIcon()).into(imgIcon);
-      	name_author.setText(choiceItemFromCatalogs.get(position).getAuthor());
-		name_book.setText(choiceItemFromCatalogs.get(position).getBook_name());
-		reader.setText("Чтец: " + choiceItemFromCatalogs.get(position).getName_reader());
-		price.setText(choiceItemFromCatalogs.get(position).getPrice() + " p.");
+      	name_author.setText(choiceItemFromCatalogs.get(position). getName_authors());
+		name_book.setText(choiceItemFromCatalogs.get(position).getName_book());
+		reader.setText("Чтец: " + choiceItemFromCatalogs.get(position).getReaders());
+		price.setText(" " + choiceItemFromCatalogs.get(position).getPrice() + " p. ");
 
 
 

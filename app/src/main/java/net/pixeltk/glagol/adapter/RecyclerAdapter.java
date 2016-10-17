@@ -14,13 +14,14 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 
 import net.pixeltk.glagol.R;
+import net.pixeltk.glagol.api.Audio;
 
 import java.util.ArrayList;
 
 
 public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> {
 
-    private ArrayList<ItemData> itemsData;
+    private ArrayList<Audio> itemsData;
     private Context context;
 
 
@@ -40,7 +41,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     }
 
     // Конструктор
-    public RecyclerAdapter(Context context, ArrayList<ItemData> itemDatas)  {
+    public RecyclerAdapter(Context context, ArrayList<Audio> itemDatas)  {
         this.context = context;
         this.itemsData = itemDatas;
     }
@@ -63,9 +64,9 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
 
-        holder.book_name.setText(itemsData.get(position).getBook_name());
-        holder.author.setText(itemsData.get(position).getAuthor_name());
-        Glide.with(context).load(itemsData.get(position).getImageUrl()).into(holder.cover);
+        holder.book_name.setText(itemsData.get(position).getName_book());
+        holder.author.setText(itemsData.get(position).getName_authors());
+        Glide.with(context).load(itemsData.get(position).getIcon()).into(holder.cover);
 
 
     }

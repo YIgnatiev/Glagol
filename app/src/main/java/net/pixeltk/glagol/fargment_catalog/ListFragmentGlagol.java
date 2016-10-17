@@ -1,8 +1,11 @@
 package net.pixeltk.glagol.fargment_catalog;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +33,8 @@ public class ListFragmentGlagol extends Fragment {
     private ArrayList<NavDrawerItem> navDrawerItems;
     private NavDrawerListAdapter adapter;
     Fragment fragment = null;
+    SharedPreferences sharedPreferences;
+    SharedPreferences.Editor editor;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -41,6 +46,9 @@ public class ListFragmentGlagol extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_list, container, false);
+
+        sharedPreferences = getActivity().getSharedPreferences("Category", Context.MODE_PRIVATE);
+        editor = sharedPreferences.edit();
 
         navMenuTitles = getResources().getStringArray(R.array.nav_drawer_items);
 
@@ -63,6 +71,8 @@ public class ListFragmentGlagol extends Fragment {
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                editor.putString("CategoryName", navMenuTitles[i]).apply();
                 fragment = new ChoiceItemList();
                 if (fragment != null) {
                     android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
