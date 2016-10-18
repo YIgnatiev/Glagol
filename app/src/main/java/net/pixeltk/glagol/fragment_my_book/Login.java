@@ -71,13 +71,9 @@ public class Login extends Fragment {
                     }
                     try {
                         JSONArray data = new JSONArray(request.getHttpGet("http://glagolapp.ru/api/login?salt=df90sdfgl9854gjs54os59gjsogsdf&email=" + mail + "&password=" + pass));
-
                         String arr = data.getJSONObject(0).getString("data");
-                        Log.d("myLogs", "arr " + arr);
                         JSONObject jsonObj = new JSONObject(arr);
-                        Log.d("myLogs", "jsonObj " + jsonObj);
                         String id = jsonObj.getString("id");
-                        Log.d("myLogs", "id " + id);
 
                         if (!sharedPreferences.contains("id"))
                         {

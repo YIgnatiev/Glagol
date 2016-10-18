@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -43,12 +44,13 @@ public class CardBook extends Fragment implements OnBackPressedListener {
 
     Button buy, download, listen;
     Fragment fragment = null;
-    SharedPreferences sharedPreferences, idbook;
-    SharedPreferences.Editor editor;
+    SharedPreferences sharedPreferences, idbook, subscription;
+    SharedPreferences.Editor editor, editorsubscription;
     ImageView cover;
     TextView name_author, name_book, text_reader, text_publisher, text_time, text_teg, description;
     private ArrayList<Audio> audios = new ArrayList<>();
     getHttpGet request = new getHttpGet();
+    LinearLayout content_line1, content_line2, content_line3;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -63,6 +65,8 @@ public class CardBook extends Fragment implements OnBackPressedListener {
 
         sharedPreferences = getActivity().getSharedPreferences("Payment", Context.MODE_PRIVATE);
         idbook = getActivity().getSharedPreferences("Category", Context.MODE_PRIVATE);
+        subscription = getActivity().getSharedPreferences("Subscription", Context.MODE_PRIVATE);
+        editorsubscription = subscription.edit();
         editor = idbook.edit();
 
         buy = (Button) view.findViewById(R.id.buy);
@@ -77,6 +81,10 @@ public class CardBook extends Fragment implements OnBackPressedListener {
         text_teg = (TextView) view.findViewById(R.id.text_teg);
         description = (TextView) view.findViewById(R.id.description);
 
+        content_line1 = (LinearLayout) view.findViewById(R.id.content_line1);
+        content_line2 = (LinearLayout) view.findViewById(R.id.content_line2);
+        content_line3 = (LinearLayout) view.findViewById(R.id.content_line10);
+
         cover = (ImageView) view.findViewById(R.id.cover);
 
         if (android.os.Build.VERSION.SDK_INT > 9) {
@@ -86,16 +94,22 @@ public class CardBook extends Fragment implements OnBackPressedListener {
         try {
             Log.d("myLogs","in ");
             JSONArray data = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/getbook?salt=df90sdfgl9854gjs54os59gjsogsdf&book_id=" + idbook.getString("idbook", "")));
-            editor.remove("idbook").apply();
+
             Gson gson = new Gson();
             audios = gson.fromJson(data.toString(),  new TypeToken<List<Audio>>(){}.getType());
 
             if (audios!= null) {
-                name_author.setText(audios.get(0).getName_authors());
+                name_author.setText("Автор: " + audios.get(0).getName_authors());
                 name_book.setText(audios.get(0).getName_book());
                 text_reader.setText("Чтец: " + audios.get(0).getReaders());
                 text_publisher.setText("Издатель: " + audios.get(0).getPublisher());
-                text_time.setText(getTime(Long.valueOf(audios.get(0).getDuration())) + " " + Double.parseDouble(audios.get(0).getSize())/1000 + " мб.");
+                if (audios.get(0).getDuration() != null && audios.get(0).getSize() != null) {
+                    text_time.setText(getTime(Long.valueOf(audios.get(0).getDuration())) + " " + Double.parseDouble(audios.get(0).getSize()) / 1000 + " мб.");
+                }
+                else
+                {
+                    text_time.setText(0 + " ч. " + 0 + " мин. " + 0+ " сек. " + " " + 0 + " мб.");
+                }
                 text_teg.setText("Теги: " + audios.get(0).getCategorys());
                 description.setText(audios.get(0).getDescription());
                 Glide.with(getActivity()).load(audios.get(0).getIcon()).into(cover);
@@ -137,6 +151,48 @@ public class CardBook extends Fragment implements OnBackPressedListener {
                 }
             }
         });
+
+        content_line1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                editorsubscription.putString("Reader", audios.get(0).getReaders()).apply();
+                fragment = new FragmentSubscription();
+                if (fragment != null) {
+                    android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.catalog_frame, fragment).commit();
+
+                }
+            }
+        });
+
+        content_line2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                editorsubscription.putString("Publisher", audios.get(0).getPublisher()).apply();
+                fragment = new FragmentSubscription();
+                if (fragment != null) {
+                    android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.catalog_frame, fragment).commit();
+
+                }
+            }
+        });
+
+        content_line3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                editorsubscription.putString("Author", audios.get(0).getName_authors()).apply();
+                fragment = new FragmentSubscription();
+                if (fragment != null) {
+                    android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.catalog_frame, fragment).commit();
+
+                }
+            }
+        });
         return  view;
 
 
@@ -150,6 +206,7 @@ public class CardBook extends Fragment implements OnBackPressedListener {
     @Override
     public void onBackPressed() {
         fragment = new ChoiceItemList();
+        editor.remove("idbook").apply();
         if (fragment != null) {
             android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
             fragmentManager.beginTransaction()
