@@ -235,11 +235,17 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
             @Override
             public void onClick(View view) {
                 SharedPreferences sharedPreferences = getActivity().getSharedPreferences("Sign", Context.MODE_PRIVATE);
-                request.getHttpGet("http://www.glagolapp.ru/api/subscribe?salt=df90sdfgl9854gjs54os59gjsogsdf&collection_id=" + id + "&model=" + collection + "&user_id=" + sharedPreferences.getString("id", ""));
-                editor.putString(subscribe_collection, subscribe_collection).apply();
-                subscription.setVisibility(View.INVISIBLE);
-                news_line.setVisibility(View.VISIBLE);
-
+                String user_id = sharedPreferences.getString("id", "");
+                if (!user_id.equals("")) {
+                    request.getHttpGet("http://www.glagolapp.ru/api/subscribe?salt=df90sdfgl9854gjs54os59gjsogsdf&collection_id=" + id + "&model=" + collection + "&user_id=" + user_id);
+                    editor.putString(subscribe_collection, subscribe_collection).apply();
+                    subscription.setVisibility(View.INVISIBLE);
+                    news_line.setVisibility(View.VISIBLE);
+                }
+                else
+                {
+                    Toast.makeText(getActivity(), "Вы не вошли или не зарегистрировались!", Toast.LENGTH_LONG).show();
+                }
 
 
             }
