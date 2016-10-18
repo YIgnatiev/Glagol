@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -253,6 +254,20 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
                 news_line.setVisibility(View.INVISIBLE);
                 subscription.setVisibility(View.VISIBLE);
 
+            }
+        });
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                editor.putString("idbook", choiceItemFromCatalogs.get(i).getId()).apply();
+                Log.d("MyLog", " " + choiceItemFromCatalogs.get(i).getId());
+                fragment = new CardBook();
+                if (fragment != null) {
+                    android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.catalog_frame, fragment).commit();
+                }
             }
         });
 
