@@ -37,15 +37,9 @@ public class TabActivity extends AppCompatActivity {
         tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.layout_tab_icon_mybook));
         tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.layout_tab_icon_other));
 
-        replaceFragment(new MainContentFragment());
+        replaceFragment(new CatalogFragment());
 
-        tabLayout.getChildAt(0).setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View v) {
-                Log.d("MyLog", "0");
-            }
-        });
+        tabLayout.getTabAt(3).select();
 
         tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
