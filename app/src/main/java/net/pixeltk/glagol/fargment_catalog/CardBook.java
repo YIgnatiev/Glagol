@@ -87,6 +87,9 @@ public class CardBook extends Fragment implements OnBackPressedListener {
 
         cover = (ImageView) view.findViewById(R.id.cover);
 
+        TabActivity tabActivity = new TabActivity();
+        tabActivity.setTitleToolbar("О книге");
+
         if (android.os.Build.VERSION.SDK_INT > 9) {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
@@ -213,6 +216,7 @@ public class CardBook extends Fragment implements OnBackPressedListener {
                     .replace(R.id.catalog_frame, fragment).commit();
 
         }
+
 
     }
 

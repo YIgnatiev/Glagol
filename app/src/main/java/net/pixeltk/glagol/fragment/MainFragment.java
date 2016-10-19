@@ -1,12 +1,18 @@
 package net.pixeltk.glagol.fragment;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
+
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+
+import android.util.Log;
 import android.view.MotionEvent;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.SearchView;
 
@@ -15,10 +21,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.ogaclejapan.smarttablayout.SmartTabLayout;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 
 import net.pixeltk.glagol.R;
 import net.pixeltk.glagol.activity.TabActivity;
+import net.pixeltk.glagol.adapter.RecyclerAdapter;
+import net.pixeltk.glagol.adapter.RecyclerClickListener;
+import net.pixeltk.glagol.api.Audio;
+import net.pixeltk.glagol.api.getHttpGet;
+import net.pixeltk.glagol.fargment_catalog.CardBook;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,8 +50,15 @@ public class MainFragment extends Fragment{
     }
 
     SearchView searchView;
-    ViewPager viewPager;
-    private SmartTabLayout viewPagerTab;
+    Button my_news, my_variant;
+    private RecyclerView variant, news, top_sale, sale, choice_editor, soon_be;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager, mnews, mtop_sale, msale, mchoice_editor, msoon_be;
+    private ArrayList<Audio> itemData = new ArrayList<>();
+    private ArrayList<Audio> audios = new ArrayList<>();
+    getHttpGet request = new getHttpGet();
+    Fragment fragment = null;
+    LinearLayout variant_frag, news_frag;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -52,6 +75,35 @@ public class MainFragment extends Fragment{
         searchView.setQueryHint("Поиск");
         searchView.setHovered(false);
 
+        variant_frag = (LinearLayout) view.findViewById(R.id.variant_frag);
+        news_frag = (LinearLayout) view.findViewById(R.id.news_frag);
+
+        my_news = (Button) view.findViewById(R.id.my_news);
+        my_variant = (Button) view.findViewById(R.id.my_variant);
+
+        my_news.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                my_news.setTextColor(Color.parseColor("#000000"));
+                my_variant.setTextColor(Color.parseColor("#F1F1F1"));
+                my_news.setBackgroundResource(R.drawable.background);
+                my_variant.setBackgroundResource(R.drawable.backsearch);
+                news_frag.setVisibility(View.GONE);
+                variant_frag.setVisibility(View.VISIBLE);
+            }
+        });
+        my_variant.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                my_news.setTextColor(Color.parseColor("#F1F1F1"));
+                my_variant.setTextColor(Color.parseColor("#000000"));
+                my_news.setBackgroundResource(R.drawable.backsearch);
+                my_variant.setBackgroundResource(R.drawable.background);
+                variant_frag.setVisibility(View.GONE);
+                news_frag.setVisibility(View.VISIBLE);
+            }
+        });
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
             @Override
@@ -67,83 +119,96 @@ public class MainFragment extends Fragment{
             }
         });
 
+        variant = (RecyclerView) view.findViewById(R.id.recycler_view_variant);
+        news = (RecyclerView) view.findViewById(R.id.recycler_view_news);
+        top_sale = (RecyclerView) view.findViewById(R.id.recycler_view_top_sale);
+        sale = (RecyclerView) view.findViewById(R.id.recycler_view_sale);
+        choice_editor = (RecyclerView) view.findViewById(R.id.recycler_view_choice_editor);
+        soon_be = (RecyclerView) view.findViewById(R.id.recycler_view_soon_be);
 
-        viewPager = (ViewPager) view.findViewById(R.id.viewpager);
-        viewPager.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                return true;
-            }
-        });
-        setupViewPager(viewPager);
 
-        viewPagerTab = (SmartTabLayout) view.findViewById(R.id.viewpagertab);
+        // если мы уверены, что изменения в контенте не изменят размер layout-а RecyclerView
+        // передаем параметр true - это увеличивает производительность
+        variant.setHasFixedSize(true);
+        news.setHasFixedSize(true);
+        top_sale.setHasFixedSize(true);
+        sale.setHasFixedSize(true);
+        choice_editor.setHasFixedSize(true);
+        soon_be.setHasFixedSize(true);
 
-        inflater = LayoutInflater.from(viewPagerTab.getContext());
-        final LayoutInflater finalInflater = inflater;
-        viewPagerTab.setCustomTabView(new SmartTabLayout.TabProvider() {
-            @Override
-            public View createTabView(ViewGroup viewGroup, int i, PagerAdapter pagerAdapter) {
-                LinearLayout view = null;
-                switch (i) {
-                    case 0: // Страница главная
-                        view = (LinearLayout) finalInflater.inflate(R.layout.layout_tab_text_variant, viewGroup, false);
-                        break;
-                    case 1: // Страница каталога
-                        view = (LinearLayout) finalInflater.inflate(R.layout.layout_tab_text_news, viewGroup, false);
-                        break;
+        // используем linear layout manager
+        mLayoutManager = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
+        mnews = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
+        mtop_sale = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
+        msale = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
+        mchoice_editor = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
+        msoon_be = new LinearLayoutManager(getActivity(), LinearLayoutManager.HORIZONTAL, false);
+
+        variant.setLayoutManager(mLayoutManager);
+        news.setLayoutManager(mnews);
+        top_sale.setLayoutManager(mtop_sale);
+        sale.setLayoutManager(msale);
+        choice_editor.setLayoutManager(mchoice_editor);
+        soon_be.setLayoutManager(msoon_be);
+        itemData.clear();
+        // создаем адаптер
+        if (android.os.Build.VERSION.SDK_INT > 9) {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+        }
+        try {
+            Log.d("myLogs","in ");
+            JSONArray data = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/newbooks?salt=df90sdfgl9854gjs54os59gjsogsdf"));
+            Gson gson = new Gson();
+            audios = gson.fromJson(data.toString(),  new TypeToken<List<Audio>>(){}.getType());
+
+            if (audios!= null) {
+
+                for (int i=0; i<audios.size(); i++)
+                {
+                    Audio audio = audios.get(i);
+                    itemData.add(audio);
                 }
-                return view;
+
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        mAdapter = new RecyclerAdapter(getActivity(), itemData);
+
+        variant.setAdapter(mAdapter);
+        news.setAdapter(mAdapter);
+        top_sale.setAdapter(mAdapter);
+        sale.setAdapter(mAdapter);
+        choice_editor.setAdapter(mAdapter);
+        soon_be.setAdapter(mAdapter);
+
+        variant.addOnItemTouchListener(new RecyclerClickListener(getActivity()) {
+            @Override
+            public void onItemClick(RecyclerView recyclerView, View itemView, int position) {
+               SharedPreferences sharedPreferences = getActivity().getSharedPreferences("Category", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.putString("idbook", itemData.get(position).getId());
+                editor.apply();
+                fragment = new CardBook();
+                if (fragment != null) {
+                    android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.catalog_frame, fragment).commit();
+                }
+            }
+
+            @Override
+            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+
             }
         });
 
-
-        viewPagerTab.setViewPager(viewPager);
         return view;
     }
 
 
-    private void setupViewPager(ViewPager viewPager) {
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getChildFragmentManager());
-        adapter.addFrag(new VariantFragment(), "");
-        adapter.addFrag(new NewsFragment(), "");
-        viewPager.setAdapter(adapter);
-    }
-
-    class ViewPagerAdapter extends FragmentPagerAdapter {
-        private final List<Fragment> mFragmentList = new ArrayList<>();
-        private final List<String> mFragmentTitleList = new ArrayList<>();
-
-        public ViewPagerAdapter(FragmentManager manager) {
-            super(manager);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            switch (position){
-                case 0:
-                    return new VariantFragment();
-                case 1:
-                    return new NewsFragment();
-                default:
-                    return null;
-            }
-        }
-
-        @Override
-        public int getCount() {
-            return mFragmentList.size();
-        }
-
-        public void addFrag(Fragment fragment, String title) {
-            mFragmentList.add(fragment);
-            mFragmentTitleList.add(title);
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return mFragmentTitleList.get(position);
-        }
-    }
 
 }

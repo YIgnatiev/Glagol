@@ -43,17 +43,5 @@ public class MainContentFragment extends Fragment {
         return view;
     }
 
-    public void clickFrag(String str)
-    {
-        /*SharedPreferences sharedPreferences = getActivity().getSharedPreferences("Category", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("idbook", str).apply();*/
-        fragment = new CardBook();
-        if (fragment != null) {
-            android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
-            fragmentManager.beginTransaction()
-                    .replace(R.id.content_main_frame, fragment).commit();
-        }
-    }
 
 }

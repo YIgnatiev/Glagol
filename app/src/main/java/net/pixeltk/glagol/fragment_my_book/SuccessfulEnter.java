@@ -10,15 +10,11 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.LinearLayout;
 
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
 
 import net.pixeltk.glagol.R;
-import net.pixeltk.glagol.fragment.MainFragment;
-import net.pixeltk.glagol.fragment.NewsFragment;
-import net.pixeltk.glagol.fragment.VariantFragment;
 
 import java.util.ArrayList;
 import java.util.List;

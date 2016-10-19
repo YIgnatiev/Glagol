@@ -1,44 +1,26 @@
 package net.pixeltk.glagol.activity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.Switch;
-import android.widget.TableRow;
-
-import com.ogaclejapan.smarttablayout.SmartTabLayout;
 
 import net.pixeltk.glagol.R;
 import net.pixeltk.glagol.fargment_catalog.OnBackPressedListener;
 import net.pixeltk.glagol.fragment.CatalogFragment;
 import net.pixeltk.glagol.fragment.MainContentFragment;
-import net.pixeltk.glagol.fragment.MainFragment;
 import net.pixeltk.glagol.fragment.MyBooks;
 import net.pixeltk.glagol.fragment.OtherInfoFragment;
 import net.pixeltk.glagol.fragment.PlayerFragment;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class TabActivity extends AppCompatActivity {
 
-    Toolbar toolbar;
-    ViewPager viewPager;
-    private SmartTabLayout viewPagerTab;
+    static Toolbar toolbar;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,66 +29,37 @@ public class TabActivity extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setLogo(R.drawable.glagollogogrn);
         setSupportActionBar(toolbar);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
 
+        tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.layout_tab_icon_main));
+        tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.layout_tab_icon_catalog));
+        tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.layout_tab_icon_player));
+        tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.layout_tab_icon_mybook));
+        tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.layout_tab_icon_other));
 
-        viewPager = (ViewPager) findViewById(R.id.viewpager);
-        viewPager.setOnTouchListener(new View.OnTouchListener() {
+        replaceFragment(new MainContentFragment());
+
+        tabLayout.getChildAt(0).setOnClickListener(new View.OnClickListener() {
+
             @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                return true;
-            }
-        });
-        setupViewPager(viewPager);
-       viewPagerTab = (SmartTabLayout) findViewById(R.id.viewpagertab);
-
-        final LayoutInflater inflater = LayoutInflater.from(viewPagerTab.getContext());
-        viewPagerTab.setCustomTabView(new SmartTabLayout.TabProvider() {
-            @Override
-            public View createTabView(ViewGroup viewGroup, int i, PagerAdapter pagerAdapter) {
-                LinearLayout view = null;
-                switch (i) {
-                    case 0: // Страница главная
-                        view = (LinearLayout) inflater.inflate(R.layout.layout_tab_icon_main, viewGroup, false);
-                        break;
-                    case 1: // Страница каталога
-                        view = (LinearLayout) inflater.inflate(R.layout.layout_tab_icon_catalog, viewGroup, false);
-                        break;
-                    case 2: // Страница плеера
-                        view = (LinearLayout) inflater.inflate(R.layout.layout_tab_icon_player, viewGroup, false);
-                        break;
-                    case 3: // Страница моих книг
-                        view = (LinearLayout) inflater.inflate(R.layout.layout_tab_icon_mybook, viewGroup, false);
-                        break;
-                    case 4: // Страница доп инф
-                        view = (LinearLayout) inflater.inflate(R.layout.layout_tab_icon_other, viewGroup, false);
-                        break;
-                }
-                return view;
+            public void onClick(View v) {
+                Log.d("MyLog", "0");
             }
         });
 
-        viewPagerTab.setViewPager(viewPager);
-
-        viewPagerTab.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-
-                Log.d("MyLog", String.valueOf(position));
-                switch (position) {
+            public void onTabSelected(TabLayout.Tab tab) {
+                switch (tab.getPosition())
+                {
                     case 0:
-                        Log.d("MyLog", String.valueOf(position));
                         toolbar.setLogo(R.drawable.glagollogogrn);
                         toolbar.setTitle("");
                         setSupportActionBar(toolbar);
                         getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+                        replaceFragment(new MainContentFragment());
                         return;
                     case 1:
-                        Log.d("MyLog", String.valueOf(position));
                         toolbar.setLogo(null);
                         toolbar.setTitle("Каталог");
                         setSupportActionBar(toolbar);
@@ -118,11 +71,9 @@ public class TabActivity extends AppCompatActivity {
                                 onBackPressed();
                             }
                         });
-
-
+                        replaceFragment(new CatalogFragment());
                         return;
                     case 2:
-                        Log.d("MyLog", String.valueOf(position));
                         toolbar.setLogo(null);
                         toolbar.setTitle("Плеер");
                         setSupportActionBar(toolbar);
@@ -134,6 +85,7 @@ public class TabActivity extends AppCompatActivity {
                                 onBackPressed();
                             }
                         });
+                        replaceFragment(new PlayerFragment());
                         return;
                     case 3:
                         toolbar.setLogo(null);
@@ -147,9 +99,9 @@ public class TabActivity extends AppCompatActivity {
                                 onBackPressed();
                             }
                         });
+                        replaceFragment(new MyBooks());
                         return;
                     case 4:
-                        Log.d("MyLog", String.valueOf(position));
                         toolbar.setLogo(null);
                         toolbar.setTitle("Еще");
                         setSupportActionBar(toolbar);
@@ -161,15 +113,18 @@ public class TabActivity extends AppCompatActivity {
                                 onBackPressed();
                             }
                         });
-                        return;
-                    default:
+                        replaceFragment(new OtherInfoFragment());
                         return;
                 }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
 
             }
 
             @Override
-            public void onPageScrollStateChanged(int state) {
+            public void onTabReselected(TabLayout.Tab tab) {
 
             }
         });
@@ -188,60 +143,20 @@ public class TabActivity extends AppCompatActivity {
         if (backPressedListener != null) {
             backPressedListener.onBackPressed();
         } else {
-            viewPager.setCurrentItem(0);
         }
     }
+    private void replaceFragment(Fragment fragment) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.main_frame, fragment);
 
-    private void setupViewPager(ViewPager viewPager) {
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFrag(new MainContentFragment(), "");
-        adapter.addFrag(new CatalogFragment(), "");
-        adapter.addFrag(new PlayerFragment(), "");
-        adapter.addFrag(new MyBooks(), "");
-        adapter.addFrag(new OtherInfoFragment(), "");
-        viewPager.setAdapter(adapter);
+        transaction.commit();
     }
 
-    class ViewPagerAdapter extends FragmentPagerAdapter {
-        private final List<Fragment> mFragmentList = new ArrayList<>();
-        private final List<String> mFragmentTitleList = new ArrayList<>();
-
-        public ViewPagerAdapter(FragmentManager manager) {
-            super(manager);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            switch (position){
-                case 0:
-                    return new MainFragment();
-                case 1:
-                    return new CatalogFragment();
-                case 2:
-                    return new PlayerFragment();
-                case 3:
-                    return new MyBooks();
-                case 4:
-                    return new OtherInfoFragment();
-                default:
-                    return null;
-            }
-        }
-
-        @Override
-        public int getCount() {
-            return mFragmentList.size();
-        }
-
-        public void addFrag(Fragment fragment, String title) {
-            mFragmentList.add(fragment);
-            mFragmentTitleList.add(title);
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return mFragmentTitleList.get(position);
-        }
+    public static void setTitleToolbar(String title)
+    {
+        toolbar.setLogo(null);
+        toolbar.setTitle(title);
     }
 
 }
