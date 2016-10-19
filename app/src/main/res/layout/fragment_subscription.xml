@@ -18,41 +18,19 @@
             android:textSize="18sp"
             android:text="Сообщить о новинках"/>
 
-        <LinearLayout
+
+        <Button
             android:layout_width="match_parent"
-            android:orientation="horizontal"
-            android:id="@+id/news_line"
+            android:background="@drawable/backsearch"
+            android:text="Отписаться"
+            android:textSize="18sp"
             android:visibility="invisible"
             android:layout_margin="20dp"
-            android:layout_height="wrap_content">
+            android:id="@+id/cancel_subscription"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:layout_height="wrap_content" />
 
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/my_news"
-                android:textSize="18sp"
-                android:background="@drawable/backsearch"
-                android:textAllCaps="false"
-                android:textColor="#FFFFFF"
-                android:layout_weight="1"
-                android:text="Мои новости"/>
-
-            <Space
-                android:layout_width="30dp"
-                android:layout_height="match_parent" />
-
-            <Button
-                android:layout_width="match_parent"
-                android:layout_weight="1"
-                android:background="@drawable/backsearch"
-                android:text="Отписаться"
-                android:textSize="18sp"
-                android:id="@+id/cancel_subscription"
-                android:textAllCaps="false"
-                android:textColor="#FFFFFF"
-                android:layout_height="wrap_content" />
-
-        </LinearLayout>
 
     </RelativeLayout>
 

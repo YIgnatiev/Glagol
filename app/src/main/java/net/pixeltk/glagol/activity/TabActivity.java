@@ -25,6 +25,7 @@ import com.ogaclejapan.smarttablayout.SmartTabLayout;
 import net.pixeltk.glagol.R;
 import net.pixeltk.glagol.fargment_catalog.OnBackPressedListener;
 import net.pixeltk.glagol.fragment.CatalogFragment;
+import net.pixeltk.glagol.fragment.MainContentFragment;
 import net.pixeltk.glagol.fragment.MainFragment;
 import net.pixeltk.glagol.fragment.MyBooks;
 import net.pixeltk.glagol.fragment.OtherInfoFragment;
@@ -193,7 +194,7 @@ public class TabActivity extends AppCompatActivity {
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
-        adapter.addFrag(new MainFragment(), "");
+        adapter.addFrag(new MainContentFragment(), "");
         adapter.addFrag(new CatalogFragment(), "");
         adapter.addFrag(new PlayerFragment(), "");
         adapter.addFrag(new MyBooks(), "");

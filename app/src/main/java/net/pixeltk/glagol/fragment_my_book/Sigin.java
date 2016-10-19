@@ -90,22 +90,26 @@ public class Sigin extends Fragment {
                         }
 
                         JSONArray data = new JSONArray(request.getHttpGet("http://glagolapp.ru/api/registration?salt=df90sdfgl9854gjs54os59gjsogsdf&email=" + mail));
-                        int id=Integer.parseInt(data.toString().replaceAll("[\\D]", ""));
-                        Log.d("myLogs","id " + id);
+                        String status = data.getJSONObject(0).getString("error");
+                        Log.d("myLogs","status " + data);
+                        if (status.equals("true"))
+                        {
+                            Toast toast = Toast.makeText(getActivity(),
+                                    "Пользователь с таким e-mail существует!", Toast.LENGTH_SHORT);
+                            toast.show();
+                        }
+                        else
+                        {
+                            int id=Integer.parseInt(data.toString().replaceAll("[\\D]", ""));
+                            Log.d("myLogs","id " + id);
+                        }
+
+
 
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-                    if (id != 0) {
-                        editor.putInt("id", id).apply();
 
-                    }
-                    else
-                    {
-                        Toast toast = Toast.makeText(getActivity(),
-                                "Пользователь с таким e-mail существует!", Toast.LENGTH_SHORT);
-                        toast.show();
-                    }
                     fragment = new Login();
                     if (fragment != null) {
                         android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();

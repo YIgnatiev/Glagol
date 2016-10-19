@@ -1,5 +1,7 @@
 package net.pixeltk.glagol.fragment;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v4.app.Fragment;
@@ -15,8 +17,10 @@ import com.google.gson.reflect.TypeToken;
 
 import net.pixeltk.glagol.R;
 import net.pixeltk.glagol.adapter.RecyclerAdapter;
+import net.pixeltk.glagol.adapter.RecyclerClickListener;
 import net.pixeltk.glagol.api.Audio;
 import net.pixeltk.glagol.api.getHttpGet;
+import net.pixeltk.glagol.fargment_catalog.CardBook;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -39,6 +43,8 @@ public class VariantFragment  extends Fragment {
     private ArrayList<Audio> itemData = new ArrayList<>();
     private ArrayList<Audio> audios = new ArrayList<>();
     getHttpGet request = new getHttpGet();
+    Fragment fragment = null;
+    MainContentFragment mainContentFragment;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -58,6 +64,8 @@ public class VariantFragment  extends Fragment {
         sale = (RecyclerView) view.findViewById(R.id.recycler_view_sale);
         choice_editor = (RecyclerView) view.findViewById(R.id.recycler_view_choice_editor);
         soon_be = (RecyclerView) view.findViewById(R.id.recycler_view_soon_be);
+
+        mainContentFragment = new MainContentFragment();
 
         // если мы уверены, что изменения в контенте не изменят размер layout-а RecyclerView
         // передаем параметр true - это увеличивает производительность
@@ -116,6 +124,19 @@ public class VariantFragment  extends Fragment {
         sale.setAdapter(mAdapter);
         choice_editor.setAdapter(mAdapter);
         soon_be.setAdapter(mAdapter);
+
+        variant.addOnItemTouchListener(new RecyclerClickListener(getActivity()) {
+            @Override
+            public void onItemClick(RecyclerView recyclerView, View itemView, int position) {
+                mainContentFragment.clickFrag(itemData.get(position).getId());
+            }
+
+            @Override
+            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+
+            }
+        });
+
 
         return view;
     }

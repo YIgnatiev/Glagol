@@ -3,51 +3,50 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="horizontal"
     android:layout_width="wrap_content"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content">
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
     <ImageView
-        android:layout_width="150dp"
-        android:layout_height="150dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:layout_margin="10dp"
         app:srcCompat="@drawable/notcover"
         android:id="@+id/cover" />
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:id="@+id/content"
         android:layout_toRightOf="@+id/cover"
-        android:orientation="vertical"
         android:layout_marginLeft="20dp"
+        android:gravity="center_vertical"
         android:layout_marginRight="20dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/cover"
-        android:layout_alignParentTop="true">
+        android:layout_alignTop="@+id/cover">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/name_author"
-            android:textColor="#646b6b"
-            android:layout_weight="1"
+            android:textSize="12sp"
+            android:textColor="#9CA3AD"
             android:text="Larry King"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/book_name"
-            android:textSize="19sp"
-            android:textColor="#FFFFFF"
-            android:layout_weight="1"
+            android:textSize="16sp"
+            android:layout_marginTop="5dp"
+            android:layout_below="@+id/name_author"
+            android:textColor="#F1F1F1"
             android:text="как разговаривать"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="15sp"
-            android:layout_weight="1"
-            android:textColor="#646b6b"
+            android:textSize="12sp"
+            android:layout_marginTop="5dp"
+            android:layout_below="@+id/book_name"
+            android:textColor="#9CA3AD"
             android:id="@+id/name_reader"
             android:text="Чтец: Иванов Иван"/>
         <TextView
@@ -55,10 +54,12 @@
             android:layout_height="wrap_content"
             android:id="@+id/price"
             android:gravity="center"
-            android:textColor="#FFFFFF"
-            android:layout_weight="1"
+            android:layout_marginTop="5dp"
+            android:textSize="12sp"
+            android:layout_below="@+id/name_reader"
+            android:textColor="#F1F1F1"
             android:background="@drawable/backsearch"
             android:text=" 149 р. " />
-    </LinearLayout>
+    </RelativeLayout>
         </RelativeLayout>
 </RelativeLayout>

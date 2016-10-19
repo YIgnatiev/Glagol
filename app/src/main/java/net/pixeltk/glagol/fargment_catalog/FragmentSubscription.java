@@ -42,9 +42,8 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
     Fragment fragment = null;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
-    String id, collection, subscribe_collection;
-    Button subscription, cancel_subscription, my_news;
-    LinearLayout news_line;
+    String id, collection, subscribe_collection, author, publisher, reader;
+    Button subscription, cancel_subscription;
     getHttpGet request = new getHttpGet();
     ListView listView;
     private ArrayList<Audio> listcheck = new ArrayList<>();
@@ -69,16 +68,15 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
         listView = (ListView) view.findViewById(R.id.list_choice_item);
 
         subscription = (Button) view.findViewById(R.id.subscription);
-        my_news = (Button) view.findViewById(R.id.my_news);
         cancel_subscription = (Button) view.findViewById(R.id.cancel_subscription);
 
-        news_line = (LinearLayout) view.findViewById(R.id.news_line);
 
         choiceItemFromCatalogs = new ArrayList<Audio>();
 
         if (sharedPreferences.contains("Author"))
         {
             collection = "author";
+            author = sharedPreferences.getString("Author", "");
             if (android.os.Build.VERSION.SDK_INT > 9) {
                 StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
                 StrictMode.setThreadPolicy(policy);
@@ -93,13 +91,13 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
 
                     for (int i=0; i<listcheck.size(); i++)
                     {
-                        if (listcheck.get(i).getName_book().equals(sharedPreferences.getString("Author", ""))) {
+                        if (listcheck.get(i).getName_book().equals(author)) {
                             id = listcheck.get(i).getId();
                             subscribe_collection = listcheck.get(i).getName_book();
                             if (sharedPreferences.contains(subscribe_collection))
                             {
                                 subscription.setVisibility(View.INVISIBLE);
-                                news_line.setVisibility(View.VISIBLE);
+                                cancel_subscription.setVisibility(View.VISIBLE);
                             }
                             JSONArray data_selection = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/getCollectionBooks?salt=df90sdfgl9854gjs54os59gjsogsdf&collection_id=" + id + "&model=author"));
                             Gson gson_selection = new Gson();
@@ -127,6 +125,7 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
         else  if (sharedPreferences.contains("Reader"))
         {
             collection = "reader";
+            reader = sharedPreferences.getString("Reader", "");
             if (android.os.Build.VERSION.SDK_INT > 9) {
                 StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
                 StrictMode.setThreadPolicy(policy);
@@ -141,14 +140,14 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
 
                     for (int i=0; i<listcheck.size(); i++)
                     {
-                        if (listcheck.get(i).getName_book().equals(sharedPreferences.getString("Reader", ""))) {
+                        if (listcheck.get(i).getName_book().equals(reader)) {
                             id = listcheck.get(i).getId();
                             subscribe_collection = listcheck.get(i).getName_book();
                             Log.d("MyLog", String.valueOf(sharedPreferences.contains(subscribe_collection)));
                             if (sharedPreferences.contains(subscribe_collection))
                             {
                                 subscription.setVisibility(View.INVISIBLE);
-                                news_line.setVisibility(View.VISIBLE);
+                                cancel_subscription.setVisibility(View.VISIBLE);
                             }
                             JSONArray data_selection = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/getCollectionBooks?salt=df90sdfgl9854gjs54os59gjsogsdf&collection_id=" + id + "&model=reader"));
                             Gson gson_selection = new Gson();
@@ -176,6 +175,7 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
         else  if (sharedPreferences.contains("Publisher"))
         {
             collection = "publisher";
+            publisher = sharedPreferences.getString("Publisher", "");
             if (android.os.Build.VERSION.SDK_INT > 9) {
                 StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
                 StrictMode.setThreadPolicy(policy);
@@ -190,13 +190,13 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
 
                     for (int i=0; i<listcheck.size(); i++)
                     {
-                        if (listcheck.get(i).getName_book().equals(sharedPreferences.getString("Publisher", ""))) {
+                        if (listcheck.get(i).getName_book().equals(publisher)) {
                             id = listcheck.get(i).getId();
                             subscribe_collection = listcheck.get(i).getName_book();
                             if (sharedPreferences.contains(subscribe_collection))
                             {
                                 subscription.setVisibility(View.INVISIBLE);
-                                news_line.setVisibility(View.VISIBLE);
+                                cancel_subscription.setVisibility(View.VISIBLE);
                             }
                             JSONArray data_selection = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/getCollectionBooks?salt=df90sdfgl9854gjs54os59gjsogsdf&collection_id=" + id + "&model=publisher"));
                             Gson gson_selection = new Gson();
@@ -240,7 +240,19 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
                     request.getHttpGet("http://www.glagolapp.ru/api/subscribe?salt=df90sdfgl9854gjs54os59gjsogsdf&collection_id=" + id + "&model=" + collection + "&user_id=" + user_id);
                     editor.putString(subscribe_collection, subscribe_collection).apply();
                     subscription.setVisibility(View.INVISIBLE);
-                    news_line.setVisibility(View.VISIBLE);
+                    cancel_subscription.setVisibility(View.VISIBLE);
+                    switch (collection)
+                    {
+                        case "author":
+                            Toast.makeText(getActivity(), "Вы подписаны на  новинки автора - " + author +"!", Toast.LENGTH_LONG).show();
+                            return;
+                        case "reader":
+                            Toast.makeText(getActivity(), "Вы подписаны на  новинки чтеца - " + reader + "!", Toast.LENGTH_LONG).show();
+                            return;
+                        case "publisher":
+                            Toast.makeText(getActivity(), "Вы подписаны на  новинки издательства - " + publisher + "!", Toast.LENGTH_LONG).show();
+                            return;
+                    }
                 }
                 else
                 {
@@ -257,7 +269,7 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
                 SharedPreferences sharedPreferences = getActivity().getSharedPreferences("Sign", Context.MODE_PRIVATE);
                 request.getHttpGet("http://www.glagolapp.ru/api/subscribe?salt=df90sdfgl9854gjs54os59gjsogsdf&collection_id=" + id + "&model=" + collection + "&user_id=" + sharedPreferences.getString("id", ""));
                 editor.remove(subscribe_collection).apply();
-                news_line.setVisibility(View.INVISIBLE);
+                cancel_subscription.setVisibility(View.INVISIBLE);
                 subscription.setVisibility(View.VISIBLE);
 
             }

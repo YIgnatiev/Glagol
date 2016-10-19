@@ -71,20 +71,30 @@ public class Login extends Fragment {
                     }
                     try {
                         JSONArray data = new JSONArray(request.getHttpGet("http://glagolapp.ru/api/login?salt=df90sdfgl9854gjs54os59gjsogsdf&email=" + mail + "&password=" + pass));
-                        String arr = data.getJSONObject(0).getString("data");
-                        JSONObject jsonObj = new JSONObject(arr);
-                        String id = jsonObj.getString("id");
-
-                        if (!sharedPreferences.contains("id"))
+                        String status = data.getJSONObject(0).getString("error");
+                        if (status.equals("true"))
                         {
-                            editor.putString("id", id).apply();
+                            Toast toast = Toast.makeText(getActivity(),
+                                    "Вы ввели неправильный логи или пароль!", Toast.LENGTH_LONG);
+                            toast.show();
+                        }
+                        else {
+                            String arr = data.getJSONObject(0).getString("data");
+                            JSONObject jsonObj = new JSONObject(arr);
+                            String id = jsonObj.getString("id");
+
+                            if (!sharedPreferences.contains("id"))
+                            {
+                                editor.putString("id", id).apply();
+                            }
+
+                            if (fragment != null) {
+                                android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
+                                fragmentManager.beginTransaction()
+                                        .replace(R.id.frame_my_book, fragment).commit();
+                            }
                         }
 
-                        if (fragment != null) {
-                            android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
-                            fragmentManager.beginTransaction()
-                                    .replace(R.id.frame_my_book, fragment).commit();
-                        }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }

@@ -102,15 +102,15 @@ public class CardBook extends Fragment implements OnBackPressedListener {
                 name_author.setText("Автор: " + audios.get(0).getName_authors());
                 name_book.setText(audios.get(0).getName_book());
                 text_reader.setText("Чтец: " + audios.get(0).getReaders());
-                text_publisher.setText("Издатель: " + audios.get(0).getPublisher());
+                text_publisher.setText("Издательство: " + audios.get(0).getPublisher());
                 if (audios.get(0).getDuration() != null && audios.get(0).getSize() != null) {
-                    text_time.setText(getTime(Long.valueOf(audios.get(0).getDuration())) + " " + Double.parseDouble(audios.get(0).getSize()) / 1000 + " мб.");
+                    text_time.setText(getTime(Long.valueOf(audios.get(0).getDuration())) + " " + Integer.parseInt(String.valueOf(Integer.parseInt(audios.get(0).getSize()) / 1000)) + " мб.");
                 }
                 else
                 {
                     text_time.setText(0 + " ч. " + 0 + " мин. " + 0+ " сек. " + " " + 0 + " мб.");
                 }
-                text_teg.setText("Теги: " + audios.get(0).getCategorys());
+                text_teg.setText("Категории: " + audios.get(0).getCategorys());
                 description.setText(audios.get(0).getDescription());
                 Glide.with(getActivity()).load(audios.get(0).getIcon()).into(cover);
                 buy.setText("Купить за " + audios.get(0).getPrice() + " p.");
