@@ -10,7 +10,9 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
 
@@ -30,6 +32,8 @@ public class SuccessfulEnter extends Fragment {
     }
     ViewPager viewPager;
     private SmartTabLayout viewPagerTab;
+    ImageView back_arrow, logo;
+    TextView name_frag;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -50,6 +54,16 @@ public class SuccessfulEnter extends Fragment {
             }
         });
         setupViewPager(viewPager);
+
+
+        back_arrow = (ImageView) view.findViewById(R.id.back);
+        logo = (ImageView) view.findViewById(R.id.logo);
+
+        back_arrow.setVisibility(View.VISIBLE);
+        logo.setVisibility(View.INVISIBLE);
+
+        name_frag = (TextView) view.findViewById(R.id.name_frag);
+        name_frag.setText("Мои Книги");
 
         viewPagerTab = (SmartTabLayout) view.findViewById(R.id.viewpagertab);
 

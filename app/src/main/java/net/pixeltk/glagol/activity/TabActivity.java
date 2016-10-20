@@ -6,30 +6,27 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 
 import net.pixeltk.glagol.R;
+import net.pixeltk.glagol.fargment_catalog.ListFragmentGlagol;
 import net.pixeltk.glagol.fargment_catalog.OnBackPressedListener;
-import net.pixeltk.glagol.fragment.CatalogFragment;
-import net.pixeltk.glagol.fragment.MainContentFragment;
+import net.pixeltk.glagol.fragment.MainFragment;
 import net.pixeltk.glagol.fragment.MyBooks;
 import net.pixeltk.glagol.fragment.OtherInfoFragment;
 import net.pixeltk.glagol.fragment.PlayerFragment;
 
-public class TabActivity extends AppCompatActivity {
+public class  TabActivity extends AppCompatActivity {
 
-    static Toolbar toolbar;
-
+    LinearLayout main, catalog, player, book, other;
+    static TabLayout tabLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tab);
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setLogo(R.drawable.glagollogogrn);
-        setSupportActionBar(toolbar);
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
+        tabLayout = (TabLayout) findViewById(R.id.tab_layout);
 
         tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.layout_tab_icon_main));
         tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.layout_tab_icon_catalog));
@@ -37,91 +34,58 @@ public class TabActivity extends AppCompatActivity {
         tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.layout_tab_icon_mybook));
         tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.layout_tab_icon_other));
 
-        replaceFragment(new CatalogFragment());
+        main = (LinearLayout) tabLayout.findViewById(R.id.line1);
+        catalog = (LinearLayout) tabLayout.findViewById(R.id.catalog);
+        player = (LinearLayout) tabLayout.findViewById(R.id.player);
+        book = (LinearLayout) tabLayout.findViewById(R.id.book);
+        other = (LinearLayout) tabLayout.findViewById(R.id.other);
 
-        tabLayout.getTabAt(3).select();
+        replaceFragment(new MainFragment());
 
-        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+        main.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                switch (tab.getPosition())
-                {
-                    case 0:
-                        toolbar.setLogo(R.drawable.glagollogogrn);
-                        toolbar.setTitle("");
-                        setSupportActionBar(toolbar);
-                        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-                        replaceFragment(new MainContentFragment());
-                        return;
-                    case 1:
-                        toolbar.setLogo(null);
-                        toolbar.setTitle("Каталог");
-                        setSupportActionBar(toolbar);
-                        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                        getSupportActionBar().setDisplayShowHomeEnabled(true);
-                        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                onBackPressed();
-                            }
-                        });
-                        replaceFragment(new CatalogFragment());
-                        return;
-                    case 2:
-                        toolbar.setLogo(null);
-                        toolbar.setTitle("Плеер");
-                        setSupportActionBar(toolbar);
-                        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                        getSupportActionBar().setDisplayShowHomeEnabled(true);
-                        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                onBackPressed();
-                            }
-                        });
-                        replaceFragment(new PlayerFragment());
-                        return;
-                    case 3:
-                        toolbar.setLogo(null);
-                        toolbar.setTitle("Мои книги");
-                        setSupportActionBar(toolbar);
-                        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                        getSupportActionBar().setDisplayShowHomeEnabled(true);
-                        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                onBackPressed();
-                            }
-                        });
-                        replaceFragment(new MyBooks());
-                        return;
-                    case 4:
-                        toolbar.setLogo(null);
-                        toolbar.setTitle("Еще");
-                        setSupportActionBar(toolbar);
-                        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-                        getSupportActionBar().setDisplayShowHomeEnabled(true);
-                        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                onBackPressed();
-                            }
-                        });
-                        replaceFragment(new OtherInfoFragment());
-                        return;
-                }
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
+            public void onClick(View view) {
+                replaceFragment(new MainFragment());
+                tabLayout.getTabAt(0).select();
             }
         });
+
+        catalog.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                replaceFragment(new ListFragmentGlagol());
+                tabLayout.getTabAt(1).select();
+            }
+        });
+
+        player.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                replaceFragment(new PlayerFragment());
+                tabLayout.getTabAt(2).select();
+            }
+        });
+
+        book.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                replaceFragment(new MyBooks());
+                tabLayout.getTabAt(3).select();
+            }
+        });
+
+        other.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                replaceFragment(new OtherInfoFragment());
+                tabLayout.getTabAt(4).select();
+            }
+        });
+
     }
     @Override
     public void onBackPressed() {
@@ -146,11 +110,9 @@ public class TabActivity extends AppCompatActivity {
 
         transaction.commit();
     }
-
-    public static void setTitleToolbar(String title)
+    public static void changePage()
     {
-        toolbar.setLogo(null);
-        toolbar.setTitle(title);
+        tabLayout.getTabAt(0).select();
     }
 
 }

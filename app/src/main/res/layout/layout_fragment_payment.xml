@@ -8,9 +8,14 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
+    <include layout="@layout/toolbar"
+        android:id="@+id/toolbar"/>
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/toolbar"
         android:gravity="center"
         android:textSize="18sp"
         android:textColor="#FFFFFF"

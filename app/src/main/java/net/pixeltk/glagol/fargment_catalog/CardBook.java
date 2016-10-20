@@ -51,6 +51,8 @@ public class CardBook extends Fragment implements OnBackPressedListener {
     private ArrayList<Audio> audios = new ArrayList<>();
     getHttpGet request = new getHttpGet();
     LinearLayout content_line1, content_line2, content_line3;
+    TextView name_frag;
+    ImageView back_arrow, logo;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -69,6 +71,22 @@ public class CardBook extends Fragment implements OnBackPressedListener {
         editorsubscription = subscription.edit();
         editor = idbook.edit();
 
+        back_arrow = (ImageView) view.findViewById(R.id.back);
+        logo = (ImageView) view.findViewById(R.id.logo);
+
+        back_arrow.setVisibility(View.VISIBLE);
+        logo.setVisibility(View.INVISIBLE);
+
+        name_frag = (TextView) view.findViewById(R.id.name_frag);
+        name_frag.setText("О книге");
+
+        back_arrow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
+
         buy = (Button) view.findViewById(R.id.buy);
         download = (Button) view.findViewById(R.id.download);
         listen = (Button) view.findViewById(R.id.listen);
@@ -86,9 +104,6 @@ public class CardBook extends Fragment implements OnBackPressedListener {
         content_line3 = (LinearLayout) view.findViewById(R.id.content_line10);
 
         cover = (ImageView) view.findViewById(R.id.cover);
-
-        TabActivity tabActivity = new TabActivity();
-        tabActivity.setTitleToolbar("О книге");
 
         if (android.os.Build.VERSION.SDK_INT > 9) {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -150,7 +165,7 @@ public class CardBook extends Fragment implements OnBackPressedListener {
                 if (fragment != null) {
                     android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
                     fragmentManager.beginTransaction()
-                            .replace(R.id.catalog_frame, fragment).commit();
+                            .replace(R.id.main_frame, fragment).commit();
                 }
             }
         });
@@ -163,7 +178,7 @@ public class CardBook extends Fragment implements OnBackPressedListener {
                 if (fragment != null) {
                     android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
                     fragmentManager.beginTransaction()
-                            .replace(R.id.catalog_frame, fragment).commit();
+                            .replace(R.id.main_frame, fragment).commit();
 
                 }
             }
@@ -177,7 +192,7 @@ public class CardBook extends Fragment implements OnBackPressedListener {
                 if (fragment != null) {
                     android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
                     fragmentManager.beginTransaction()
-                            .replace(R.id.catalog_frame, fragment).commit();
+                            .replace(R.id.main_frame, fragment).commit();
 
                 }
             }
@@ -191,7 +206,7 @@ public class CardBook extends Fragment implements OnBackPressedListener {
                 if (fragment != null) {
                     android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
                     fragmentManager.beginTransaction()
-                            .replace(R.id.catalog_frame, fragment).commit();
+                            .replace(R.id.main_frame, fragment).commit();
 
                 }
             }
@@ -213,7 +228,7 @@ public class CardBook extends Fragment implements OnBackPressedListener {
         if (fragment != null) {
             android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
             fragmentManager.beginTransaction()
-                    .replace(R.id.catalog_frame, fragment).commit();
+                    .replace(R.id.main_frame, fragment).commit();
 
         }
 

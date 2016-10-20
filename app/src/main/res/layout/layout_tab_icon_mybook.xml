@@ -3,6 +3,7 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:background="@drawable/selectormybookbackground"
     android:gravity="center"
+    android:id="@+id/book"
     android:layout_height="match_parent">
 
     <ImageView

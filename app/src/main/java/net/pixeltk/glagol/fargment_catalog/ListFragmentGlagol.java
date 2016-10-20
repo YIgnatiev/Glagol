@@ -10,11 +10,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import net.pixeltk.glagol.R;
+import net.pixeltk.glagol.activity.TabActivity;
 import net.pixeltk.glagol.adapter.NavDrawerItem;
 import net.pixeltk.glagol.adapter.NavDrawerListAdapter;
+import net.pixeltk.glagol.fragment.MainFragment;
 
 import java.util.ArrayList;
 
@@ -22,7 +26,7 @@ import java.util.ArrayList;
  * Created by root on 07.10.16.
  */
 
-public class ListFragmentGlagol extends Fragment {
+public class ListFragmentGlagol extends Fragment implements OnBackPressedListener{
 
     public ListFragmentGlagol() {
         // Required empty public constructor
@@ -35,6 +39,9 @@ public class ListFragmentGlagol extends Fragment {
     Fragment fragment = null;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
+
+    ImageView back_arrow, logo;
+    TextView name_frag;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -49,6 +56,22 @@ public class ListFragmentGlagol extends Fragment {
 
         sharedPreferences = getActivity().getSharedPreferences("Category", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
+
+        back_arrow = (ImageView) view.findViewById(R.id.back);
+        logo = (ImageView) view.findViewById(R.id.logo);
+
+        back_arrow.setVisibility(View.VISIBLE);
+        logo.setVisibility(View.INVISIBLE);
+
+        name_frag = (TextView) view.findViewById(R.id.name_frag);
+        name_frag.setText("Каталог");
+
+        back_arrow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
 
         navMenuTitles = getResources().getStringArray(R.array.nav_drawer_items);
 
@@ -77,11 +100,25 @@ public class ListFragmentGlagol extends Fragment {
                 if (fragment != null) {
                     android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
                     fragmentManager.beginTransaction()
-                            .replace(R.id.catalog_frame, fragment).commit();
+                            .replace(R.id.main_frame, fragment).commit();
                 }
             }
         });
 
         return view;
+    }
+    @Override
+    public void onBackPressed() {
+        fragment = new MainFragment();
+        TabActivity tabActivity = new TabActivity();
+        tabActivity.changePage();
+        if (fragment != null) {
+            android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.main_frame, fragment).commit();
+
+        }
+
+
     }
 }

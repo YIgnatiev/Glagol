@@ -6,6 +6,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import net.pixeltk.glagol.R;
 
@@ -21,6 +23,8 @@ public class CheckLoginSign extends Fragment {
 
     Button login, sign;
     Fragment fragment = null;
+    ImageView back_arrow, logo;
+    TextView name_frag;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -35,6 +39,15 @@ public class CheckLoginSign extends Fragment {
 
         login = (Button) view.findViewById(R.id.sign);
         sign = (Button) view.findViewById(R.id.login);
+
+        back_arrow = (ImageView) view.findViewById(R.id.back);
+        logo = (ImageView) view.findViewById(R.id.logo);
+
+        back_arrow.setVisibility(View.VISIBLE);
+        logo.setVisibility(View.INVISIBLE);
+
+        name_frag = (TextView) view.findViewById(R.id.name_frag);
+        name_frag.setText("Авторизация");
 
         login.setOnClickListener(new View.OnClickListener() {
             @Override

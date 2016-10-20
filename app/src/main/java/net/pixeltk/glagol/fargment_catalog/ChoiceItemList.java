@@ -11,8 +11,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -49,6 +51,8 @@ public class ChoiceItemList extends Fragment implements OnBackPressedListener {
     getHttpGet request = new getHttpGet();
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
+    ImageView back_arrow, logo;
+    TextView name_frag;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -63,6 +67,22 @@ public class ChoiceItemList extends Fragment implements OnBackPressedListener {
 
         sharedPreferences = getActivity().getSharedPreferences("Category", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
+
+        back_arrow = (ImageView) view.findViewById(R.id.back);
+        logo = (ImageView) view.findViewById(R.id.logo);
+
+        back_arrow.setVisibility(View.VISIBLE);
+        logo.setVisibility(View.INVISIBLE);
+
+        name_frag = (TextView) view.findViewById(R.id.name_frag);
+        name_frag.setText(sharedPreferences.getString("CategoryName", ""));
+
+        back_arrow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
 
         sort_spinner = (Spinner) view.findViewById(R.id.spinner);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, sort);
@@ -141,7 +161,7 @@ public class ChoiceItemList extends Fragment implements OnBackPressedListener {
                 if (fragment != null) {
                     android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
                     fragmentManager.beginTransaction()
-                            .replace(R.id.catalog_frame, fragment).commit();
+                            .replace(R.id.main_frame, fragment).commit();
                 }
             }
         });
@@ -194,7 +214,7 @@ public class ChoiceItemList extends Fragment implements OnBackPressedListener {
         if (fragment != null) {
             android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
             fragmentManager.beginTransaction()
-                    .replace(R.id.catalog_frame, fragment).commit();
+                    .replace(R.id.main_frame, fragment).commit();
             editor.clear().apply();
         }
 

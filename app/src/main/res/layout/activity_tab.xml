@@ -7,8 +7,6 @@
     android:layout_height="match_parent"
     android:background="#272727"
     tools:context="net.pixeltk.glagol.activity.TabActivity">
-    <include android:id="@+id/toolbar"
-        layout="@layout/toolbar" />
 
     <FrameLayout
         android:layout_width="match_parent"

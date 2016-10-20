@@ -13,7 +13,9 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.SearchView;
 
 import android.view.LayoutInflater;
@@ -59,6 +61,8 @@ public class MainFragment extends Fragment{
     getHttpGet request = new getHttpGet();
     Fragment fragment = null;
     LinearLayout variant_frag, news_frag;
+    ImageView back_arrow;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -80,6 +84,10 @@ public class MainFragment extends Fragment{
 
         my_news = (Button) view.findViewById(R.id.my_news);
         my_variant = (Button) view.findViewById(R.id.my_variant);
+
+        back_arrow = (ImageView) view.findViewById(R.id.back);
+
+        back_arrow.setVisibility(View.INVISIBLE);
 
         my_news.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -196,7 +204,7 @@ public class MainFragment extends Fragment{
                 if (fragment != null) {
                     android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
                     fragmentManager.beginTransaction()
-                            .replace(R.id.catalog_frame, fragment).commit();
+                            .replace(R.id.main_frame, fragment).commit();
                 }
             }
 

@@ -9,6 +9,8 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import net.pixeltk.glagol.R;
 import net.pixeltk.glagol.fragment_my_book.CheckLoginSign;
@@ -41,6 +43,7 @@ public class MyBooks extends Fragment {
         View view =  inflater.inflate(R.layout.mybooks_fragment, container, false);
 
         sharedPreferences = getActivity().getSharedPreferences("Sign", Context.MODE_PRIVATE);
+
 
         if (sharedPreferences.contains("id"))
         {

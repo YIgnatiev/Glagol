@@ -12,6 +12,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -20,6 +22,8 @@ import com.google.gson.reflect.TypeToken;
 import net.pixeltk.glagol.R;
 import net.pixeltk.glagol.api.Audio;
 import net.pixeltk.glagol.api.getHttpGet;
+import net.pixeltk.glagol.fargment_catalog.ChoiceItemList;
+import net.pixeltk.glagol.fargment_catalog.OnBackPressedListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,7 +35,7 @@ import java.util.List;
  * Created by root on 07.10.16.
  */
 
-public class Sigin extends Fragment {
+public class Sigin extends Fragment implements OnBackPressedListener{
 
     public Sigin() {
         // Required empty public constructor
@@ -45,6 +49,8 @@ public class Sigin extends Fragment {
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
     Fragment fragment = null;
+    ImageView back_arrow, logo;
+    TextView name_frag;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -64,6 +70,21 @@ public class Sigin extends Fragment {
         editor = sharedPreferences.edit();
 
 
+        back_arrow = (ImageView) view.findViewById(R.id.back);
+        logo = (ImageView) view.findViewById(R.id.logo);
+
+        back_arrow.setVisibility(View.VISIBLE);
+        logo.setVisibility(View.INVISIBLE);
+
+        name_frag = (TextView) view.findViewById(R.id.name_frag);
+        name_frag.setText("Авторизация");
+
+        back_arrow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
 
         login.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -100,8 +121,9 @@ public class Sigin extends Fragment {
                         }
                         else
                         {
-                            int id=Integer.parseInt(data.toString().replaceAll("[\\D]", ""));
-                            Log.d("myLogs","id " + id);
+                            Toast toast = Toast.makeText(getActivity(),
+                                    "Вы успешно зарегистрированы, пароль выслан на почту!", Toast.LENGTH_SHORT);
+                            toast.show();
                         }
 
 
@@ -131,4 +153,18 @@ public class Sigin extends Fragment {
 
         return view;
     }
+    @Override
+    public void onBackPressed() {
+        fragment = new CheckLoginSign();
+        editor.remove("idbook").apply();
+        if (fragment != null) {
+            android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.main_frame, fragment).commit();
+
+        }
+
+
+    }
+
 }

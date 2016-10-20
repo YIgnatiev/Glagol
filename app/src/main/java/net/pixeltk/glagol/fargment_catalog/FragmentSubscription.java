@@ -11,8 +11,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -50,6 +52,8 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
     private ArrayList<Audio> audios = new ArrayList<>();
     private ChoiceListAdapter choiceListAdapter;
     private ArrayList<Audio> choiceItemFromCatalogs;
+    ImageView back_arrow, logo;
+    TextView name_frag;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -65,6 +69,21 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
         sharedPreferences = getActivity().getSharedPreferences("Subscription", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
 
+        back_arrow = (ImageView) view.findViewById(R.id.back);
+        logo = (ImageView) view.findViewById(R.id.logo);
+
+        back_arrow.setVisibility(View.VISIBLE);
+        logo.setVisibility(View.INVISIBLE);
+
+        name_frag = (TextView) view.findViewById(R.id.name_frag);
+
+        back_arrow.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
+
         listView = (ListView) view.findViewById(R.id.list_choice_item);
 
         subscription = (Button) view.findViewById(R.id.subscription);
@@ -77,6 +96,7 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
         {
             collection = "author";
             author = sharedPreferences.getString("Author", "");
+            name_frag.setText(author);
             if (android.os.Build.VERSION.SDK_INT > 9) {
                 StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
                 StrictMode.setThreadPolicy(policy);
@@ -126,6 +146,7 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
         {
             collection = "reader";
             reader = sharedPreferences.getString("Reader", "");
+            name_frag.setText(reader);
             if (android.os.Build.VERSION.SDK_INT > 9) {
                 StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
                 StrictMode.setThreadPolicy(policy);
@@ -176,6 +197,7 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
         {
             collection = "publisher";
             publisher = sharedPreferences.getString("Publisher", "");
+            name_frag.setText(publisher);
             if (android.os.Build.VERSION.SDK_INT > 9) {
                 StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
                 StrictMode.setThreadPolicy(policy);
@@ -278,13 +300,14 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+               SharedPreferences subscription = getActivity().getSharedPreferences("Category", Context.MODE_PRIVATE);
+               SharedPreferences.Editor editor = subscription.edit();
                 editor.putString("idbook", choiceItemFromCatalogs.get(i).getId()).apply();
-                Log.d("MyLog", " " + choiceItemFromCatalogs.get(i).getId());
                 fragment = new CardBook();
                 if (fragment != null) {
                     android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
                     fragmentManager.beginTransaction()
-                            .replace(R.id.catalog_frame, fragment).commit();
+                            .replace(R.id.main_frame, fragment).commit();
                 }
             }
         });
@@ -297,7 +320,7 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
         if (fragment != null) {
             android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
             fragmentManager.beginTransaction()
-                    .replace(R.id.catalog_frame, fragment).commit();
+                    .replace(R.id.main_frame, fragment).commit();
 
         }
 
