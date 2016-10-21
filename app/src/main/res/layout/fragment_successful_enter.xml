@@ -8,41 +8,86 @@
     <include layout="@layout/toolbar"
         android:id="@+id/toolbar"/>
 
-    <com.ogaclejapan.smarttablayout.SmartTabLayout
-        android:id="@+id/viewpagertab"
+    <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_marginRight="15dp"
-        android:layout_marginLeft="15dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginBottom="20dp"
-        android:layout_height="30dp"
-        app:stl_indicatorAlwaysInCenter="false"
-        app:stl_indicatorWithoutPadding="true"
-        app:stl_indicatorInFront="true"
-        app:stl_indicatorInterpolation="linear"
-        app:stl_indicatorGravity="bottom"
-        app:stl_indicatorThickness="1dp"
-        app:stl_indicatorCornerRadius="0dp"
-        app:stl_overlineColor="#4D000000"
-        app:stl_overlineThickness="0dp"
-        app:stl_underlineColor="#4D000000"
-        app:stl_underlineThickness="0dp"
-        app:stl_dividerColor="#4D000000"
-        app:stl_dividerThickness="0dp"
-        app:stl_defaultTabBackground="?attr/selectableItemBackground"
-        app:stl_defaultTabTextAllCaps="true"
-        app:stl_defaultTabTextColor="#fff"
-        app:stl_defaultTabTextSize="12sp"
-        app:stl_defaultTabTextHorizontalPadding="16dp"
-        app:stl_defaultTabTextMinWidth="0dp"
-        app:stl_distributeEvenly="true"
-        app:stl_clickable="true"
-        android:showDividers="middle"
-        android:background="@drawable/backsearch" />
+        android:background="#2e2e2e"
+        android:layout_height="wrap_content">
 
-        <android.support.v4.view.ViewPager
-        android:id="@+id/viewpager"
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="20dp"
+            android:text="Слушаю"
+            android:gravity="center"
+            android:textSize="10sp"
+            android:textColor="#000"
+            android:background="@drawable/background"
+            android:textAllCaps="false"
+            android:layout_marginBottom="20dp"
+            android:layout_weight="1"
+            android:layout_height="30dp"
+            android:id="@+id/listen"/>
+
+        <Button
+            android:text="Куплено"
+            android:gravity="center"
+            android:textSize="10sp"
+            android:textColor="#F1F1f1"
+            android:layout_width="wrap_content"
+            android:layout_marginTop="20dp"
+            android:textAllCaps="false"
+            android:background="@drawable/backsearch"
+            android:layout_marginBottom="20dp"
+            android:layout_height="30dp"
+            android:layout_weight="1"
+            android:id="@+id/buy"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text="Закладки"
+            android:gravity="center"
+            android:textSize="10sp"
+            android:textColor="#F1F1F1"
+            android:background="@drawable/backsearch"
+            android:textAllCaps="false"
+            android:layout_marginBottom="20dp"
+            android:layout_weight="1"
+            android:layout_height="30dp"
+            android:id="@+id/my_tab"/>
+
+        <Button
+            android:text="История"
+            android:gravity="center"
+            android:textSize="10sp"
+            android:textColor="#F1F1f1"
+            android:layout_width="wrap_content"
+            android:layout_marginRight="15dp"
+            android:layout_marginTop="20dp"
+            android:textAllCaps="false"
+            android:background="@drawable/backsearch"
+            android:layout_marginBottom="20dp"
+            android:layout_height="30dp"
+            android:layout_weight="1"
+            android:id="@+id/history"/>
+    </LinearLayout>
+
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="wrap_content">
+        <include layout="@layout/fragment_listening"
+            android:id="@+id/listen_incl"/>
+        <include layout="@layout/fragment_buy"
+            android:visibility="gone"
+            android:id="@+id/buy_incl"/>
+        <include layout="@layout/fragment_my_tab"
+            android:visibility="gone"
+            android:id="@+id/my_tab_incl"/>
+        <include layout="@layout/fragment_history"
+            android:visibility="gone"
+            android:id="@+id/history_incl"/>
+    </RelativeLayout>
+
 
 </LinearLayout>

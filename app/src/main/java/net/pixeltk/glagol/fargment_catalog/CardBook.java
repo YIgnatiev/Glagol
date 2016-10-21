@@ -2,10 +2,13 @@ package net.pixeltk.glagol.fargment_catalog;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,10 +24,16 @@ import com.google.gson.reflect.TypeToken;
 
 import net.pixeltk.glagol.R;
 import net.pixeltk.glagol.activity.TabActivity;
+import net.pixeltk.glagol.adapter.BookMarksHelper;
+import net.pixeltk.glagol.adapter.DataBasesHelper;
+import net.pixeltk.glagol.adapter.DrawItemBookMarks;
 import net.pixeltk.glagol.api.Audio;
 import net.pixeltk.glagol.api.getHttpGet;
+import net.pixeltk.glagol.fragment.ClickOnMainPart;
 import net.pixeltk.glagol.fragment.FragmentPayment;
+import net.pixeltk.glagol.fragment.MainFragment;
 import net.pixeltk.glagol.fragment.PlayerFragment;
+import net.pixeltk.glagol.fragment_my_book.SuccessfulEnter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,7 +51,7 @@ public class CardBook extends Fragment implements OnBackPressedListener {
         // Required empty public constructor
     }
 
-    Button buy, download, listen;
+    Button buy, download, listen, book_marks, del_marks;
     Fragment fragment = null;
     SharedPreferences sharedPreferences, idbook, subscription;
     SharedPreferences.Editor editor, editorsubscription;
@@ -53,6 +62,9 @@ public class CardBook extends Fragment implements OnBackPressedListener {
     LinearLayout content_line1, content_line2, content_line3;
     TextView name_frag;
     ImageView back_arrow, logo;
+    DataBasesHelper dataBasesHelper;
+    ArrayList IdList = new ArrayList();
+    BookMarksHelper bookMarksHelper;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -70,6 +82,8 @@ public class CardBook extends Fragment implements OnBackPressedListener {
         subscription = getActivity().getSharedPreferences("Subscription", Context.MODE_PRIVATE);
         editorsubscription = subscription.edit();
         editor = idbook.edit();
+
+        dataBasesHelper = new DataBasesHelper(getActivity());
 
         back_arrow = (ImageView) view.findViewById(R.id.back);
         logo = (ImageView) view.findViewById(R.id.logo);
@@ -90,6 +104,8 @@ public class CardBook extends Fragment implements OnBackPressedListener {
         buy = (Button) view.findViewById(R.id.buy);
         download = (Button) view.findViewById(R.id.download);
         listen = (Button) view.findViewById(R.id.listen);
+        book_marks = (Button) view.findViewById(R.id.book_marks);
+        del_marks = (Button) view.findViewById(R.id.del_marks);
 
         name_author = (TextView) view.findViewById(R.id.name_author);
         name_book = (TextView) view.findViewById(R.id.name_book);
@@ -104,6 +120,10 @@ public class CardBook extends Fragment implements OnBackPressedListener {
         content_line3 = (LinearLayout) view.findViewById(R.id.content_line10);
 
         cover = (ImageView) view.findViewById(R.id.cover);
+
+        IdList = dataBasesHelper.getidRow();
+        Log.d("MyLog", String.valueOf(IdList));
+
 
         if (android.os.Build.VERSION.SDK_INT > 9) {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -128,7 +148,8 @@ public class CardBook extends Fragment implements OnBackPressedListener {
                 {
                     text_time.setText(0 + " ч. " + 0 + " мин. " + 0+ " сек. " + " " + 0 + " мб.");
                 }
-                text_teg.setText("Категории: " + audios.get(0).getCategorys());
+                text_teg.setText(audios.get(0).getCategorys());
+                text_teg.setPaintFlags(text_teg.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
                 description.setText(audios.get(0).getDescription());
                 Glide.with(getActivity()).load(audios.get(0).getIcon()).into(cover);
                 buy.setText("Купить за " + audios.get(0).getPrice() + " p.");
@@ -137,10 +158,45 @@ public class CardBook extends Fragment implements OnBackPressedListener {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        text_teg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                editor.remove("CategoryName").apply();
+                editor.putString("CategoryName", text_teg.getText().toString()).apply();
+                fragment = new ChoiceItemList();
+                if (fragment != null) {
+                    android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.main_frame, fragment).commit();
+
+                }
+            }
+        });
         if (sharedPreferences.contains("Pay"))
         {
             buy.setVisibility(View.INVISIBLE);
             download.setVisibility(View.VISIBLE);
+        }
+        if (audios.get(0).getPrice() == null)
+        {
+            fragment = new MainFragment();
+            if (fragment != null) {
+                android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
+                fragmentManager.beginTransaction()
+                        .replace(R.id.main_frame, fragment).commit();
+
+            }
+        }
+        for (int i = 0; i < IdList.size(); i++)
+        {
+
+            bookMarksHelper = dataBasesHelper.getProduct(IdList.get(i).toString());
+            if (audios.get(0).getPrice().equals(bookMarksHelper.getPrice()))
+            {
+                book_marks.setVisibility(View.INVISIBLE);
+                del_marks.setVisibility(View.VISIBLE);
+            }
+                bookMarksHelper = null;
         }
 
         download.setOnClickListener(new View.OnClickListener() {
@@ -155,6 +211,28 @@ public class CardBook extends Fragment implements OnBackPressedListener {
         listen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+            }
+        });
+
+        del_marks.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                book_marks.setVisibility(View.VISIBLE);
+                del_marks.setVisibility(View.INVISIBLE);
+                SQLiteDatabase db = dataBasesHelper.getWritableDatabase();
+                db.delete("Bookmarks", "price = " + audios.get(0).getPrice(), null);
+                db.close();
+            }
+        });
+
+        book_marks.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                del_marks.setVisibility(View.VISIBLE);
+                book_marks.setVisibility(View.INVISIBLE);
+                dataBasesHelper.insertBookMarks(audios.get(0).getName_authors(), audios.get(0).getName_book(), audios.get(0).getPrice(), audios.get(0).getIcon(), audios.get(0).getId());
+                dataBasesHelper.close();
             }
         });
 
@@ -223,7 +301,31 @@ public class CardBook extends Fragment implements OnBackPressedListener {
     }
     @Override
     public void onBackPressed() {
-        fragment = new ChoiceItemList();
+        if (idbook.getString("intent", "").equals("Successful"))
+        {
+            editor.remove("intent").apply();
+            fragment = new SuccessfulEnter();
+        }
+        else if (idbook.getString("intent", "").equals("Main"))
+        {
+            fragment = new MainFragment();
+            editor.remove("intent").apply();
+        }
+        else if (idbook.getString("intent", "").equals("mainpart"))
+        {
+            fragment = new ClickOnMainPart();
+            editor.remove("intent").apply();
+        }
+        else if (idbook.getString("intent", "").equals("Subscription"))
+        {
+            fragment = new FragmentSubscription();
+            editor.remove("intent").apply();
+        }
+
+        else {
+            fragment = new ChoiceItemList();
+            editor.remove("intent").apply();
+        }
         editor.remove("idbook").apply();
         if (fragment != null) {
             android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();

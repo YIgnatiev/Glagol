@@ -3,24 +3,25 @@
     android:layout_width="match_parent"
     android:orientation="vertical"
     android:layout_height="match_parent">
+
+
     <include layout="@layout/toolbar"
         android:id="@+id/toolbar"/>
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-
-
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:background="#4d545e"
+        android:id="@+id/search_line"
         android:layout_height="wrap_content">
         <SearchView
             android:id="@+id/searchView"
@@ -28,16 +29,20 @@
             android:iconifiedByDefault="false"
             android:background="@drawable/backsearch"
             android:layout_margin="10dp"
-            android:layout_height="wrap_content">
+            android:layout_height="40dp">
         </SearchView>
 
 
     </LinearLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
     <LinearLayout
         android:orientation="horizontal"
         android:layout_width="match_parent"
         android:background="#2e2e2e"
+        android:id="@+id/button_line"
         android:layout_height="wrap_content">
 
 
@@ -70,8 +75,11 @@
             android:layout_weight="1"
             android:id="@+id/my_variant"/>
     </LinearLayout>
+
+
         <RelativeLayout
             android:layout_width="match_parent"
+            android:layout_below="@+id/button_line"
             android:layout_height="wrap_content">
             <include layout="@layout/variant_fragment"
                 android:id="@+id/variant_frag"/>
@@ -79,11 +87,20 @@
                 android:visibility="gone"
                 android:id="@+id/news_frag"/>
         </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_height="300dp">
+            <include layout="@layout/list_for_search_variant"
+                android:id="@+id/search_variant"/>
 
+            <include layout="@layout/list_for_search_book"
+                android:visibility="gone"
+                android:id="@+id/search_book"/>
+        </RelativeLayout>
 
-
-
+        </RelativeLayout>
     </LinearLayout>
-
-</ScrollView>
-    </LinearLayout>
+    </ScrollView>
+</LinearLayout>

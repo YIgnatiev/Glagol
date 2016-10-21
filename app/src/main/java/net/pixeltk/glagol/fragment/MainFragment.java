@@ -12,15 +12,19 @@ import android.support.v7.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.MotionEvent;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.SearchView;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -29,6 +33,7 @@ import com.google.gson.reflect.TypeToken;
 
 import net.pixeltk.glagol.R;
 import net.pixeltk.glagol.activity.TabActivity;
+import net.pixeltk.glagol.adapter.ChoiceListAdapter;
 import net.pixeltk.glagol.adapter.RecyclerAdapter;
 import net.pixeltk.glagol.adapter.RecyclerClickListener;
 import net.pixeltk.glagol.api.Audio;
@@ -45,7 +50,7 @@ import java.util.List;
  * Created by root on 04.10.16.
  */
 
-public class MainFragment extends Fragment{
+public class MainFragment extends Fragment implements View.OnClickListener {
 
     public MainFragment() {
         // Required empty public constructor
@@ -60,8 +65,16 @@ public class MainFragment extends Fragment{
     private ArrayList<Audio> audios = new ArrayList<>();
     getHttpGet request = new getHttpGet();
     Fragment fragment = null;
-    LinearLayout variant_frag, news_frag;
+    LinearLayout variant_frag, news_frag, search_variant, search_book;
     ImageView back_arrow;
+    String[] names = { "Иван", "Марья", "Петр", "Антон", "Даша", "Борис",
+            "Костя", "Игорь", "Анна", "Денис", "Андрей" };
+    ListView list_variant, list_book;
+    private ChoiceListAdapter choiceListAdapter;
+    TextView variant_text, text_news, text_top_sale, text_sale, text_choice_editor, text_soon_be;
+    SharedPreferences sharedPreferences;
+    SharedPreferences.Editor editor;
+
 
 
     @Override
@@ -79,13 +92,35 @@ public class MainFragment extends Fragment{
         searchView.setQueryHint("Поиск");
         searchView.setHovered(false);
 
+        sharedPreferences = getActivity().getSharedPreferences("ClickMain", Context.MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+
         variant_frag = (LinearLayout) view.findViewById(R.id.variant_frag);
         news_frag = (LinearLayout) view.findViewById(R.id.news_frag);
+        search_variant = (LinearLayout) view.findViewById(R.id.search_variant);
+        search_book = (LinearLayout) view.findViewById(R.id.search_book);
+
+        list_variant = (ListView) view.findViewById(R.id.list_variant);
+        list_book = (ListView) view.findViewById(R.id.list_book);
 
         my_news = (Button) view.findViewById(R.id.my_news);
         my_variant = (Button) view.findViewById(R.id.my_variant);
 
         back_arrow = (ImageView) view.findViewById(R.id.back);
+
+        variant_text = (TextView) view.findViewById(R.id.variant);
+        text_news = (TextView) view.findViewById(R.id.text_news);
+        text_top_sale = (TextView) view.findViewById(R.id.text_top_sale);
+        text_sale = (TextView) view.findViewById(R.id.text_sale);
+        text_choice_editor = (TextView) view.findViewById(R.id.text_choice_editor);
+        text_soon_be = (TextView) view.findViewById(R.id.text_soon_be);
+
+        variant_text.setOnClickListener(this);
+        text_news.setOnClickListener(this);
+        text_top_sale.setOnClickListener(this);
+        text_sale.setOnClickListener(this);
+        text_choice_editor.setOnClickListener(this);
+        text_soon_be.setOnClickListener(this);
 
         back_arrow.setVisibility(View.INVISIBLE);
 
@@ -112,20 +147,7 @@ public class MainFragment extends Fragment{
             }
         });
 
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                Toast.makeText(getActivity(), query, Toast.LENGTH_LONG).show();
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                Toast.makeText(getActivity(), newText, Toast.LENGTH_LONG).show();
-                return false;
-            }
-        });
 
         variant = (RecyclerView) view.findViewById(R.id.recycler_view_variant);
         news = (RecyclerView) view.findViewById(R.id.recycler_view_news);
@@ -193,19 +215,111 @@ public class MainFragment extends Fragment{
         choice_editor.setAdapter(mAdapter);
         soon_be.setAdapter(mAdapter);
 
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+
+                if (newText.toCharArray().length > 3) {
+                    search_variant.setVisibility(View.VISIBLE);
+                    final ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
+                            android.R.layout.simple_list_item_1, names);
+
+                    // присваиваем адаптер списку
+                    list_variant.setAdapter(adapter);
+                    list_variant.setOnTouchListener(new View.OnTouchListener() {
+                        // Setting on Touch Listener for handling the touch inside ScrollView
+                        @Override
+                        public boolean onTouch(View v, MotionEvent event) {
+                            // Disallow the touch request for parent scroll on touch of child view
+                            v.getParent().requestDisallowInterceptTouchEvent(true);
+                            return false;
+                        }
+                    });
+                    list_variant.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                            search_variant.setVisibility(View.GONE);
+                            search_book.setVisibility(View.VISIBLE);
+                            choiceListAdapter = new ChoiceListAdapter(getActivity(), itemData);
+                            list_book.setAdapter(choiceListAdapter);
+                        }
+                    });
+
+                }
+                else
+                {
+                    search_variant.setVisibility(View.GONE);
+                }
+                return false;
+            }
+        });
+
         variant.addOnItemTouchListener(new RecyclerClickListener(getActivity()) {
             @Override
             public void onItemClick(RecyclerView recyclerView, View itemView, int position) {
-               SharedPreferences sharedPreferences = getActivity().getSharedPreferences("Category", Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString("idbook", itemData.get(position).getId());
-                editor.apply();
-                fragment = new CardBook();
-                if (fragment != null) {
-                    android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
-                    fragmentManager.beginTransaction()
-                            .replace(R.id.main_frame, fragment).commit();
-                }
+              clickCard(position);
+            }
+
+            @Override
+            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+
+            }
+        });
+        news.addOnItemTouchListener(new RecyclerClickListener(getActivity()) {
+            @Override
+            public void onItemClick(RecyclerView recyclerView, View itemView, int position) {
+                clickCard(position);
+            }
+
+            @Override
+            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+
+            }
+        });
+        top_sale.addOnItemTouchListener(new RecyclerClickListener(getActivity()) {
+            @Override
+            public void onItemClick(RecyclerView recyclerView, View itemView, int position) {
+                clickCard(position);
+            }
+
+            @Override
+            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+
+            }
+        });
+        sale.addOnItemTouchListener(new RecyclerClickListener(getActivity()) {
+            @Override
+            public void onItemClick(RecyclerView recyclerView, View itemView, int position) {
+                clickCard(position);
+            }
+
+            @Override
+            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+
+            }
+        });
+        choice_editor.addOnItemTouchListener(new RecyclerClickListener(getActivity()) {
+            @Override
+            public void onItemClick(RecyclerView recyclerView, View itemView, int position) {
+                clickCard(position);
+            }
+
+            @Override
+            public void onRequestDisallowInterceptTouchEvent(boolean disallowIntercept) {
+
+            }
+        });
+        soon_be.addOnItemTouchListener(new RecyclerClickListener(getActivity()) {
+            @Override
+            public void onItemClick(RecyclerView recyclerView, View itemView, int position) {
+                clickCard(position);
             }
 
             @Override
@@ -216,7 +330,54 @@ public class MainFragment extends Fragment{
 
         return view;
     }
+    public void clickVariant(String text)
+    {
+        editor.putString("var", text).apply();
+        fragment = new ClickOnMainPart();
+        if (fragment != null) {
+            android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.main_frame, fragment).commit();
+        }
+    }
+    public void clickCard(int position)
+    {
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("Category", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("idbook", itemData.get(position).getId());
+        editor.putString("intent", "Main");
+        editor.apply();
+        fragment = new CardBook();
+        if (fragment != null) {
+            android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.main_frame, fragment).commit();
+        }
+    }
 
+    @Override
+    public void onClick(View view) {
+        switch (view.getId())
+        {
+            case R.id.variant:
+                clickVariant(variant_text.getText().toString());
+                return;
+            case R.id.text_news:
+                clickVariant(text_news.getText().toString());
+                return;
+            case R.id.text_top_sale:
+                clickVariant(text_top_sale.getText().toString());
+                return;
+            case R.id.text_sale:
+                clickVariant(text_sale.getText().toString());
+                return;
+            case R.id.text_choice_editor:
+                clickVariant(text_choice_editor.getText().toString());
+                return;
+            case R.id.text_soon_be:
+                clickVariant(text_soon_be.getText().toString());
+                return;
+        }
 
-
+    }
 }

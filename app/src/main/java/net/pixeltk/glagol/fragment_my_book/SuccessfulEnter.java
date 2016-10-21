@@ -1,22 +1,37 @@
 package net.pixeltk.glagol.fragment_my_book;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
 
 import net.pixeltk.glagol.R;
+import net.pixeltk.glagol.activity.TabActivity;
+import net.pixeltk.glagol.adapter.BookMarksHelper;
+import net.pixeltk.glagol.adapter.DataBasesHelper;
+import net.pixeltk.glagol.adapter.DrawItemBookMarks;
+import net.pixeltk.glagol.adapter.DrawerListBookMarks;
+import net.pixeltk.glagol.fargment_catalog.CardBook;
+import net.pixeltk.glagol.fargment_catalog.OnBackPressedListener;
+import net.pixeltk.glagol.fragment.MainFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,15 +40,23 @@ import java.util.List;
  * Created by root on 07.10.16.
  */
 
-public class SuccessfulEnter extends Fragment {
+public class SuccessfulEnter extends Fragment implements OnBackPressedListener{
 
     public SuccessfulEnter() {
         // Required empty public constructor
     }
-    ViewPager viewPager;
-    private SmartTabLayout viewPagerTab;
-    ImageView back_arrow, logo;
+    LinearLayout listen_incl, buy_incl, my_tab_incl, history_incl;
+    Button listen, buy, my_tab, history;
+    private ArrayList<DrawItemBookMarks> navDrawerItems;
+    private static DrawerListBookMarks adapter;
+    ListView listView;
+    DataBasesHelper dataBasesHelper;
+    BookMarksHelper bookMarksHelper;
+    ArrayList IdList = new ArrayList();
+    SharedPreferences sharedPreferences;
+    SharedPreferences.Editor editor;
     TextView name_frag;
+    ImageView back_arrow, logo;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -46,15 +69,15 @@ public class SuccessfulEnter extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_successful_enter, container, false);
 
-        viewPager = (ViewPager) view.findViewById(R.id.viewpager);
-        viewPager.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                return true;
-            }
-        });
-        setupViewPager(viewPager);
+        listen_incl = (LinearLayout) view.findViewById(R.id.listen_incl);
+        buy_incl = (LinearLayout) view.findViewById(R.id.buy_incl);
+        my_tab_incl = (LinearLayout) view.findViewById(R.id.my_tab_incl);
+        history_incl = (LinearLayout) view.findViewById(R.id.history_incl);
 
+        listen = (Button) view.findViewById(R.id.listen);
+        buy = (Button) view.findViewById(R.id.buy);
+        my_tab = (Button) view.findViewById(R.id.my_tab);
+        history = (Button) view.findViewById(R.id.history);
 
         back_arrow = (ImageView) view.findViewById(R.id.back);
         logo = (ImageView) view.findViewById(R.id.logo);
@@ -63,88 +86,151 @@ public class SuccessfulEnter extends Fragment {
         logo.setVisibility(View.INVISIBLE);
 
         name_frag = (TextView) view.findViewById(R.id.name_frag);
-        name_frag.setText("Мои Книги");
+        name_frag.setText("Мои книги");
 
-        viewPagerTab = (SmartTabLayout) view.findViewById(R.id.viewpagertab);
-
-        inflater = LayoutInflater.from(viewPagerTab.getContext());
-        final LayoutInflater finalInflater = inflater;
-        viewPagerTab.setCustomTabView(new SmartTabLayout.TabProvider() {
+        back_arrow.setOnClickListener(new View.OnClickListener() {
             @Override
-            public View createTabView(ViewGroup viewGroup, int i, PagerAdapter pagerAdapter) {
-                LinearLayout view = null;
-                switch (i) {
-                    case 0: // Страница главная
-                        view = (LinearLayout) finalInflater.inflate(R.layout.layout_tab_listening, viewGroup, false);
-                        break;
-                    case 1: // Страница каталога
-                        view = (LinearLayout) finalInflater.inflate(R.layout.layout_tab_buy, viewGroup, false);
-                        break;
-                    case 2: // Страница главная
-                        view = (LinearLayout) finalInflater.inflate(R.layout.layout_tab_my, viewGroup, false);
-                        break;
-                    case 3: // Страница каталога
-                        view = (LinearLayout) finalInflater.inflate(R.layout.layout_tab_history, viewGroup, false);
-                        break;
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
 
+        sharedPreferences = getActivity().getSharedPreferences("Category", Context.MODE_PRIVATE);
+        editor = sharedPreferences.edit();
+
+        listView = (ListView) view.findViewById(R.id.list_view);
+
+        navDrawerItems = new ArrayList<DrawItemBookMarks>();
+        dataBasesHelper = new DataBasesHelper(getActivity());
+
+        IdList = dataBasesHelper.getidRow();
+        Log.d("MyLog", String.valueOf(IdList));
+
+        for (int i = 0; i < IdList.size(); i++)
+        {
+            bookMarksHelper = dataBasesHelper.getProduct(IdList.get(i).toString());
+            Log.d("MyLog", "Id" + bookMarksHelper.getId_book());
+            navDrawerItems.add(new DrawItemBookMarks(bookMarksHelper.getName_author(), bookMarksHelper.getName_book(), bookMarksHelper.getPrice(), bookMarksHelper.getImg_url(), bookMarksHelper.getId_book()));
+            bookMarksHelper = null;
+        }
+
+        adapter = new DrawerListBookMarks(getActivity(), navDrawerItems);
+        listView.setAdapter(adapter);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                editor.putString("idbook", navDrawerItems.get(i).getId());
+                editor.putString("intent", "Successful").apply();
+                Fragment fragment = new CardBook();
+                if (fragment != null) {
+                    android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.main_frame, fragment).commit();
                 }
-                return view;
             }
         });
 
 
-        viewPagerTab.setViewPager(viewPager);
+        listen.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listen.setTextColor(Color.parseColor("#000000"));
+                buy.setTextColor(Color.parseColor("#F1F1F1"));
+                my_tab.setTextColor(Color.parseColor("#F1F1F1"));
+                history.setTextColor(Color.parseColor("#F1F1F1"));
+
+                listen.setBackgroundResource(R.drawable.background);
+                buy.setBackgroundResource(R.drawable.backsearch);
+                my_tab.setBackgroundResource(R.drawable.backsearch);
+                history.setBackgroundResource(R.drawable.backsearch);
+
+                listen_incl.setVisibility(View.VISIBLE);
+                buy_incl.setVisibility(View.GONE);
+                my_tab_incl.setVisibility(View.GONE);
+                history_incl.setVisibility(View.GONE);
+            }
+        });
+
+        buy.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listen.setTextColor(Color.parseColor("#F1F1F1"));
+                buy.setTextColor(Color.parseColor("#000000"));
+                my_tab.setTextColor(Color.parseColor("#F1F1F1"));
+                history.setTextColor(Color.parseColor("#F1F1F1"));
+
+                listen.setBackgroundResource(R.drawable.backsearch);
+                buy.setBackgroundResource(R.drawable.background);
+                my_tab.setBackgroundResource(R.drawable.backsearch);
+                history.setBackgroundResource(R.drawable.backsearch);
+
+                listen_incl.setVisibility(View.GONE);
+                buy_incl.setVisibility(View.VISIBLE);
+                my_tab_incl.setVisibility(View.GONE);
+                history_incl.setVisibility(View.GONE);
+            }
+        });
+
+        my_tab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listen.setTextColor(Color.parseColor("#F1F1F1"));
+                buy.setTextColor(Color.parseColor("#F1F1F1"));
+                my_tab.setTextColor(Color.parseColor("#000000"));
+                history.setTextColor(Color.parseColor("#F1F1F1"));
+
+                listen.setBackgroundResource(R.drawable.backsearch);
+                buy.setBackgroundResource(R.drawable.backsearch);
+                my_tab.setBackgroundResource(R.drawable.background);
+                history.setBackgroundResource(R.drawable.backsearch);
+
+                listen_incl.setVisibility(View.GONE);
+                buy_incl.setVisibility(View.GONE);
+                my_tab_incl.setVisibility(View.VISIBLE);
+                history_incl.setVisibility(View.GONE);
+            }
+        });
+
+        history.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listen.setTextColor(Color.parseColor("#F1F1F1"));
+                buy.setTextColor(Color.parseColor("#F1F1F1"));
+                my_tab.setTextColor(Color.parseColor("#F1F1F1"));
+                history.setTextColor(Color.parseColor("#000000"));
+
+                listen.setBackgroundResource(R.drawable.backsearch);
+                buy.setBackgroundResource(R.drawable.backsearch);
+                my_tab.setBackgroundResource(R.drawable.backsearch);
+                history.setBackgroundResource(R.drawable.background);
+
+                listen_incl.setVisibility(View.GONE);
+                buy_incl.setVisibility(View.GONE);
+                my_tab_incl.setVisibility(View.GONE);
+                history_incl.setVisibility(View.VISIBLE);
+            }
+        });
+
         return view;
     }
+    @Override
+    public void onBackPressed() {
+        Fragment fragment = new MainFragment();
+        TabActivity tabActivity = new TabActivity();
+        tabActivity.changePage();
+        if (fragment != null) {
+            android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.main_frame, fragment).commit();
+
+        }
 
 
-    private void setupViewPager(ViewPager viewPager) {
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getChildFragmentManager());
-        adapter.addFrag(new Listening(), "");
-        adapter.addFrag(new Buy(), "");
-        adapter.addFrag(new MyTab(), "");
-        adapter.addFrag(new History(), "");
-        viewPager.setAdapter(adapter);
     }
-
-    class ViewPagerAdapter extends FragmentPagerAdapter {
-        private final List<Fragment> mFragmentList = new ArrayList<>();
-        private final List<String> mFragmentTitleList = new ArrayList<>();
-
-        public ViewPagerAdapter(FragmentManager manager) {
-            super(manager);
-        }
-
-        @Override
-        public Fragment getItem(int position) {
-            switch (position){
-                case 0:
-                    return new Listening();
-                case 1:
-                    return new Buy();
-                case 2:
-                    return new MyTab();
-                case 3:
-                    return new History();
-                default:
-                    return null;
-            }
-        }
-
-        @Override
-        public int getCount() {
-            return mFragmentList.size();
-        }
-
-        public void addFrag(Fragment fragment, String title) {
-            mFragmentList.add(fragment);
-            mFragmentTitleList.add(title);
-        }
-
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return mFragmentTitleList.get(position);
-        }
+    public static void dataChanged()
+    {
+        adapter.notifyDataSetChanged();
     }
-
 }

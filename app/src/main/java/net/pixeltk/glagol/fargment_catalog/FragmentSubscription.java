@@ -24,6 +24,7 @@ import net.pixeltk.glagol.R;
 import net.pixeltk.glagol.adapter.ChoiceListAdapter;
 import net.pixeltk.glagol.api.Audio;
 import net.pixeltk.glagol.api.getHttpGet;
+import net.pixeltk.glagol.fragment.MainFragment;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -132,7 +133,6 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
                                 }
 
                             }
-                            editor.remove("Author").apply();
                         }
                     }
 
@@ -183,7 +183,6 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
                                 }
 
                             }
-                            editor.remove("Reader").apply();
                         }
                     }
 
@@ -233,7 +232,6 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
                                 }
 
                             }
-                            editor.remove("Publisher").apply();
                         }
                     }
 
@@ -302,7 +300,8 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                SharedPreferences subscription = getActivity().getSharedPreferences("Category", Context.MODE_PRIVATE);
                SharedPreferences.Editor editor = subscription.edit();
-                editor.putString("idbook", choiceItemFromCatalogs.get(i).getId()).apply();
+                editor.putString("idbook", choiceItemFromCatalogs.get(i).getId());
+                editor.putString("intent", "Subscription").apply();
                 fragment = new CardBook();
                 if (fragment != null) {
                     android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
@@ -316,7 +315,18 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
     }
     @Override
     public void onBackPressed() {
-        fragment = new CardBook();
+        fragment = new MainFragment();
+        if (sharedPreferences.contains("Author"))
+        {
+            editor.remove("Author").apply();
+        }
+        else  if (sharedPreferences.contains("Reader"))
+        {
+            editor.remove("Reader").apply();
+        }
+        else {
+            editor.remove("Publisher").apply();
+        }
         if (fragment != null) {
             android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
             fragmentManager.beginTransaction()

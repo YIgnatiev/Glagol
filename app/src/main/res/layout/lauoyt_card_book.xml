@@ -83,18 +83,34 @@
                 android:layout_margin="15dp"
                 android:text="Слушать демо"/>
 
-            <Button
+            <RelativeLayout
                 android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:layout_marginRight="15dp"
                 android:layout_marginTop="15dp"
                 android:layout_marginBottom="15dp"
-                android:layout_marginLeft="0dp"
-                android:background="@drawable/backmain"
-                android:text="В закладках"
-                android:textAllCaps="false"
-                android:textColor="#FFFFFF"
-                android:layout_height="wrap_content" />
+                android:layout_marginLeft="0dp">
+                <Button
+                    android:layout_width="match_parent"
+                    android:background="@drawable/backmain"
+                    android:text="В закладки"
+                    android:textAllCaps="false"
+                    android:textColor="#FFFFFF"
+                    android:id="@+id/book_marks"
+                    android:layout_height="wrap_content" />
+                <Button
+                    android:layout_width="match_parent"
+                    android:background="@drawable/backsearch"
+                    android:text="В закладках"
+                    android:textAllCaps="false"
+                    android:visibility="invisible"
+                    android:textColor="#FFFFFF"
+                    android:id="@+id/del_marks"
+                    android:layout_height="wrap_content" />
+            </RelativeLayout>
+
+
         </LinearLayout>
 
         <LinearLayout
@@ -233,12 +249,16 @@
             android:layout_marginRight="15dp"
             android:layout_height="wrap_content">
             <TextView
-                android:text="Теги: бизнес, финансы, Ларри Кинг"
+                android:text="Категории: "
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#FFFFFF" />
+            <TextView
+                android:text=""
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/text_teg"
-                android:textColor="#FFFFFF"
-                android:layout_weight="1" />
+                android:textColor="#FFFFFF" />
 
         </LinearLayout>
         <LinearLayout
