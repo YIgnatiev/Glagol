@@ -17,6 +17,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
@@ -31,6 +32,7 @@ import net.pixeltk.glagol.api.Audio;
 import net.pixeltk.glagol.api.getHttpGet;
 import net.pixeltk.glagol.fragment.ClickOnMainPart;
 import net.pixeltk.glagol.fragment.FragmentPayment;
+import net.pixeltk.glagol.fragment.ListSearchBook;
 import net.pixeltk.glagol.fragment.MainFragment;
 import net.pixeltk.glagol.fragment.PlayerFragment;
 import net.pixeltk.glagol.fragment_my_book.SuccessfulEnter;
@@ -53,7 +55,7 @@ public class CardBook extends Fragment implements OnBackPressedListener {
 
     Button buy, download, listen, book_marks, del_marks;
     Fragment fragment = null;
-    SharedPreferences sharedPreferences, idbook, subscription;
+    SharedPreferences sharedPreferences, idbook, subscription, checklogin;
     SharedPreferences.Editor editor, editorsubscription;
     ImageView cover;
     TextView name_author, name_book, text_reader, text_publisher, text_time, text_teg, description;
@@ -80,6 +82,7 @@ public class CardBook extends Fragment implements OnBackPressedListener {
         sharedPreferences = getActivity().getSharedPreferences("Payment", Context.MODE_PRIVATE);
         idbook = getActivity().getSharedPreferences("Category", Context.MODE_PRIVATE);
         subscription = getActivity().getSharedPreferences("Subscription", Context.MODE_PRIVATE);
+        checklogin = getActivity().getSharedPreferences("Sign", Context.MODE_PRIVATE);
         editorsubscription = subscription.edit();
         editor = idbook.edit();
 
@@ -211,6 +214,13 @@ public class CardBook extends Fragment implements OnBackPressedListener {
         listen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (!checklogin.contains("id"))
+                {
+                    Toast toast = Toast.makeText(getActivity(),
+                            "Для выполнения этого действия нужно авторизироватся!", Toast.LENGTH_LONG);
+                    toast.show();
+                }
+
             }
         });
 
@@ -229,21 +239,37 @@ public class CardBook extends Fragment implements OnBackPressedListener {
             @Override
             public void onClick(View view) {
 
-                del_marks.setVisibility(View.VISIBLE);
-                book_marks.setVisibility(View.INVISIBLE);
-                dataBasesHelper.insertBookMarks(audios.get(0).getName_authors(), audios.get(0).getName_book(), audios.get(0).getPrice(), audios.get(0).getIcon(), audios.get(0).getId());
-                dataBasesHelper.close();
+                if (!checklogin.contains("id"))
+                {
+                    Toast toast = Toast.makeText(getActivity(),
+                            "Для выполнения этого действия нужно авторизироватся!", Toast.LENGTH_LONG);
+                    toast.show();
+                }
+                else {
+                    del_marks.setVisibility(View.VISIBLE);
+                    book_marks.setVisibility(View.INVISIBLE);
+                    dataBasesHelper.insertBookMarks(audios.get(0).getName_authors(), audios.get(0).getName_book(), audios.get(0).getPrice(), audios.get(0).getIcon(), audios.get(0).getId());
+                    dataBasesHelper.close();
+                }
             }
         });
 
         buy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                fragment = new FragmentPayment();
-                if (fragment != null) {
-                    android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
-                    fragmentManager.beginTransaction()
-                            .replace(R.id.main_frame, fragment).commit();
+                if (!checklogin.contains("id"))
+                {
+                    Toast toast = Toast.makeText(getActivity(),
+                            "Для выполнения этого действия нужно авторизироватся!", Toast.LENGTH_LONG);
+                    toast.show();
+                }
+                else {
+                    fragment = new FragmentPayment();
+                    if (fragment != null) {
+                        android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
+                        fragmentManager.beginTransaction()
+                                .replace(R.id.main_frame, fragment).commit();
+                    }
                 }
             }
         });
@@ -319,6 +345,11 @@ public class CardBook extends Fragment implements OnBackPressedListener {
         else if (idbook.getString("intent", "").equals("Subscription"))
         {
             fragment = new FragmentSubscription();
+            editor.remove("intent").apply();
+        }
+        else if (idbook.getString("intent", "").equals("ListSearch"))
+        {
+            fragment = new ListSearchBook();
             editor.remove("intent").apply();
         }
 

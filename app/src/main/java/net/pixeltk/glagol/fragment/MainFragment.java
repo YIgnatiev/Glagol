@@ -63,14 +63,12 @@ public class MainFragment extends Fragment implements View.OnClickListener {
     private RecyclerView.LayoutManager mLayoutManager, mnews, mtop_sale, msale, mchoice_editor, msoon_be;
     private ArrayList<Audio> itemData = new ArrayList<>();
     private ArrayList<Audio> audios = new ArrayList<>();
+    private ArrayList<Audio> auto_compliet = new ArrayList<>();
     getHttpGet request = new getHttpGet();
     Fragment fragment = null;
-    LinearLayout variant_frag, news_frag, search_variant, search_book;
+    LinearLayout variant_frag, news_frag, search_variant;
     ImageView back_arrow;
-    String[] names = { "Иван", "Марья", "Петр", "Антон", "Даша", "Борис",
-            "Костя", "Игорь", "Анна", "Денис", "Андрей" };
-    ListView list_variant, list_book;
-    private ChoiceListAdapter choiceListAdapter;
+    ListView list_variant;
     TextView variant_text, text_news, text_top_sale, text_sale, text_choice_editor, text_soon_be;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
@@ -98,10 +96,9 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         variant_frag = (LinearLayout) view.findViewById(R.id.variant_frag);
         news_frag = (LinearLayout) view.findViewById(R.id.news_frag);
         search_variant = (LinearLayout) view.findViewById(R.id.search_variant);
-        search_book = (LinearLayout) view.findViewById(R.id.search_book);
 
         list_variant = (ListView) view.findViewById(R.id.list_variant);
-        list_book = (ListView) view.findViewById(R.id.list_book);
+
 
         my_news = (Button) view.findViewById(R.id.my_news);
         my_variant = (Button) view.findViewById(R.id.my_variant);
@@ -226,31 +223,60 @@ public class MainFragment extends Fragment implements View.OnClickListener {
             @Override
             public boolean onQueryTextChange(String newText) {
 
+                newText = newText.trim();
                 if (newText.toCharArray().length > 3) {
                     search_variant.setVisibility(View.VISIBLE);
-                    final ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
-                            android.R.layout.simple_list_item_1, names);
+                    try {
+                        JSONArray data = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/autocomplete?salt=df90sdfgl9854gjs54os59gjsogsdf&search=" + newText));
+                        Gson gson = new Gson();
 
-                    // присваиваем адаптер списку
-                    list_variant.setAdapter(adapter);
-                    list_variant.setOnTouchListener(new View.OnTouchListener() {
-                        // Setting on Touch Listener for handling the touch inside ScrollView
-                        @Override
-                        public boolean onTouch(View v, MotionEvent event) {
-                            // Disallow the touch request for parent scroll on touch of child view
-                            v.getParent().requestDisallowInterceptTouchEvent(true);
-                            return false;
+                        auto_compliet = gson.fromJson(data.toString(),  new TypeToken<List<Audio>>(){}.getType());
+                        Log.d("MyLog", auto_compliet.toString());
+                        if (auto_compliet != null) {
+                            final String words[] = new String[auto_compliet.size()];
+                            for (int i = 0; i < auto_compliet.size(); i++)
+                            {
+                                Audio audio = auto_compliet.get(i);
+                                words[i] = audio.getWord();
+                            }
+                            if (words[0] != null) {
+                                final ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
+                                        R.layout.text_for_list, words);
+                                list_variant.setAdapter(adapter);
+                                // присваиваем адаптер списку
+                                list_variant.setOnTouchListener(new View.OnTouchListener() {
+                                    // Setting on Touch Listener for handling the touch inside ScrollView
+                                    @Override
+                                    public boolean onTouch(View v, MotionEvent event) {
+                                        // Disallow the touch request for parent scroll on touch of child view
+                                        v.getParent().requestDisallowInterceptTouchEvent(true);
+                                        return false;
+                                    }
+                                });
+                                list_variant.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                    @Override
+                                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                                        search_variant.setVisibility(View.GONE);
+                                        SharedPreferences search_line = getActivity().getSharedPreferences("Search", Context.MODE_PRIVATE);
+                                        SharedPreferences.Editor serch_edit = search_line.edit();
+                                        serch_edit.putString("search", words[i]).apply();
+                                        fragment = new ListSearchBook();
+                                        if (fragment != null) {
+                                            android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
+                                            fragmentManager.beginTransaction()
+                                                    .replace(R.id.main_frame, fragment).commit();
+                                        }
+                                    }
+                                });
+                            }
+                            else {
+                                search_variant.setVisibility(View.GONE);
+                            }
                         }
-                    });
-                    list_variant.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        @Override
-                        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                            search_variant.setVisibility(View.GONE);
-                            search_book.setVisibility(View.VISIBLE);
-                            choiceListAdapter = new ChoiceListAdapter(getActivity(), itemData);
-                            list_book.setAdapter(choiceListAdapter);
-                        }
-                    });
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
 
                 }
                 else

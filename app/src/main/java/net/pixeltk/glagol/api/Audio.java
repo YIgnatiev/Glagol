@@ -104,6 +104,15 @@ public class Audio {
         this.description = description;
     }
 
+    @SerializedName("word") String word;
+    public String getWord(){
+        return word;
+    }
+
+    public void setWord(String word) {
+        this.word = word;
+    }
+
 
 
 }

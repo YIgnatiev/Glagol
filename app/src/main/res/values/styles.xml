@@ -23,6 +23,7 @@
     <style name="CustomListView" parent="@android:style/Widget.ListView">
         <item name="android:background">#2F2F2F</item>
         <item name="android:fastScrollEnabled">true</item>
+        <item name="android:textColor">#F1F1F1</item>
     </style>
 
     <style name="MyTheme" parent="Theme.AppCompat.Light.NoActionBar">

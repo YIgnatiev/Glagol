@@ -94,10 +94,6 @@
             android:layout_height="300dp">
             <include layout="@layout/list_for_search_variant"
                 android:id="@+id/search_variant"/>
-
-            <include layout="@layout/list_for_search_book"
-                android:visibility="gone"
-                android:id="@+id/search_book"/>
         </RelativeLayout>
 
         </RelativeLayout>

@@ -24,6 +24,15 @@
 
     </LinearLayout>
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_height="wrap_content">
+        <include layout="@layout/list_for_search_variant"
+            android:id="@+id/search_variant"/>
+    </RelativeLayout>
+
     <Spinner
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
