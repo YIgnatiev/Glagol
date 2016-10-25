@@ -56,7 +56,7 @@ public class CheckLoginSign extends Fragment {
                 if (fragment != null) {
                     android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
                     fragmentManager.beginTransaction()
-                            .replace(R.id.frame_my_book, fragment).commit();
+                            .replace(R.id.main_frame, fragment).commit();
                 }
             }
         });
@@ -68,7 +68,7 @@ public class CheckLoginSign extends Fragment {
                 if (fragment != null) {
                     android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
                     fragmentManager.beginTransaction()
-                            .replace(R.id.frame_my_book, fragment).commit();
+                            .replace(R.id.main_frame, fragment).commit();
                 }
             }
         });

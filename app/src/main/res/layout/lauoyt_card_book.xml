@@ -94,19 +94,20 @@
                 <Button
                     android:layout_width="match_parent"
                     android:background="@drawable/backmain"
-                    android:text="В закладки"
-                    android:textAllCaps="false"
-                    android:textColor="#FFFFFF"
-                    android:id="@+id/book_marks"
-                    android:layout_height="wrap_content" />
-                <Button
-                    android:layout_width="match_parent"
-                    android:background="@drawable/backsearch"
                     android:text="В закладках"
                     android:textAllCaps="false"
                     android:visibility="invisible"
                     android:textColor="#FFFFFF"
                     android:id="@+id/del_marks"
+                    android:layout_height="wrap_content" />
+                <Button
+                    android:layout_width="match_parent"
+                    android:background="@drawable/backsearch"
+                    android:text="В закладки"
+                    android:textAllCaps="false"
+                    android:visibility="visible"
+                    android:textColor="#FFFFFF"
+                    android:id="@+id/book_marks"
                     android:layout_height="wrap_content" />
             </RelativeLayout>
 

@@ -4,9 +4,6 @@
     android:orientation="horizontal"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
-    <RelativeLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
     <ImageView
         android:layout_width="100dp"
         android:layout_height="100dp"
@@ -64,13 +61,5 @@
 
 
     </RelativeLayout>
-        <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            app:srcCompat="@drawable/delete"
-            android:layout_margin="10dp"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentRight="true"
-            android:id="@+id/dellete" />
-        </RelativeLayout>
+
 </RelativeLayout>

@@ -51,9 +51,10 @@
             android:layout_marginLeft="15dp"
             android:layout_marginTop="20dp"
             android:text="Мои новости"
+            android:textColor="#F1F1f1"
             android:gravity="center"
             android:textSize="12sp"
-            android:background="@drawable/background"
+            android:background="@drawable/backsearch"
             android:textAllCaps="false"
             android:layout_marginBottom="20dp"
             android:layout_weight="1"
@@ -61,7 +62,7 @@
             android:id="@+id/my_news"/>
 
         <Button
-            android:text="Мои подборки"
+            android:text="Мои подписки"
             android:gravity="center"
             android:textSize="12sp"
             android:textColor="#F1F1f1"
@@ -82,10 +83,13 @@
             android:layout_below="@+id/button_line"
             android:layout_height="wrap_content">
             <include layout="@layout/variant_fragment"
+                android:visibility="gone"
                 android:id="@+id/variant_frag"/>
             <include layout="@layout/news_fragment"
                 android:visibility="gone"
                 android:id="@+id/news_frag"/>
+            <include layout="@layout/main_frag_part"
+                android:id="@+id/main_frag_part"/>
         </RelativeLayout>
         <RelativeLayout
             android:layout_width="match_parent"

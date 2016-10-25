@@ -7,16 +7,18 @@ public class DrawItemBookMarks {
 
     private String name_book;
     private String name_author;
+    private String name_reader;
     private String price;
     private String img_url;
     private String id;
 
 
 
-    public DrawItemBookMarks(String name_book, String name_author, String price, String img_url, String id){
+    public DrawItemBookMarks(String name_author, String  name_book, String name_reader, String price, String img_url, String id){
 
         this.name_book = name_book;
         this.name_author = name_author;
+        this.name_reader = name_reader;
         this.price = price;
         this.img_url = img_url;
         this.id = id;
@@ -40,6 +42,10 @@ public class DrawItemBookMarks {
         return img_url;
     }
 
+    public String getName_reader() {
+        return name_reader;
+    }
+
     public String getId() {
         return id;
     }
@@ -60,5 +66,7 @@ public class DrawItemBookMarks {
         this.img_url = img_url;
     }
 
-
+    public void setName_reader(String name_reader) {
+        this.name_reader = name_reader;
+    }
 }

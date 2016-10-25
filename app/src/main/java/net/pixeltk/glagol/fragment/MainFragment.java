@@ -12,6 +12,7 @@ import android.support.v7.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.MotionEvent;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -66,7 +67,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
     private ArrayList<Audio> auto_compliet = new ArrayList<>();
     getHttpGet request = new getHttpGet();
     Fragment fragment = null;
-    LinearLayout variant_frag, news_frag, search_variant;
+    LinearLayout variant_frag, news_frag, search_variant, main_frag_part;
     ImageView back_arrow;
     ListView list_variant;
     TextView variant_text, text_news, text_top_sale, text_sale, text_choice_editor, text_soon_be;
@@ -88,13 +89,15 @@ public class MainFragment extends Fragment implements View.OnClickListener {
 
         searchView=(SearchView) view.findViewById(R.id.searchView);
         searchView.setQueryHint("Поиск");
-        searchView.setHovered(false);
+        searchView.setFocusable(false);
+        searchView.clearFocus();
 
         sharedPreferences = getActivity().getSharedPreferences("ClickMain", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
 
         variant_frag = (LinearLayout) view.findViewById(R.id.variant_frag);
         news_frag = (LinearLayout) view.findViewById(R.id.news_frag);
+        main_frag_part = (LinearLayout) view.findViewById(R.id.main_frag_part);
         search_variant = (LinearLayout) view.findViewById(R.id.search_variant);
 
         list_variant = (ListView) view.findViewById(R.id.list_variant);
@@ -128,7 +131,9 @@ public class MainFragment extends Fragment implements View.OnClickListener {
                 my_variant.setTextColor(Color.parseColor("#F1F1F1"));
                 my_news.setBackgroundResource(R.drawable.background);
                 my_variant.setBackgroundResource(R.drawable.backsearch);
+
                 news_frag.setVisibility(View.GONE);
+                main_frag_part.setVisibility(View.GONE);
                 variant_frag.setVisibility(View.VISIBLE);
             }
         });
@@ -139,7 +144,9 @@ public class MainFragment extends Fragment implements View.OnClickListener {
                 my_variant.setTextColor(Color.parseColor("#000000"));
                 my_news.setBackgroundResource(R.drawable.backsearch);
                 my_variant.setBackgroundResource(R.drawable.background);
+
                 variant_frag.setVisibility(View.GONE);
+                main_frag_part.setVisibility(View.GONE);
                 news_frag.setVisibility(View.VISIBLE);
             }
         });
@@ -216,7 +223,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
 
             @Override
             public boolean onQueryTextSubmit(String query) {
-
+                searchView.clearFocus();
                 return false;
             }
 

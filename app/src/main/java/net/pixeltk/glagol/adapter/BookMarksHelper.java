@@ -8,6 +8,7 @@ public class BookMarksHelper {
 
     private String name_book;
     private String name_author;
+    private String name_reader;
     private String price;
     private String img_url;
     private String id_book;
@@ -27,6 +28,10 @@ public class BookMarksHelper {
     public String getImg_url()
     {
         return img_url;
+    }
+
+    public String getName_reader() {
+        return name_reader;
     }
 
     public String getId_book() {
@@ -51,5 +56,9 @@ public class BookMarksHelper {
 
     public void setId_book(String id_book) {
         this.id_book = id_book;
+    }
+
+    public void setName_reader(String name_reader) {
+        this.name_reader = name_reader;
     }
 }

@@ -1,5 +1,6 @@
 package net.pixeltk.glagol.fragment_my_book;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -10,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -93,7 +95,7 @@ public class Sigin extends Fragment implements OnBackPressedListener{
                 if (fragment != null) {
                     android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
                     fragmentManager.beginTransaction()
-                            .replace(R.id.frame_my_book, fragment).commit();
+                            .replace(R.id.main_frame, fragment).commit();
                 }
             }
         });
@@ -112,6 +114,7 @@ public class Sigin extends Fragment implements OnBackPressedListener{
 
                         JSONArray data = new JSONArray(request.getHttpGet("http://glagolapp.ru/api/registration?salt=df90sdfgl9854gjs54os59gjsogsdf&email=" + mail));
                         String status = data.getJSONObject(0).getString("error");
+                        int id=Integer.parseInt(data.toString().replaceAll("[\\D]", ""));
                         Log.d("myLogs","status " + data);
                         if (status.equals("true"))
                         {
@@ -121,9 +124,20 @@ public class Sigin extends Fragment implements OnBackPressedListener{
                         }
                         else
                         {
-                            Toast toast = Toast.makeText(getActivity(),
-                                    "Вы успешно зарегистрированы, пароль выслан на почту!", Toast.LENGTH_SHORT);
-                            toast.show();
+                            editor.putString("id", String.valueOf(id)).apply();
+                            final Dialog dialog = new Dialog(getActivity());
+                            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+                            dialog.setContentView(R.layout.customdialog);
+
+                            Button dialogButtonCancel = (Button) dialog.findViewById(R.id.customDialogCancel);
+                            dialogButtonCancel.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    dialog.dismiss();
+                                }
+                            });
+
+                            dialog.show();
                         }
 
 
@@ -132,7 +146,7 @@ public class Sigin extends Fragment implements OnBackPressedListener{
                         e.printStackTrace();
                     }
 
-                    fragment = new Login();
+                    fragment = new SuccessfulEnter();
                     if (fragment != null) {
                         android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
                         fragmentManager.beginTransaction()

@@ -29,6 +29,7 @@ import net.pixeltk.glagol.adapter.BookMarksHelper;
 import net.pixeltk.glagol.adapter.DataBasesHelper;
 import net.pixeltk.glagol.adapter.DrawItemBookMarks;
 import net.pixeltk.glagol.adapter.DrawerListBookMarks;
+import net.pixeltk.glagol.adapter.DrawerListHistory;
 import net.pixeltk.glagol.fargment_catalog.CardBook;
 import net.pixeltk.glagol.fargment_catalog.OnBackPressedListener;
 import net.pixeltk.glagol.fragment.MainFragment;
@@ -48,11 +49,14 @@ public class SuccessfulEnter extends Fragment implements OnBackPressedListener{
     LinearLayout listen_incl, buy_incl, my_tab_incl, history_incl;
     Button listen, buy, my_tab, history;
     private ArrayList<DrawItemBookMarks> navDrawerItems;
+    private ArrayList<DrawItemBookMarks> navDrawerHistoryItems;
     private static DrawerListBookMarks adapter;
-    ListView listView;
+    private static DrawerListHistory history_adapter;
+    ListView listView, listHistory;
     DataBasesHelper dataBasesHelper;
-    BookMarksHelper bookMarksHelper;
+    BookMarksHelper bookMarksHelper, historyHelper;
     ArrayList IdList = new ArrayList();
+    ArrayList HistoryListId = new ArrayList();
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
     TextView name_frag;
@@ -99,23 +103,17 @@ public class SuccessfulEnter extends Fragment implements OnBackPressedListener{
         editor = sharedPreferences.edit();
 
         listView = (ListView) view.findViewById(R.id.list_view);
+        listHistory = (ListView) view.findViewById(R.id.list_history);
 
         navDrawerItems = new ArrayList<DrawItemBookMarks>();
+        navDrawerHistoryItems = new ArrayList<DrawItemBookMarks>();
         dataBasesHelper = new DataBasesHelper(getActivity());
 
-        IdList = dataBasesHelper.getidRow();
+        IdList = dataBasesHelper.getidRow("Bookmarks");
+        HistoryListId = dataBasesHelper.getidRow("History");
         Log.d("MyLog", String.valueOf(IdList));
 
-        for (int i = 0; i < IdList.size(); i++)
-        {
-            bookMarksHelper = dataBasesHelper.getProduct(IdList.get(i).toString());
-            Log.d("MyLog", "Id" + bookMarksHelper.getId_book());
-            navDrawerItems.add(new DrawItemBookMarks(bookMarksHelper.getName_author(), bookMarksHelper.getName_book(), bookMarksHelper.getPrice(), bookMarksHelper.getImg_url(), bookMarksHelper.getId_book()));
-            bookMarksHelper = null;
-        }
 
-        adapter = new DrawerListBookMarks(getActivity(), navDrawerItems);
-        listView.setAdapter(adapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -131,6 +129,23 @@ public class SuccessfulEnter extends Fragment implements OnBackPressedListener{
                 }
             }
         });
+        listHistory.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                editor.putString("idbook", navDrawerHistoryItems.get(i).getId());
+                editor.putString("intent", "Successful").apply();
+                Fragment fragment = new CardBook();
+                if (fragment != null) {
+                    android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.main_frame, fragment).commit();
+                }
+            }
+        });
+
+
+
 
 
         listen.setOnClickListener(new View.OnClickListener() {
@@ -190,6 +205,16 @@ public class SuccessfulEnter extends Fragment implements OnBackPressedListener{
                 buy_incl.setVisibility(View.GONE);
                 my_tab_incl.setVisibility(View.VISIBLE);
                 history_incl.setVisibility(View.GONE);
+
+                for (int i = 0; i < IdList.size(); i++)
+                {
+                    navDrawerItems.clear();
+                    bookMarksHelper = dataBasesHelper.getProduct(IdList.get(i).toString(), "Bookmarks");
+                    navDrawerItems.add(new DrawItemBookMarks(bookMarksHelper.getName_author(), bookMarksHelper.getName_book(), bookMarksHelper.getName_reader(), bookMarksHelper.getPrice(), bookMarksHelper.getImg_url(), bookMarksHelper.getId_book()));
+                    bookMarksHelper = null;
+                }
+                adapter = new DrawerListBookMarks(getActivity(), navDrawerItems);
+                listView.setAdapter(adapter);
             }
         });
 
@@ -210,6 +235,21 @@ public class SuccessfulEnter extends Fragment implements OnBackPressedListener{
                 buy_incl.setVisibility(View.GONE);
                 my_tab_incl.setVisibility(View.GONE);
                 history_incl.setVisibility(View.VISIBLE);
+
+
+                navDrawerHistoryItems.clear();
+                for (int i = 0; i < HistoryListId.size(); i++)
+                {
+
+                    historyHelper = dataBasesHelper.getProduct(HistoryListId.get(i).toString(), "History");
+                    navDrawerHistoryItems.add(new DrawItemBookMarks(historyHelper.getName_author(), historyHelper.getName_book(), historyHelper.getName_reader(), historyHelper.getPrice(), historyHelper.getImg_url(), historyHelper.getId_book()));
+                    bookMarksHelper = null;
+
+                }
+
+                history_adapter = new DrawerListHistory(getActivity(), navDrawerHistoryItems);
+                listHistory.setAdapter(history_adapter);
+
             }
         });
 

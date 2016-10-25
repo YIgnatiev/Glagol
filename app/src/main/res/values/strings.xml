@@ -7,7 +7,7 @@
     <string name="sign_in">Войти под своим логином и паролем</string>
     <string name="text_enter_mail">Укажите свой e-mail</string>
     <string name="example_mail">example@gmail.com</string>
-    <string name="text_info_registration">Регистрация необходима для совершения покупок, синхронизации личного кабинета на разных устройствах и востановления доступа к приложению</string>
+    <string name="text_info_registration">Регистрация необходима для совершения покупок, синхронизации личного кабинета на разных устройствах и восстановления доступа к приложению</string>
     <string name="text_mail_pass">Укажите свой e-mail и пароль</string>
     <string name="text_info_login">Укажите пароль, который был отправлен на ваш e-mail после регистрации</string>
     <string name="button_login">Войти</string>

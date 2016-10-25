@@ -35,6 +35,7 @@ import net.pixeltk.glagol.fragment.FragmentPayment;
 import net.pixeltk.glagol.fragment.ListSearchBook;
 import net.pixeltk.glagol.fragment.MainFragment;
 import net.pixeltk.glagol.fragment.PlayerFragment;
+import net.pixeltk.glagol.fragment_my_book.Sigin;
 import net.pixeltk.glagol.fragment_my_book.SuccessfulEnter;
 
 import org.json.JSONArray;
@@ -66,7 +67,8 @@ public class CardBook extends Fragment implements OnBackPressedListener {
     ImageView back_arrow, logo;
     DataBasesHelper dataBasesHelper;
     ArrayList IdList = new ArrayList();
-    BookMarksHelper bookMarksHelper;
+    ArrayList HistoryListId = new ArrayList();
+    BookMarksHelper bookMarksHelper, historyHelper;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -124,8 +126,9 @@ public class CardBook extends Fragment implements OnBackPressedListener {
 
         cover = (ImageView) view.findViewById(R.id.cover);
 
-        IdList = dataBasesHelper.getidRow();
-        Log.d("MyLog", String.valueOf(IdList));
+        IdList = dataBasesHelper.getidRow("Bookmarks");
+        HistoryListId = dataBasesHelper.getidRow("History");
+        Log.d("MyLog", " id history list " + String.valueOf(IdList.size()));
 
 
         if (android.os.Build.VERSION.SDK_INT > 9) {
@@ -133,7 +136,6 @@ public class CardBook extends Fragment implements OnBackPressedListener {
             StrictMode.setThreadPolicy(policy);
         }
         try {
-            Log.d("myLogs","in ");
             JSONArray data = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/getbook?salt=df90sdfgl9854gjs54os59gjsogsdf&book_id=" + idbook.getString("idbook", "")));
 
             Gson gson = new Gson();
@@ -160,6 +162,35 @@ public class CardBook extends Fragment implements OnBackPressedListener {
 
         } catch (JSONException e) {
             e.printStackTrace();
+        }
+       /* if (!checklogin.contains("id"))
+        {
+            Toast toast = Toast.makeText(getActivity(),
+                    "Для выполнения этого действия нужно авторизироватся!", Toast.LENGTH_LONG);
+            toast.show();
+        }
+        else {
+            del_marks.setVisibility(View.VISIBLE);
+            book_marks.setVisibility(View.INVISIBLE);
+            dataBasesHelper.insertBookMarks(audios.get(0).getName_authors(), audios.get(0).getName_book(), audios.get(0).getReaders(), audios.get(0).getPrice(), audios.get(0).getIcon(), audios.get(0).getId());
+            dataBasesHelper.close();
+        }*/
+        if (HistoryListId.size() == 0)
+        {
+            dataBasesHelper.insertHistory(audios.get(0).getName_authors(), audios.get(0).getName_book(), audios.get(0).getReaders(), audios.get(0).getPrice(), audios.get(0).getIcon(), audios.get(0).getId());
+            dataBasesHelper.close();
+        }
+        else {
+            for (int i = 0; i < HistoryListId.size(); i++) {
+                historyHelper = dataBasesHelper.getProduct(HistoryListId.get(i).toString(), "History");
+                Log.d("MyLog", String.valueOf(audios.get(0).getId().equals(historyHelper.getId_book())));
+                if (!audios.get(0).getId().equals(historyHelper.getId_book())) {
+                    Log.d("MyLog", " in 2");
+                    dataBasesHelper.insertHistory(audios.get(0).getName_authors(), audios.get(0).getName_book(), audios.get(0).getReaders(), audios.get(0).getPrice(), audios.get(0).getIcon(), audios.get(0).getId());
+                    dataBasesHelper.close();
+                    break;
+                }
+            }
         }
         text_teg.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -189,17 +220,6 @@ public class CardBook extends Fragment implements OnBackPressedListener {
                         .replace(R.id.main_frame, fragment).commit();
 
             }
-        }
-        for (int i = 0; i < IdList.size(); i++)
-        {
-
-            bookMarksHelper = dataBasesHelper.getProduct(IdList.get(i).toString());
-            if (audios.get(0).getPrice().equals(bookMarksHelper.getPrice()))
-            {
-                book_marks.setVisibility(View.INVISIBLE);
-                del_marks.setVisibility(View.VISIBLE);
-            }
-                bookMarksHelper = null;
         }
 
         download.setOnClickListener(new View.OnClickListener() {
@@ -248,7 +268,7 @@ public class CardBook extends Fragment implements OnBackPressedListener {
                 else {
                     del_marks.setVisibility(View.VISIBLE);
                     book_marks.setVisibility(View.INVISIBLE);
-                    dataBasesHelper.insertBookMarks(audios.get(0).getName_authors(), audios.get(0).getName_book(), audios.get(0).getPrice(), audios.get(0).getIcon(), audios.get(0).getId());
+                    dataBasesHelper.insertBookMarks(audios.get(0).getName_authors(), audios.get(0).getName_book(), audios.get(0).getReaders(), audios.get(0).getPrice(), audios.get(0).getIcon(), audios.get(0).getId());
                     dataBasesHelper.close();
                 }
             }
@@ -259,17 +279,17 @@ public class CardBook extends Fragment implements OnBackPressedListener {
             public void onClick(View view) {
                 if (!checklogin.contains("id"))
                 {
-                    Toast toast = Toast.makeText(getActivity(),
-                            "Для выполнения этого действия нужно авторизироватся!", Toast.LENGTH_LONG);
-                    toast.show();
+
+                    fragment = new Sigin();
                 }
                 else {
                     fragment = new FragmentPayment();
-                    if (fragment != null) {
-                        android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
-                        fragmentManager.beginTransaction()
-                                .replace(R.id.main_frame, fragment).commit();
-                    }
+
+                }
+                if (fragment != null) {
+                    android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.main_frame, fragment).commit();
                 }
             }
         });
