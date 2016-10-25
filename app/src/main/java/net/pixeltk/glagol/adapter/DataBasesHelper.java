@@ -102,11 +102,25 @@ public class DataBasesHelper extends SQLiteOpenHelper {
 
 
 
-    public ArrayList getidRow(String TABLE_NAME) {
+    public ArrayList getidRow() {
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor c = db.query(TABLE_NAME, null, null, null, null, null, null);
-        if(c!=null&&c. moveToFirst()){
+        Cursor c = db.query(TABLE_BOOKMARKS, null, null, null, null, null, null);
+        if(c!=null&&c.moveToFirst()){
             do{
+                Log.d("MyLog", String.valueOf(c));
+                String id = c.getString(c.getColumnIndexOrThrow (ID));
+                IdList.add(id);
+
+            }while(c.moveToNext());
+        }
+        return IdList;
+    }
+    public ArrayList getIdHistory() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.query(TABLE_HISTORY, null, null, null, null, null, null);
+        if(c!=null&&c.moveToFirst()){
+            do{
+
                 String id = c.getString(c.getColumnIndexOrThrow (ID));
                 IdList.add(id);
 

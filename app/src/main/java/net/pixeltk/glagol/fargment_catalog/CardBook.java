@@ -65,10 +65,10 @@ public class CardBook extends Fragment implements OnBackPressedListener {
     LinearLayout content_line1, content_line2, content_line3;
     TextView name_frag;
     ImageView back_arrow, logo;
-    DataBasesHelper dataBasesHelper;
+    DataBasesHelper dataBookMarks, dataHistory;
     ArrayList IdList = new ArrayList();
     ArrayList HistoryListId = new ArrayList();
-    BookMarksHelper bookMarksHelper, historyHelper;
+    BookMarksHelper historyHelper, bookMarksHelper;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -88,7 +88,8 @@ public class CardBook extends Fragment implements OnBackPressedListener {
         editorsubscription = subscription.edit();
         editor = idbook.edit();
 
-        dataBasesHelper = new DataBasesHelper(getActivity());
+        dataBookMarks = new DataBasesHelper(getActivity());
+        dataHistory = new DataBasesHelper(getActivity());
 
         back_arrow = (ImageView) view.findViewById(R.id.back);
         logo = (ImageView) view.findViewById(R.id.logo);
@@ -126,9 +127,9 @@ public class CardBook extends Fragment implements OnBackPressedListener {
 
         cover = (ImageView) view.findViewById(R.id.cover);
 
-        IdList = dataBasesHelper.getidRow("Bookmarks");
-        HistoryListId = dataBasesHelper.getidRow("History");
-        Log.d("MyLog", " id history list " + String.valueOf(IdList.size()));
+        IdList = dataBookMarks.getidRow();
+        HistoryListId = dataHistory.getIdHistory();
+        Log.d("MyLog", " id history list " + String.valueOf(HistoryListId.size()));
 
 
         if (android.os.Build.VERSION.SDK_INT > 9) {
@@ -163,35 +164,33 @@ public class CardBook extends Fragment implements OnBackPressedListener {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-       /* if (!checklogin.contains("id"))
+        if (!checklogin.contains("id"))
         {
-            Toast toast = Toast.makeText(getActivity(),
-                    "Для выполнения этого действия нужно авторизироватся!", Toast.LENGTH_LONG);
-            toast.show();
         }
         else {
-            del_marks.setVisibility(View.VISIBLE);
-            book_marks.setVisibility(View.INVISIBLE);
-            dataBasesHelper.insertBookMarks(audios.get(0).getName_authors(), audios.get(0).getName_book(), audios.get(0).getReaders(), audios.get(0).getPrice(), audios.get(0).getIcon(), audios.get(0).getId());
-            dataBasesHelper.close();
-        }*/
-        if (HistoryListId.size() == 0)
-        {
-            dataBasesHelper.insertHistory(audios.get(0).getName_authors(), audios.get(0).getName_book(), audios.get(0).getReaders(), audios.get(0).getPrice(), audios.get(0).getIcon(), audios.get(0).getId());
-            dataBasesHelper.close();
-        }
-        else {
-            for (int i = 0; i < HistoryListId.size(); i++) {
-                historyHelper = dataBasesHelper.getProduct(HistoryListId.get(i).toString(), "History");
-                Log.d("MyLog", String.valueOf(audios.get(0).getId().equals(historyHelper.getId_book())));
-                if (!audios.get(0).getId().equals(historyHelper.getId_book())) {
-                    Log.d("MyLog", " in 2");
-                    dataBasesHelper.insertHistory(audios.get(0).getName_authors(), audios.get(0).getName_book(), audios.get(0).getReaders(), audios.get(0).getPrice(), audios.get(0).getIcon(), audios.get(0).getId());
-                    dataBasesHelper.close();
-                    break;
+            if (HistoryListId.size() == 0)
+            {
+                dataHistory.insertHistory(audios.get(0).getName_authors(), audios.get(0).getName_book(), audios.get(0).getReaders(), audios.get(0).getPrice(), audios.get(0).getIcon(), audios.get(0).getId());
+                dataBookMarks.close();
+            }
+            else {
+                int check = 0;
+                for (int i = 0; i < HistoryListId.size(); i++) {
+                    historyHelper = dataHistory.getProduct(HistoryListId.get(i).toString(), "History");
+
+                    if (audios.get(0).getId().equals(historyHelper.getId_book())) {
+                        check=1;
+                        break;
+                    }
+                }
+                if (check == 0)
+                {
+                    dataHistory.insertHistory(audios.get(0).getName_authors(), audios.get(0).getName_book(), audios.get(0).getReaders(), audios.get(0).getPrice(), audios.get(0).getIcon(), audios.get(0).getId());
+                    dataHistory.close();
                 }
             }
         }
+
         text_teg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -221,6 +220,17 @@ public class CardBook extends Fragment implements OnBackPressedListener {
 
             }
         }
+        for (int i = 0; i < IdList.size(); i++)
+        {
+
+            bookMarksHelper = dataBookMarks.getProduct(IdList.get(i).toString(), "Bookmarks");
+            if (audios.get(0).getId().equals(bookMarksHelper.getId_book()))
+            {
+                book_marks.setVisibility(View.INVISIBLE);
+                del_marks.setVisibility(View.VISIBLE);
+            }
+            bookMarksHelper = null;
+        }
 
         download.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -249,7 +259,7 @@ public class CardBook extends Fragment implements OnBackPressedListener {
             public void onClick(View view) {
                 book_marks.setVisibility(View.VISIBLE);
                 del_marks.setVisibility(View.INVISIBLE);
-                SQLiteDatabase db = dataBasesHelper.getWritableDatabase();
+                SQLiteDatabase db = dataBookMarks.getWritableDatabase();
                 db.delete("Bookmarks", "price = " + audios.get(0).getPrice(), null);
                 db.close();
             }
@@ -268,8 +278,8 @@ public class CardBook extends Fragment implements OnBackPressedListener {
                 else {
                     del_marks.setVisibility(View.VISIBLE);
                     book_marks.setVisibility(View.INVISIBLE);
-                    dataBasesHelper.insertBookMarks(audios.get(0).getName_authors(), audios.get(0).getName_book(), audios.get(0).getReaders(), audios.get(0).getPrice(), audios.get(0).getIcon(), audios.get(0).getId());
-                    dataBasesHelper.close();
+                    dataBookMarks.insertBookMarks(audios.get(0).getName_authors(), audios.get(0).getName_book(), audios.get(0).getReaders(), audios.get(0).getPrice(), audios.get(0).getIcon(), audios.get(0).getId());
+                    dataBookMarks.close();
                 }
             }
         });

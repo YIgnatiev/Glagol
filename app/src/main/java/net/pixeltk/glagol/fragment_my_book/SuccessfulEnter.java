@@ -50,10 +50,10 @@ public class SuccessfulEnter extends Fragment implements OnBackPressedListener{
     Button listen, buy, my_tab, history;
     private ArrayList<DrawItemBookMarks> navDrawerItems;
     private ArrayList<DrawItemBookMarks> navDrawerHistoryItems;
-    private static DrawerListBookMarks adapter;
-    private static DrawerListHistory history_adapter;
+    public static DrawerListBookMarks adapter;
+    private DrawerListHistory history_adapter;
     ListView listView, listHistory;
-    DataBasesHelper dataBasesHelper;
+    DataBasesHelper dataBookMarks, dataHistory;
     BookMarksHelper bookMarksHelper, historyHelper;
     ArrayList IdList = new ArrayList();
     ArrayList HistoryListId = new ArrayList();
@@ -107,13 +107,13 @@ public class SuccessfulEnter extends Fragment implements OnBackPressedListener{
 
         navDrawerItems = new ArrayList<DrawItemBookMarks>();
         navDrawerHistoryItems = new ArrayList<DrawItemBookMarks>();
-        dataBasesHelper = new DataBasesHelper(getActivity());
 
-        IdList = dataBasesHelper.getidRow("Bookmarks");
-        HistoryListId = dataBasesHelper.getidRow("History");
-        Log.d("MyLog", String.valueOf(IdList));
+        dataBookMarks = new DataBasesHelper(getActivity());
+        dataHistory = new DataBasesHelper(getActivity());
 
-
+        IdList.clear();
+        IdList = dataBookMarks.getidRow();
+        HistoryListId = dataHistory.getIdHistory();
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -205,11 +205,10 @@ public class SuccessfulEnter extends Fragment implements OnBackPressedListener{
                 buy_incl.setVisibility(View.GONE);
                 my_tab_incl.setVisibility(View.VISIBLE);
                 history_incl.setVisibility(View.GONE);
-
+                navDrawerItems.clear();
                 for (int i = 0; i < IdList.size(); i++)
                 {
-                    navDrawerItems.clear();
-                    bookMarksHelper = dataBasesHelper.getProduct(IdList.get(i).toString(), "Bookmarks");
+                    bookMarksHelper = dataBookMarks.getProduct(IdList.get(i).toString(), "Bookmarks");
                     navDrawerItems.add(new DrawItemBookMarks(bookMarksHelper.getName_author(), bookMarksHelper.getName_book(), bookMarksHelper.getName_reader(), bookMarksHelper.getPrice(), bookMarksHelper.getImg_url(), bookMarksHelper.getId_book()));
                     bookMarksHelper = null;
                 }
@@ -236,12 +235,11 @@ public class SuccessfulEnter extends Fragment implements OnBackPressedListener{
                 my_tab_incl.setVisibility(View.GONE);
                 history_incl.setVisibility(View.VISIBLE);
 
-
                 navDrawerHistoryItems.clear();
                 for (int i = 0; i < HistoryListId.size(); i++)
                 {
 
-                    historyHelper = dataBasesHelper.getProduct(HistoryListId.get(i).toString(), "History");
+                    historyHelper = dataHistory.getProduct(HistoryListId.get(i).toString(), "History");
                     navDrawerHistoryItems.add(new DrawItemBookMarks(historyHelper.getName_author(), historyHelper.getName_book(), historyHelper.getName_reader(), historyHelper.getPrice(), historyHelper.getImg_url(), historyHelper.getId_book()));
                     bookMarksHelper = null;
 
