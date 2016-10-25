@@ -113,6 +113,24 @@ public class Audio {
         this.word = word;
     }
 
+    @SerializedName("filename") String name_audio;
+
+    public String getName_audio() {
+        return name_audio;
+    }
+
+    public void setName_audio(String name_audio) {
+        this.name_audio = name_audio;
+    }
 
 
+    @SerializedName("pathfile") String path_audio;
+
+    public String getPath_audio() {
+        return path_audio;
+    }
+
+    public void setPath_audio(String path_audio) {
+        this.path_audio = path_audio;
+    }
 }

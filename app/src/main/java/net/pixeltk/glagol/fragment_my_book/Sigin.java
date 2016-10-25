@@ -104,7 +104,7 @@ public class Sigin extends Fragment implements OnBackPressedListener{
             @Override
             public void onClick(View view) {
                 mail = enter_mail.getText().toString();
-                if (mail!="") {
+                if (!mail.trim().equals("")) {
                     try {
 
                         if (android.os.Build.VERSION.SDK_INT > 9) {
@@ -114,8 +114,7 @@ public class Sigin extends Fragment implements OnBackPressedListener{
 
                         JSONArray data = new JSONArray(request.getHttpGet("http://glagolapp.ru/api/registration?salt=df90sdfgl9854gjs54os59gjsogsdf&email=" + mail));
                         String status = data.getJSONObject(0).getString("error");
-                        int id=Integer.parseInt(data.toString().replaceAll("[\\D]", ""));
-                        Log.d("myLogs","status " + data);
+
                         if (status.equals("true"))
                         {
                             Toast toast = Toast.makeText(getActivity(),
@@ -124,6 +123,7 @@ public class Sigin extends Fragment implements OnBackPressedListener{
                         }
                         else
                         {
+                            int id=Integer.parseInt(data.toString().replaceAll("[\\D]", ""));
                             editor.putString("id", String.valueOf(id)).apply();
                             final Dialog dialog = new Dialog(getActivity());
                             dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -138,6 +138,12 @@ public class Sigin extends Fragment implements OnBackPressedListener{
                             });
 
                             dialog.show();
+                            fragment = new SuccessfulEnter();
+                            if (fragment != null) {
+                                android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
+                                fragmentManager.beginTransaction()
+                                        .replace(R.id.main_frame, fragment).commit();
+                            }
                         }
 
 
@@ -146,12 +152,7 @@ public class Sigin extends Fragment implements OnBackPressedListener{
                         e.printStackTrace();
                     }
 
-                    fragment = new SuccessfulEnter();
-                    if (fragment != null) {
-                        android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
-                        fragmentManager.beginTransaction()
-                                .replace(R.id.frame_my_book, fragment).commit();
-                    }
+
                 }
                 else {
                     Toast toast = Toast.makeText(getActivity(),
@@ -161,10 +162,6 @@ public class Sigin extends Fragment implements OnBackPressedListener{
                 }
             }
         });
-
-
-
-
         return view;
     }
     @Override

@@ -4,7 +4,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Paint;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.StrictMode;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -41,6 +43,13 @@ import net.pixeltk.glagol.fragment_my_book.SuccessfulEnter;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -237,6 +246,7 @@ public class CardBook extends Fragment implements OnBackPressedListener {
             public void onClick(View view) {
                 download.setVisibility(View.INVISIBLE);
                 listen.setVisibility(View.VISIBLE);
+                setDownload();
 
             }
         });
@@ -349,6 +359,30 @@ public class CardBook extends Fragment implements OnBackPressedListener {
 
 
     }
+    public void setDownload ( )
+    {
+        if (android.os.Build.VERSION.SDK_INT > 9) {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+        }
+        try {
+            JSONArray data = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/getbookfiles?salt=df90sdfgl9854gjs54os59gjsogsdf&book_id=" + idbook.getString("idbook", "")));
+
+            Gson gson = new Gson();
+            audios = gson.fromJson(data.toString(),  new TypeToken<List<Audio>>(){}.getType());
+
+            if (audios!= null) {
+               /* for (int i=0; i<audios.size(); i++)
+                {*/
+                    Audio audio = audios.get(0);
+                    new DownloadFileFromURL().execute(audio.getPath_audio(), audio.getName_audio());
+                //}
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
     private String getTime(Long s){
         Long hours = s / 3600;
         Long minutes = (s % 3600) / 60;
@@ -395,6 +429,69 @@ public class CardBook extends Fragment implements OnBackPressedListener {
 
         }
 
+
+    }
+    class DownloadFileFromURL extends AsyncTask<String, Integer, String> {
+
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+        }
+
+        @Override
+        protected String doInBackground(String... f_url) {
+            URL u = null;
+            InputStream is = null;
+
+            try {
+                u = new URL(f_url[0]);
+                is = u.openStream();
+                HttpURLConnection huc = (HttpURLConnection)u.openConnection();//to know the size of video
+                int size = huc.getContentLength();
+
+                if(huc != null){
+                    String fileName = f_url[1];
+                    String storagePath = Environment.getExternalStorageDirectory().toString();
+                    File f = new File(storagePath,fileName);
+
+                    FileOutputStream fos = new FileOutputStream(f);
+                    byte[] buffer = new byte[1024];
+                    long total = 0;
+                    int len1 = 0;
+                    if(is != null){
+                        while ((len1 = is.read(buffer)) > 0) {
+                            total+=len1;
+                            publishProgress((int)((total*100)/size));
+                            fos.write(buffer,0, len1);
+                        }
+                    }
+                    if(fos != null){
+                        fos.close();
+                    }
+                }
+            }catch (MalformedURLException mue) {
+                mue.printStackTrace();
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+            } finally {
+                try {
+                    if(is != null){
+                        is.close();
+                    }
+                }catch (IOException ioe) {
+                    // just going to ignore this one
+                }
+            }
+            return "";
+        }
+
+
+        @Override
+        protected void onPostExecute(String file_url) {
+
+
+        }
 
     }
 
