@@ -1,10 +1,16 @@
 package net.pixeltk.glagol.fargment_catalog;
 
+import android.app.DownloadManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Paint;
+import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StrictMode;
@@ -52,6 +58,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Created by Yaroslav on 09.10.2016.
@@ -63,7 +70,7 @@ public class CardBook extends Fragment implements OnBackPressedListener {
         // Required empty public constructor
     }
 
-    Button buy, download, listen, book_marks, del_marks;
+    Button buy, download, listen, book_marks, del_marks, delete_audio;
     Fragment fragment = null;
     SharedPreferences sharedPreferences, idbook, subscription, checklogin;
     SharedPreferences.Editor editor, editorsubscription;
@@ -74,10 +81,14 @@ public class CardBook extends Fragment implements OnBackPressedListener {
     LinearLayout content_line1, content_line2, content_line3;
     TextView name_frag;
     ImageView back_arrow, logo;
-    DataBasesHelper dataBookMarks, dataHistory;
+    String id_book, file_path;
+    DataBasesHelper dataBookMarks, dataHistory, dataBuy, dataDownload;
     ArrayList IdList = new ArrayList();
     ArrayList HistoryListId = new ArrayList();
-    BookMarksHelper historyHelper, bookMarksHelper;
+    ArrayList BuyListId = new ArrayList();
+    ArrayList DownloadListId = new ArrayList();
+
+    BookMarksHelper historyHelper, bookMarksHelper, buyHelper, downloadHelper;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -99,6 +110,9 @@ public class CardBook extends Fragment implements OnBackPressedListener {
 
         dataBookMarks = new DataBasesHelper(getActivity());
         dataHistory = new DataBasesHelper(getActivity());
+        dataBuy = new DataBasesHelper(getActivity());
+        dataDownload = new DataBasesHelper(getActivity());
+
 
         back_arrow = (ImageView) view.findViewById(R.id.back);
         logo = (ImageView) view.findViewById(R.id.logo);
@@ -121,6 +135,7 @@ public class CardBook extends Fragment implements OnBackPressedListener {
         listen = (Button) view.findViewById(R.id.listen);
         book_marks = (Button) view.findViewById(R.id.book_marks);
         del_marks = (Button) view.findViewById(R.id.del_marks);
+        delete_audio = (Button) view.findViewById(R.id.delete_audio);
 
         name_author = (TextView) view.findViewById(R.id.name_author);
         name_book = (TextView) view.findViewById(R.id.name_book);
@@ -138,7 +153,8 @@ public class CardBook extends Fragment implements OnBackPressedListener {
 
         IdList = dataBookMarks.getidRow();
         HistoryListId = dataHistory.getIdHistory();
-        Log.d("MyLog", " id history list " + String.valueOf(HistoryListId.size()));
+        BuyListId = dataBuy.getIdBuy();
+        DownloadListId = dataDownload.getIdDownload();
 
 
         if (android.os.Build.VERSION.SDK_INT > 9) {
@@ -152,6 +168,8 @@ public class CardBook extends Fragment implements OnBackPressedListener {
             audios = gson.fromJson(data.toString(),  new TypeToken<List<Audio>>(){}.getType());
 
             if (audios!= null) {
+                id_book = audios.get(0).getId();
+                file_path = audios.get(0).getName_book();
                 name_author.setText("Автор: " + audios.get(0).getName_authors());
                 name_book.setText(audios.get(0).getName_book());
                 text_reader.setText("Чтец: " + audios.get(0).getReaders());
@@ -163,6 +181,7 @@ public class CardBook extends Fragment implements OnBackPressedListener {
                 {
                     text_time.setText(0 + " ч. " + 0 + " мин. " + 0+ " сек. " + " " + 0 + " мб.");
                 }
+                download.setText("Скачать " + Integer.parseInt(String.valueOf(Integer.parseInt(audios.get(0).getSize()) / 1000)) + " мб.");
                 text_teg.setText(audios.get(0).getCategorys());
                 text_teg.setPaintFlags(text_teg.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
                 description.setText(audios.get(0).getDescription());
@@ -214,11 +233,19 @@ public class CardBook extends Fragment implements OnBackPressedListener {
                 }
             }
         });
-        if (sharedPreferences.contains("Pay"))
-        {
-            buy.setVisibility(View.INVISIBLE);
-            download.setVisibility(View.VISIBLE);
+        for (int i = 0; i < BuyListId.size(); i++) {
+            buyHelper = dataBuy.getProduct(BuyListId.get(i).toString(), "Buy");
+
+            if (audios.get(0).getId().equals(buyHelper.getId_book())) {
+                buy.setVisibility(View.INVISIBLE);
+                download.setVisibility(View.VISIBLE);
+                del_marks.setVisibility(View.GONE);
+                book_marks.setVisibility(View.GONE);
+                delete_audio.setVisibility(View.GONE);
+                break;
+            }
         }
+
         if (audios.get(0).getPrice() == null)
         {
             fragment = new MainFragment();
@@ -235,18 +262,83 @@ public class CardBook extends Fragment implements OnBackPressedListener {
             bookMarksHelper = dataBookMarks.getProduct(IdList.get(i).toString(), "Bookmarks");
             if (audios.get(0).getId().equals(bookMarksHelper.getId_book()))
             {
-                book_marks.setVisibility(View.INVISIBLE);
+                book_marks.setVisibility(View.GONE);
                 del_marks.setVisibility(View.VISIBLE);
             }
             bookMarksHelper = null;
         }
+        for (int i = 0; i < DownloadListId.size(); i++)
+        {
 
+            downloadHelper = dataDownload.getProductDownload(DownloadListId.get(i).toString());
+            Log.d("MyLog", " check " + downloadHelper.getId_book());
+            if (id_book.equals(downloadHelper.getId_book()))
+            {
+                download.setVisibility(View.INVISIBLE);
+                book_marks.setVisibility(View.GONE);
+                del_marks.setVisibility(View.GONE);
+                delete_audio.setVisibility(View.VISIBLE);
+                listen.setVisibility(View.VISIBLE);
+            }
+            downloadHelper = null;
+        }
+
+        delete_audio.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                download.setVisibility(View.VISIBLE);
+                listen.setVisibility(View.INVISIBLE);
+
+                delete_audio.setVisibility(View.GONE);
+
+                File dir = new File(Environment.getExternalStorageDirectory()+"/Music/" + file_path);
+                if (dir.isDirectory())
+                {
+                    String[] children = dir.list();
+                    for (int i = 0; i < children.length; i++)
+                    {
+                        new File(dir, children[i]).delete();
+                    }
+                }
+
+                SQLiteDatabase db = dataDownload.getWritableDatabase();
+                db.delete("Download", "id_book = " + id_book, null);
+                db.close();
+            }
+        });
         download.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 download.setVisibility(View.INVISIBLE);
                 listen.setVisibility(View.VISIBLE);
+
+                del_marks.setVisibility(View.GONE);
+                book_marks.setVisibility(View.GONE);
+                delete_audio.setVisibility(View.VISIBLE);
+
                 setDownload();
+                if (DownloadListId.size() == 0)
+                {
+                    dataDownload.insertDownload(id_book);
+                    dataDownload.close();
+                }
+                else {
+                    int check = 0;
+                    for (int i = 0; i < DownloadListId.size(); i++) {
+                        downloadHelper = dataDownload.getProductDownload(DownloadListId.get(i).toString());
+                        Log.d("MyLog", "id " + audios.get(0).getId());
+                        if (id_book.equals(downloadHelper.getId_book())) {
+                            check=1;
+                            break;
+                        }
+                    }
+                    if (check == 0)
+                    {
+
+                        dataDownload.insertDownload(id_book);
+                        dataDownload.close();
+                    }
+                }
 
             }
         });
@@ -268,7 +360,8 @@ public class CardBook extends Fragment implements OnBackPressedListener {
             @Override
             public void onClick(View view) {
                 book_marks.setVisibility(View.VISIBLE);
-                del_marks.setVisibility(View.INVISIBLE);
+                del_marks.setVisibility(View.GONE);
+                delete_audio.setVisibility(View.GONE);
                 SQLiteDatabase db = dataBookMarks.getWritableDatabase();
                 db.delete("Bookmarks", "price = " + audios.get(0).getPrice(), null);
                 db.close();
@@ -287,7 +380,8 @@ public class CardBook extends Fragment implements OnBackPressedListener {
                 }
                 else {
                     del_marks.setVisibility(View.VISIBLE);
-                    book_marks.setVisibility(View.INVISIBLE);
+                    book_marks.setVisibility(View.GONE);
+                    delete_audio.setVisibility(View.GONE);
                     dataBookMarks.insertBookMarks(audios.get(0).getName_authors(), audios.get(0).getName_book(), audios.get(0).getReaders(), audios.get(0).getPrice(), audios.get(0).getIcon(), audios.get(0).getId());
                     dataBookMarks.close();
                 }
@@ -372,14 +466,16 @@ public class CardBook extends Fragment implements OnBackPressedListener {
             audios = gson.fromJson(data.toString(),  new TypeToken<List<Audio>>(){}.getType());
 
             if (audios!= null) {
-               /* for (int i=0; i<audios.size(); i++)
-                {*/
-                    Audio audio = audios.get(0);
-                    new DownloadFileFromURL().execute(audio.getPath_audio(), audio.getName_audio());
-                //}
+                for (int i=0; i<audios.size(); i++)
+                {
+                    Audio audio = audios.get(i);
+                    load(name_book.getText().toString(), audio.getName_audio(), audio.getPath_audio());
+                }
             }
 
         } catch (JSONException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -431,67 +527,43 @@ public class CardBook extends Fragment implements OnBackPressedListener {
 
 
     }
-    class DownloadFileFromURL extends AsyncTask<String, Integer, String> {
+    public void load(String book_name, String file_name, String url_file) throws Exception {
 
+        Log.d("MyLog", file_name + " url " + url_file.trim());
 
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
+        if (Build.VERSION.SDK_INT > 9) {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
         }
+        File dir = new File(Environment.getExternalStorageDirectory() + "/Music/" + book_name + "/");
+        dir.mkdir();
+            String destination = Environment.getExternalStorageDirectory() + "/Music/" + book_name + "/";
 
-        @Override
-        protected String doInBackground(String... f_url) {
-            URL u = null;
-            InputStream is = null;
+            destination += file_name;
+            Log.d("MyLog", "destin "  + destination);
+            final Uri uri = Uri.parse("file://" + destination);
 
-            try {
-                u = new URL(f_url[0]);
-                is = u.openStream();
-                HttpURLConnection huc = (HttpURLConnection)u.openConnection();//to know the size of video
-                int size = huc.getContentLength();
+            //set downloadmanager
+            DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url_file.replace(" ", "%20")));
+            request.setTitle("Идет загрузка...");
 
-                if(huc != null){
-                    String fileName = f_url[1];
-                    String storagePath = Environment.getExternalStorageDirectory().toString();
-                    File f = new File(storagePath,fileName);
+            //set destination
+            request.setDestinationUri(uri);
 
-                    FileOutputStream fos = new FileOutputStream(f);
-                    byte[] buffer = new byte[1024];
-                    long total = 0;
-                    int len1 = 0;
-                    if(is != null){
-                        while ((len1 = is.read(buffer)) > 0) {
-                            total+=len1;
-                            publishProgress((int)((total*100)/size));
-                            fos.write(buffer,0, len1);
-                        }
-                    }
-                    if(fos != null){
-                        fos.close();
-                    }
+            // get download service and enqueue file
+            final DownloadManager manager = (DownloadManager) getActivity().getSystemService(Context.DOWNLOAD_SERVICE);
+            final long downloadId = manager.enqueue(request);
+
+            //set BroadcastReceiver to install app when .apk is downloaded
+            BroadcastReceiver onComplete = new BroadcastReceiver() {
+                public void onReceive(Context ctxt, Intent intent) {
+
+//готово тост
+
                 }
-            }catch (MalformedURLException mue) {
-                mue.printStackTrace();
-            } catch (IOException ioe) {
-                ioe.printStackTrace();
-            } finally {
-                try {
-                    if(is != null){
-                        is.close();
-                    }
-                }catch (IOException ioe) {
-                    // just going to ignore this one
-                }
-            }
-            return "";
-        }
-
-
-        @Override
-        protected void onPostExecute(String file_url) {
-
-
-        }
+            };
+            //register receiver for when .apk download is compete
+            getActivity().registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
 
     }
 

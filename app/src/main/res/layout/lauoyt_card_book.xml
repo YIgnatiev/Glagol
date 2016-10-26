@@ -83,33 +83,47 @@
                 android:layout_margin="15dp"
                 android:text="Слушать демо"/>
 
-            <RelativeLayout
+            <Button
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginRight="15dp"
+                android:background="@drawable/backmain"
+                android:text="В закладках"
+                android:textAllCaps="false"
+                android:visibility="gone"
+                android:textColor="#FFFFFF"
                 android:layout_marginTop="15dp"
                 android:layout_marginBottom="15dp"
-                android:layout_marginLeft="0dp">
-                <Button
-                    android:layout_width="match_parent"
-                    android:background="@drawable/backmain"
-                    android:text="В закладках"
-                    android:textAllCaps="false"
-                    android:visibility="invisible"
-                    android:textColor="#FFFFFF"
-                    android:id="@+id/del_marks"
-                    android:layout_height="wrap_content" />
-                <Button
-                    android:layout_width="match_parent"
-                    android:background="@drawable/backsearch"
-                    android:text="В закладки"
-                    android:textAllCaps="false"
-                    android:visibility="visible"
-                    android:textColor="#FFFFFF"
-                    android:id="@+id/book_marks"
-                    android:layout_height="wrap_content" />
-            </RelativeLayout>
+                android:layout_marginRight="15dp"
+                android:id="@+id/del_marks"
+                android:layout_weight="1"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:layout_width="match_parent"
+                android:background="@drawable/backsearch"
+                android:text="В закладки"
+                android:layout_weight="1"
+                android:textAllCaps="false"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="15dp"
+                android:layout_marginRight="15dp"
+                android:visibility="visible"
+                android:textColor="#FFFFFF"
+                android:id="@+id/book_marks"
+                android:layout_height="wrap_content" />
+
+            <Button
+                android:layout_width="match_parent"
+                android:background="@drawable/backsearch"
+                android:text="Удалить"
+                android:layout_weight="1"
+                android:textAllCaps="false"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="15dp"
+                android:layout_marginRight="15dp"
+                android:visibility="gone"
+                android:textColor="#FFFFFF"
+                android:id="@+id/delete_audio"
+                android:layout_height="wrap_content" />
 
 
         </LinearLayout>

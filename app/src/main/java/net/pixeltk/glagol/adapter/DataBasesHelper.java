@@ -23,6 +23,8 @@ public class DataBasesHelper extends SQLiteOpenHelper {
     private static final String databaseName = "MyBooks";
     private static final String TABLE_BOOKMARKS = "Bookmarks";
     private static final String TABLE_HISTORY = "History";
+    private static final String TABLE_DOWNLOAD = "Download";
+    private static final String TABLE_BUY = "Buy";
 
     private static final String ID = "id";
     private static final String NAME_AUTHOR = "name_author";
@@ -53,6 +55,18 @@ public class DataBasesHelper extends SQLiteOpenHelper {
             + IMG_URL + " TEXT, "
             + ID_BOOK + " TEXT) ";
 
+    private static final String CREATE_TABLE_DOWNLOAD = "CREATE TABLE " + TABLE_DOWNLOAD + "("
+            + ID + " INTEGER PRIMARY KEY ,"
+            + ID_BOOK + " TEXT) ";
+
+    private static final String CREATE_TABLE_BUY = "CREATE TABLE " + TABLE_BUY + "("
+            + ID + " INTEGER PRIMARY KEY ,"
+            + NAME_AUTHOR + " TEXT, "
+            + BOOK_NAME + " TEXT, "
+            + NAME_READER + " TEXT, "
+            + PRICE + " TEXT, "
+            + IMG_URL + " TEXT, "
+            + ID_BOOK + " TEXT) ";
 
 
 
@@ -65,6 +79,8 @@ public class DataBasesHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL(CREATE_TABLE_BOOKMARKS);
         sqLiteDatabase.execSQL(CREATE_TABLE_HISTORY);
+        sqLiteDatabase.execSQL(CREATE_TABLE_DOWNLOAD);
+        sqLiteDatabase.execSQL(CREATE_TABLE_BUY);
 
     }
     @Override
@@ -72,6 +88,8 @@ public class DataBasesHelper extends SQLiteOpenHelper {
         // Drop older table if existed
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_BOOKMARKS);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_HISTORY);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_DOWNLOAD);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_BUY);
         onCreate(sqLiteDatabase);
     }
 
@@ -97,6 +115,28 @@ public class DataBasesHelper extends SQLiteOpenHelper {
         values.put(IMG_URL, img_url);
         values.put(ID_BOOK, id_book);
         db.insert(TABLE_HISTORY, null, values);
+        db.close();
+    }
+
+    public void insertBuy(String name_author, String book_name, String name_reader, String price, String img_url, String id_book) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(NAME_AUTHOR, name_author);
+        values.put(BOOK_NAME, book_name);
+        values.put(NAME_READER, name_reader);
+        values.put(PRICE, price);
+        values.put(IMG_URL, img_url);
+        values.put(ID_BOOK, id_book);
+        db.insert(TABLE_BUY, null, values);
+        db.close();
+    }
+
+
+    public void insertDownload(String id_book) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(ID_BOOK, id_book);
+        db.insert(TABLE_DOWNLOAD, null, values);
         db.close();
     }
 
@@ -129,6 +169,35 @@ public class DataBasesHelper extends SQLiteOpenHelper {
         return IdList;
     }
 
+    public ArrayList getIdDownload() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.query(TABLE_DOWNLOAD, null, null, null, null, null, null);
+        if(c!=null&&c.moveToFirst()){
+            do{
+
+                String id = c.getString(c.getColumnIndexOrThrow (ID));
+                IdList.add(id);
+
+            }while(c.moveToNext());
+        }
+        return IdList;
+    }
+
+    public ArrayList getIdBuy() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.query(TABLE_BUY, null, null, null, null, null, null);
+        if(c!=null&&c.moveToFirst()){
+            do{
+
+                String id = c.getString(c.getColumnIndexOrThrow (ID));
+                IdList.add(id);
+
+            }while(c.moveToNext());
+        }
+        return IdList;
+    }
+
+
 
 
     public BookMarksHelper getProduct(String productid, String TABLE_NAME) {
@@ -146,6 +215,23 @@ public class DataBasesHelper extends SQLiteOpenHelper {
                 bookMarksHelper.setPrice(cursor2.getString(4));
                 bookMarksHelper.setImg_url(cursor2.getString(5));
                 bookMarksHelper.setId_book(cursor2.getString(6));
+
+            } while (cursor2.moveToNext());
+        }
+        cursor2.close();
+        db.close();
+        return bookMarksHelper;
+    }
+    public BookMarksHelper getProductDownload(String productid) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor2 = db.query(TABLE_DOWNLOAD,
+                new String[] {ID, ID_BOOK},ID
+                        +" LIKE '"+productid+"%'", null, null, null, null);
+
+        BookMarksHelper bookMarksHelper = new BookMarksHelper();
+        if (cursor2.moveToFirst()) {
+            do {
+                bookMarksHelper.setId_book(cursor2.getString(1));
 
             } while (cursor2.moveToNext());
         }
