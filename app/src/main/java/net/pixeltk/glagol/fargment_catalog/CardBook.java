@@ -352,7 +352,14 @@ public class CardBook extends Fragment implements OnBackPressedListener {
                             "Для выполнения этого действия нужно авторизироватся!", Toast.LENGTH_LONG);
                     toast.show();
                 }
+                editor.putString("book_name", name_book.getText().toString()).apply();
+                fragment = new PlayerFragment();
+                if (fragment != null) {
+                    android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.main_frame, fragment).commit();
 
+                }
             }
         });
 
