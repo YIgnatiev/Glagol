@@ -3,218 +3,221 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
+    android:background="#2B2B2B"
     android:layout_height="match_parent">
     <include layout="@layout/toolbar"
         android:id="@+id/toolbar"/>
-<ScrollView
-    android:orientation="vertical"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <LinearLayout
+    <ScrollView
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/name_author"
-            android:layout_gravity="center"
-            android:layout_marginBottom="15dp"
-            android:layout_marginTop="15dp"
-            android:textColor="#646b6b"
-            android:text="Larry King"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/name_book"
-            android:text="Как разговаривать когда угодно и где угодно"
-            android:layout_gravity="center"
-            android:textSize="18sp"
-            android:textColor="#FFFFFF"
-            android:gravity="center"/>
-
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:srcCompat="@drawable/cpver"
-            android:layout_margin="15dp"
-            android:id="@+id/cover" />
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/part"
-            android:text="Часть 1. Глава 2: никогда не разговаривайте с неизвестными"
-            android:layout_gravity="center"
-            android:textSize="15sp"
-            android:textColor="#646b6b"
-            android:gravity="center"/>
-
         <LinearLayout
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_margin="15dp"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_height="wrap_content">
-            <Button
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:id="@+id/fast_left"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/name_author"
+                android:layout_gravity="center"
+                android:layout_marginBottom="15dp"
+                android:layout_marginTop="15dp"
+                android:textColor="#646b6b"
+                android:text="Larry King"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/name_book"
+                android:text="Как разговаривать когда угодно и где угодно"
+                android:layout_gravity="center"
+                android:textSize="18sp"
+                android:textColor="#FFFFFF"
+                android:gravity="center"/>
+
+            <ImageView
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                app:srcCompat="@drawable/cpver"
+                android:layout_gravity="center"
+                android:layout_margin="15dp"
+                android:id="@+id/cover" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/part"
+                android:text="Часть 1. Глава 2: никогда не разговаривайте с неизвестными"
+                android:layout_gravity="center"
+                android:textSize="15sp"
+                android:textColor="#646b6b"
+                android:gravity="center"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_margin="15dp"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_height="wrap_content">
+                <Button
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:id="@+id/back_track"
+                    android:layout_marginLeft="15dp"
+                    android:background="@mipmap/back"
+                    />
+                <Space
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"/>
+                <TextView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:id="@+id/left_30"
+                    android:layout_gravity="center"
+                    android:background="@mipmap/refresh"
+                    android:textSize="15sp"
+                    android:text="30"
+                    android:textColor="#FFFFFF"
+                    android:gravity="center"/>
+                <Space
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"/>
+                <Button
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:id="@+id/play_pause"
+                    android:background="@mipmap/play_button_player"
+                    />
+                <Space
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"/>
+
+                <TextView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:id="@+id/right_30"
+                    android:layout_gravity="center"
+                    android:background="@mipmap/refresh_copy"
+                    android:textSize="15sp"
+                    android:text="30"
+                    android:textColor="#FFFFFF"
+                    android:gravity="center"/>
+                <Space
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"/>
+
+                <Button
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginRight="15dp"
+                    android:id="@+id/next_track"
+                    android:background="@mipmap/back_copy"
+                    />
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:id="@+id/line0"
+                android:orientation="horizontal"
+                android:background="#FFFFFF"
+                android:layout_marginTop="15dp"
                 android:layout_marginLeft="15dp"
-                android:background="@mipmap/back"
-                />
-            <Space
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"/>
-            <TextView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:id="@+id/left_30"
-                android:layout_gravity="center"
-                android:background="@mipmap/refresh"
-                android:textSize="15sp"
-                android:text="30"
-                android:textColor="#FFFFFF"
-                android:gravity="center"/>
-            <Space
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"/>
-            <Button
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:id="@+id/play_pause"
-                android:background="@mipmap/play_button_player"
-                />
-            <Space
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"/>
-
-            <TextView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:id="@+id/right_30"
-                android:layout_gravity="center"
-                android:background="@mipmap/refresh_copy"
-                android:textSize="15sp"
-                android:text="30"
-                android:textColor="#FFFFFF"
-                android:gravity="center"/>
-            <Space
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"/>
-
-            <Button
-                android:layout_width="20dp"
-                android:layout_height="20dp"
                 android:layout_marginRight="15dp"
-                android:id="@+id/listen"
-                android:background="@mipmap/back_copy"
-                />
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:id="@+id/line0"
-            android:orientation="horizontal"
-            android:background="#FFFFFF"
-            android:layout_marginTop="15dp"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:layout_height="1dp"/>
+                android:layout_height="1dp"/>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:id="@+id/speed_line"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_margin="15dp"
-            android:layout_height="wrap_content">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/sped_text"
-                android:textColor="#FFFFFF"
-                android:text="Скорость"
-                android:gravity="center"/>
-            <TextView
-                android:layout_width="20dp"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:textColor="#FFFFFF"
-                android:background="@drawable/backsearch"
-                android:id="@+id/counter_speed"
-                android:text="1x"
-                android:gravity="center"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:id="@+id/speed_line"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_margin="15dp"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/sped_text"
+                    android:textColor="#FFFFFF"
+                    android:text="Скорость"
+                    android:gravity="center"/>
+                <TextView
+                    android:layout_width="20dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:textColor="#FFFFFF"
+                    android:background="@drawable/backsearch"
+                    android:id="@+id/counter_speed"
+                    android:text="1x"
+                    android:gravity="center"/>
 
             </LinearLayout>
 
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:id="@+id/line1"
-            android:orientation="horizontal"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:background="#FFFFFF"
-            android:layout_height="1dp"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:id="@+id/line1"
+                android:orientation="horizontal"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:background="#FFFFFF"
+                android:layout_height="1dp"/>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:id="@+id/progress_line"
-            android:orientation="horizontal"
-            android:layout_margin="15dp"
-            android:layout_height="wrap_content">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/now_time"
-                android:textColor="#FFFFFF"
-                android:layout_marginRight="5dp"
-                android:text="00:03:00"
-                android:layout_gravity="center"/>
-            <SeekBar
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/seekBar"
-                android:layout_weight="1"
-                android:progress="35"
-                android:thumb="@drawable/circle"
-                android:theme="@style/MyTheme"
-                android:layout_gravity="center"
-                />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:id="@+id/progress_line"
+                android:orientation="horizontal"
+                android:layout_margin="15dp"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/now_time"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginRight="5dp"
+                    android:text="00:03:00"
+                    android:layout_gravity="center"/>
+                <SeekBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/seekBar"
+                    android:layout_weight="1"
+                    android:progress="35"
+                    android:thumb="@drawable/circle"
+                    android:theme="@style/MyTheme"
+                    android:layout_gravity="center"
+                    />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
-                android:textColor="#FFFFFF"
-                android:id="@+id/all_time"
-                android:text="01:25:54"
-                android:layout_gravity="center"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:textColor="#FFFFFF"
+                    android:id="@+id/all_time"
+                    android:text="01:25:54"
+                    android:layout_gravity="center"/>
 
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:id="@+id/line10"
+                android:orientation="horizontal"
+                android:background="#1f1f1f"
+                android:layout_marginTop="15dp"
+                android:layout_marginBottom="15dp"
+                android:layout_height="3dp"/>
+
+            <ListView
+                android:id="@+id/playlist"
+                android:layout_width="match_parent"
+                style="@style/CustomListView"
+                android:dividerHeight="2dp"
+                android:listSelector="#2B2B2B"
+                android:divider="#2B2B2B"
+                android:layout_height="600dp" />
         </LinearLayout>
+    </ScrollView>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:id="@+id/line10"
-            android:orientation="horizontal"
-            android:background="#1f1f1f"
-            android:layout_marginTop="15dp"
-            android:layout_marginBottom="15dp"
-            android:layout_height="3dp"/>
-
-        <ListView
-            android:id="@+id/playlist"
-            android:layout_width="match_parent"
-            style="@style/CustomListView"
-            android:dividerHeight="2dp"
-            android:listSelector="#2B2B2B"
-            android:divider="#2B2B2B"
-            android:layout_height="600dp" />
-    </LinearLayout>
-</ScrollView>
-    </LinearLayout>
+</LinearLayout>

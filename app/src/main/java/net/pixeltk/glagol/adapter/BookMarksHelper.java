@@ -11,6 +11,10 @@ public class BookMarksHelper {
     private String name_reader;
     private String price;
     private String img_url;
+    private String current_position;
+    private String seekbar_value;
+    private String total_duration;
+    private String now_listening;
     private String id_book;
 
     public String getName_book()
@@ -38,6 +42,22 @@ public class BookMarksHelper {
         return id_book;
     }
 
+    public String getCurrent_position() {
+        return current_position;
+    }
+
+    public String getSeekbar_value() {
+        return seekbar_value;
+    }
+
+    public String getTotal_duration() {
+        return total_duration;
+    }
+
+    public String getNow_listening() {
+        return now_listening;
+    }
+
     public void setName_author(String name_author) {
         this.name_author = name_author;
     }
@@ -60,5 +80,21 @@ public class BookMarksHelper {
 
     public void setName_reader(String name_reader) {
         this.name_reader = name_reader;
+    }
+
+    public void setCurrent_position(String current_position) {
+        this.current_position = current_position;
+    }
+
+    public void setSeekbar_value(String seekbar_value) {
+        this.seekbar_value = seekbar_value;
+    }
+
+    public void setTotal_duration(String total_duration) {
+        this.total_duration = total_duration;
+    }
+
+    public void setNow_listening(String now_listening) {
+        this.now_listening = now_listening;
     }
 }

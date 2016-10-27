@@ -44,7 +44,6 @@
     Платеж будет зщищен и обработан сервисом Яндекс.Касса</string>
 
 
-
     <string-array name="nav_drawer_icons">
         <item>@mipmap/theatre</item>
         <item>@mipmap/teacher_briefcase</item>

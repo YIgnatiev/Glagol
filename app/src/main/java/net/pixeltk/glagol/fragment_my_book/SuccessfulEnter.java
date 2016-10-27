@@ -30,6 +30,7 @@ import net.pixeltk.glagol.adapter.DataBasesHelper;
 import net.pixeltk.glagol.adapter.DrawItemBookMarks;
 import net.pixeltk.glagol.adapter.DrawerListBookMarks;
 import net.pixeltk.glagol.adapter.DrawerListHistory;
+import net.pixeltk.glagol.adapter.DrawerListListening;
 import net.pixeltk.glagol.fargment_catalog.CardBook;
 import net.pixeltk.glagol.fargment_catalog.OnBackPressedListener;
 import net.pixeltk.glagol.fragment.MainFragment;
@@ -51,14 +52,17 @@ public class SuccessfulEnter extends Fragment implements OnBackPressedListener{
     private ArrayList<DrawItemBookMarks> navDrawerItems;
     private ArrayList<DrawItemBookMarks> navDrawerHistoryItems;
     private ArrayList<DrawItemBookMarks> navDrawerBuyItems;
+    private ArrayList<DrawItemBookMarks> navDrawerListenItems;
     public static DrawerListBookMarks adapter;
     private DrawerListHistory history_adapter, buy_adapter;
-    ListView listView, listHistory, listBuy;
-    DataBasesHelper dataBookMarks, dataHistory, dataBuy;
-    BookMarksHelper bookMarksHelper, historyHelper, buyHelper;
+    private DrawerListListening listen_adapter;
+    ListView listView, listHistory, listBuy, listlisten;
+    DataBasesHelper dataBookMarks, dataHistory, dataBuy, dataDownload, dataListen;
+    BookMarksHelper bookMarksHelper, historyHelper, buyHelper, listenHelper;
     ArrayList IdList = new ArrayList();
     ArrayList HistoryListId = new ArrayList();
     ArrayList BuyListId = new ArrayList();
+    ArrayList ListenId = new ArrayList();
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
     TextView name_frag;
@@ -107,18 +111,32 @@ public class SuccessfulEnter extends Fragment implements OnBackPressedListener{
         listView = (ListView) view.findViewById(R.id.list_view);
         listHistory = (ListView) view.findViewById(R.id.list_history);
         listBuy = (ListView) view.findViewById(R.id.list_buy);
+        listlisten = (ListView) view.findViewById(R.id.list_listen);
 
         navDrawerItems = new ArrayList<DrawItemBookMarks>();
         navDrawerHistoryItems = new ArrayList<DrawItemBookMarks>();
         navDrawerBuyItems = new ArrayList<DrawItemBookMarks>();
+        navDrawerListenItems = new ArrayList<DrawItemBookMarks>();
 
         dataBookMarks = new DataBasesHelper(getActivity());
         dataHistory = new DataBasesHelper(getActivity());
         dataBuy = new DataBasesHelper(getActivity());
+        dataListen = new DataBasesHelper(getActivity());
 
         IdList = dataBookMarks.getidRow();
         HistoryListId = dataHistory.getIdHistory();
         BuyListId = dataBuy.getIdBuy();
+        ListenId = dataListen.getIdListen();
+
+        navDrawerListenItems.clear();
+        for (int i = 0; i < ListenId.size(); i++)
+        {
+            listenHelper = dataListen.getProductListen(ListenId.get(i).toString());
+            navDrawerListenItems.add(new DrawItemBookMarks(listenHelper.getName_author(), listenHelper.getName_book(), listenHelper.getName_reader(), listenHelper.getNow_listening(), listenHelper.getImg_url(), listenHelper.getId_book()));
+            listenHelper = null;
+        }
+        listen_adapter = new DrawerListListening(getActivity(), navDrawerListenItems);
+        listlisten.setAdapter(listen_adapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -170,6 +188,16 @@ public class SuccessfulEnter extends Fragment implements OnBackPressedListener{
                 buy_incl.setVisibility(View.GONE);
                 my_tab_incl.setVisibility(View.GONE);
                 history_incl.setVisibility(View.GONE);
+
+                navDrawerListenItems.clear();
+                for (int i = 0; i < ListenId.size(); i++)
+                {
+                    listenHelper = dataListen.getProductListen(ListenId.get(i).toString());
+                    navDrawerListenItems.add(new DrawItemBookMarks(listenHelper.getName_author(), listenHelper.getName_book(), listenHelper.getName_reader(), listenHelper.getNow_listening(), listenHelper.getImg_url(), listenHelper.getId_book()));
+                    listenHelper = null;
+                }
+                listen_adapter = new DrawerListListening(getActivity(), navDrawerListenItems);
+                listlisten.setAdapter(listen_adapter);
             }
         });
 

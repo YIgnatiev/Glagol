@@ -25,6 +25,7 @@ public class DataBasesHelper extends SQLiteOpenHelper {
     private static final String TABLE_HISTORY = "History";
     private static final String TABLE_DOWNLOAD = "Download";
     private static final String TABLE_BUY = "Buy";
+    private static final String TABLE_LISTEN = "Listen";
 
     private static final String ID = "id";
     private static final String NAME_AUTHOR = "name_author";
@@ -33,6 +34,10 @@ public class DataBasesHelper extends SQLiteOpenHelper {
     private static final String PRICE = "price";
     private static final String IMG_URL = "img_url";
     private static final String ID_BOOK = "id_book";
+    private static final String CURRENTPOSITION = "current_position";
+    private static final String SEEKBAR_VALUE = "seekbar_value";
+    private static final String TOTAL_DURATION = "total_duration";
+    private static final String NOW_LISTENING = "now_listening";
 
 
     ArrayList IdList = new ArrayList();
@@ -68,6 +73,18 @@ public class DataBasesHelper extends SQLiteOpenHelper {
             + IMG_URL + " TEXT, "
             + ID_BOOK + " TEXT) ";
 
+    private static final String CREATE_TABLE_LISTEN = "CREATE TABLE " + TABLE_LISTEN + "("
+            + ID + " INTEGER PRIMARY KEY ,"
+            + NAME_AUTHOR + " TEXT, "
+            + BOOK_NAME + " TEXT, "
+            + NAME_READER + " TEXT, "
+            + IMG_URL + " TEXT, "
+            + CURRENTPOSITION + " TEXT, "
+            + SEEKBAR_VALUE + " TEXT, "
+            + TOTAL_DURATION + " TEXT, "
+            + NOW_LISTENING + " TEXT, "
+            + ID_BOOK + " TEXT) ";
+
 
 
     public DataBasesHelper(Context context) {
@@ -81,6 +98,7 @@ public class DataBasesHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL(CREATE_TABLE_HISTORY);
         sqLiteDatabase.execSQL(CREATE_TABLE_DOWNLOAD);
         sqLiteDatabase.execSQL(CREATE_TABLE_BUY);
+        sqLiteDatabase.execSQL(CREATE_TABLE_LISTEN);
 
     }
     @Override
@@ -90,6 +108,7 @@ public class DataBasesHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_HISTORY);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_DOWNLOAD);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_BUY);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_LISTEN);
         onCreate(sqLiteDatabase);
     }
 
@@ -105,16 +124,19 @@ public class DataBasesHelper extends SQLiteOpenHelper {
             db.insert(TABLE_BOOKMARKS, null, values);
         db.close();
     }
-    public void insertHistory(String name_author, String book_name, String name_reader, String price, String img_url, String id_book) {
+    public void insertListen(String name_author, String book_name, String name_reader, String img_url, String current_position, String seekbar_value, String total_duration, String now_listening, String id_book) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(NAME_AUTHOR, name_author);
         values.put(BOOK_NAME, book_name);
         values.put(NAME_READER, name_reader);
-        values.put(PRICE, price);
         values.put(IMG_URL, img_url);
+        values.put(CURRENTPOSITION, current_position);
+        values.put(SEEKBAR_VALUE, seekbar_value);
+        values.put(TOTAL_DURATION, total_duration);
+        values.put(NOW_LISTENING, now_listening);
         values.put(ID_BOOK, id_book);
-        db.insert(TABLE_HISTORY, null, values);
+        db.insert(TABLE_LISTEN, null, values);
         db.close();
     }
 
@@ -141,6 +163,18 @@ public class DataBasesHelper extends SQLiteOpenHelper {
     }
 
 
+    public void insertHistory(String name_author, String book_name, String name_reader, String price, String img_url, String id_book) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(NAME_AUTHOR, name_author);
+        values.put(BOOK_NAME, book_name);
+        values.put(NAME_READER, name_reader);
+        values.put(PRICE, price);
+        values.put(IMG_URL, img_url);
+        values.put(ID_BOOK, id_book);
+        db.insert(TABLE_HISTORY, null, values);
+        db.close();
+    }
 
     public ArrayList getidRow() {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -158,6 +192,20 @@ public class DataBasesHelper extends SQLiteOpenHelper {
     public ArrayList getIdHistory() {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.query(TABLE_HISTORY, null, null, null, null, null, null);
+        if(c!=null&&c.moveToFirst()){
+            do{
+
+                String id = c.getString(c.getColumnIndexOrThrow (ID));
+                IdList.add(id);
+
+            }while(c.moveToNext());
+        }
+        return IdList;
+    }
+
+    public ArrayList getIdListen() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.query(TABLE_LISTEN, null, null, null, null, null, null);
         if(c!=null&&c.moveToFirst()){
             do{
 
@@ -221,6 +269,40 @@ public class DataBasesHelper extends SQLiteOpenHelper {
         cursor2.close();
         db.close();
         return bookMarksHelper;
+    }
+    public BookMarksHelper getProductListen(String productid) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor2 = db.query(TABLE_LISTEN,
+                new String[] {ID, NAME_AUTHOR, BOOK_NAME, NAME_READER, IMG_URL, CURRENTPOSITION, SEEKBAR_VALUE, TOTAL_DURATION, NOW_LISTENING, ID_BOOK},ID
+                        +" LIKE '"+productid+"%'", null, null, null, null);
+
+        BookMarksHelper bookMarksHelper = new BookMarksHelper();
+        if (cursor2.moveToFirst()) {
+            do {
+                bookMarksHelper.setName_author(cursor2.getString(1));
+                bookMarksHelper.setName_book(cursor2.getString(2));
+                bookMarksHelper.setName_reader(cursor2.getString(3));
+                bookMarksHelper.setImg_url(cursor2.getString(4));
+                bookMarksHelper.setCurrent_position(cursor2.getString(5));
+                bookMarksHelper.setSeekbar_value(cursor2.getString(6));
+                bookMarksHelper.setTotal_duration(cursor2.getString(7));
+                bookMarksHelper.setNow_listening(cursor2.getString(8));
+                bookMarksHelper.setId_book(cursor2.getString(9));
+
+            } while (cursor2.moveToNext());
+        }
+        cursor2.close();
+        db.close();
+        return bookMarksHelper;
+    }
+    public void updatedetails(String id_book, String now_listen, String current_position, String seekbar_value)
+    {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues args = new ContentValues();
+        args.put(NOW_LISTENING, now_listen);
+        args.put(CURRENTPOSITION, current_position);
+        args.put(SEEKBAR_VALUE, seekbar_value);
+        db.update(TABLE_LISTEN, args, ID_BOOK + "=" + id_book, null);
     }
     public BookMarksHelper getProductDownload(String productid) {
         SQLiteDatabase db = this.getReadableDatabase();

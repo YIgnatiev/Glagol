@@ -81,14 +81,15 @@ public class CardBook extends Fragment implements OnBackPressedListener {
     LinearLayout content_line1, content_line2, content_line3;
     TextView name_frag;
     ImageView back_arrow, logo;
-    String id_book, file_path;
-    DataBasesHelper dataBookMarks, dataHistory, dataBuy, dataDownload;
+    String id_book, file_path, url_img, total_duration, book, author, reader;
+    DataBasesHelper dataBookMarks, dataHistory, dataBuy, dataDownload, dataListen;
     ArrayList IdList = new ArrayList();
     ArrayList HistoryListId = new ArrayList();
     ArrayList BuyListId = new ArrayList();
     ArrayList DownloadListId = new ArrayList();
+    ArrayList ListenId = new ArrayList();
 
-    BookMarksHelper historyHelper, bookMarksHelper, buyHelper, downloadHelper;
+    BookMarksHelper historyHelper, bookMarksHelper, buyHelper, downloadHelper, listenHelper;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -112,7 +113,7 @@ public class CardBook extends Fragment implements OnBackPressedListener {
         dataHistory = new DataBasesHelper(getActivity());
         dataBuy = new DataBasesHelper(getActivity());
         dataDownload = new DataBasesHelper(getActivity());
-
+        dataListen = new DataBasesHelper(getActivity());
 
         back_arrow = (ImageView) view.findViewById(R.id.back);
         logo = (ImageView) view.findViewById(R.id.logo);
@@ -155,6 +156,7 @@ public class CardBook extends Fragment implements OnBackPressedListener {
         HistoryListId = dataHistory.getIdHistory();
         BuyListId = dataBuy.getIdBuy();
         DownloadListId = dataDownload.getIdDownload();
+        ListenId = dataListen.getIdListen();
 
 
         if (android.os.Build.VERSION.SDK_INT > 9) {
@@ -170,10 +172,13 @@ public class CardBook extends Fragment implements OnBackPressedListener {
             if (audios!= null) {
                 id_book = audios.get(0).getId();
                 file_path = audios.get(0).getName_book();
+                author = audios.get(0).getName_authors();
+                reader = audios.get(0).getReaders();
                 name_author.setText("Автор: " + audios.get(0).getName_authors());
                 name_book.setText(audios.get(0).getName_book());
                 text_reader.setText("Чтец: " + audios.get(0).getReaders());
                 text_publisher.setText("Издательство: " + audios.get(0).getPublisher());
+                total_duration = audios.get(0).getDuration();
                 if (audios.get(0).getDuration() != null && audios.get(0).getSize() != null) {
                     text_time.setText(getTime(Long.valueOf(audios.get(0).getDuration())) + " " + Integer.parseInt(String.valueOf(Integer.parseInt(audios.get(0).getSize()) / 1000)) + " мб.");
                 }
@@ -185,6 +190,7 @@ public class CardBook extends Fragment implements OnBackPressedListener {
                 text_teg.setText(audios.get(0).getCategorys());
                 text_teg.setPaintFlags(text_teg.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
                 description.setText(audios.get(0).getDescription());
+                url_img = audios.get(0).getIcon();
                 Glide.with(getActivity()).load(audios.get(0).getIcon()).into(cover);
                 buy.setText("Купить за " + audios.get(0).getPrice() + " p.");
             }
@@ -192,14 +198,12 @@ public class CardBook extends Fragment implements OnBackPressedListener {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        if (!checklogin.contains("id"))
+        if (checklogin.contains("id"))
         {
-        }
-        else {
             if (HistoryListId.size() == 0)
             {
                 dataHistory.insertHistory(audios.get(0).getName_authors(), audios.get(0).getName_book(), audios.get(0).getReaders(), audios.get(0).getPrice(), audios.get(0).getIcon(), audios.get(0).getId());
-                dataBookMarks.close();
+                dataHistory.close();
             }
             else {
                 int check = 0;
@@ -334,7 +338,6 @@ public class CardBook extends Fragment implements OnBackPressedListener {
                     }
                     if (check == 0)
                     {
-
                         dataDownload.insertDownload(id_book);
                         dataDownload.close();
                     }
@@ -352,7 +355,31 @@ public class CardBook extends Fragment implements OnBackPressedListener {
                             "Для выполнения этого действия нужно авторизироватся!", Toast.LENGTH_LONG);
                     toast.show();
                 }
-                editor.putString("book_name", name_book.getText().toString()).apply();
+                editor.putString("book_name", file_path);
+                editor.putString("name_author", name_author.getText().toString());
+                editor.putString("url_img", url_img).apply();
+                if (ListenId.size() == 0)
+                {
+                    dataListen.insertListen(author, file_path, reader, url_img, "0", "0", total_duration, "0", id_book);
+                    dataListen.close();
+                }
+                else {
+                    int check = 0;
+                    for (int i = 0; i < ListenId.size(); i++) {
+                        listenHelper = dataListen.getProductListen(ListenId.get(i).toString());
+
+                        if (audios.get(0).getId().equals(listenHelper.getId_book())) {
+                            check=1;
+                            break;
+                        }
+                    }
+                    if (check == 0)
+                    {
+                        dataListen.insertListen(author, file_path, reader, url_img, "0", "0", total_duration, "0", id_book);
+                        dataListen.close();
+                    }
+                }
+
                 fragment = new PlayerFragment();
                 if (fragment != null) {
                     android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
