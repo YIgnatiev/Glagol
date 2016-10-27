@@ -49,6 +49,7 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
     String ATTRIBUTE_NAME_TEXT = "text";
     ListView playList;
     private int currentSongIndex = 0;
+    int positon = 0;
     SeekBar seekBar;
     private MediaPlayer mp;
     private SongsManager songManager;
@@ -127,21 +128,27 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
         utils = new Utilities();
         mp.setOnCompletionListener(this);
 
-        if (ListenId.size() != 0)
-        {
-            for (int i = 0; i < ListenId.size(); i++) {
-                listenHelper = dataBasesHelper.getProductListen(ListenId.get(i).toString());
+        if (!mp.isPlaying()) {
+            Log.d("MyLog", "Check");
+            if (mp != null) {
+                if (ListenId.size() != 0) {
+                    for (int i = 0; i < ListenId.size(); i++) {
+                        listenHelper = dataBasesHelper.getProductListen(ListenId.get(i).toString());
 
-                if (idbook.getString("book_name", "").equals(listenHelper.getName_book())) {
-                    currentSongIndex = Integer.parseInt(listenHelper.getCurrent_position());
-                    now_listening = listenHelper.getNow_listening();
-                    mp.seekTo(Integer.parseInt(listenHelper.getSeekbar_value()));
-                    //playSong(1);
-                    play_pause.setBackgroundResource(R.mipmap.pause_button);
-                    break;
+                        if (idbook.getString("book_name", "").equals(listenHelper.getName_book())) {
+                            positon = Integer.parseInt(listenHelper.getCurrent_position());
+                            // now_listening = listenHelper.getNow_listening();
+                            mp.seekTo(positon);
+                            //  playSong(0);
+                            play_pause.setBackgroundResource(R.mipmap.pause_button);
+                            break;
+                        }
+                    }
                 }
             }
         }
+        //playSong(0);
+
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
