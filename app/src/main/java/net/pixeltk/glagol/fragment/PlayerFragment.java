@@ -20,6 +20,7 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.facebook.stetho.Stetho;
 
 import net.pixeltk.glagol.R;
 import net.pixeltk.glagol.activity.TabActivity;
@@ -55,11 +56,13 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
     private SongsManager songManager;
     private Utilities utils;
     private ArrayList<HashMap<String, String>> songsList = new ArrayList<HashMap<String, String>>();
-    SharedPreferences idbook;
+    SharedPreferences idbook, playing;
+    SharedPreferences.Editor editor;
     Fragment fragment = null;
     Button play_pause, back_track, next_track;
     private Handler mHandler = new Handler();
-    double now_listening, total_duration;
+    int now_listening, total_duration, duration;
+    int old_listen = 0;
     DataBasesHelper dataBasesHelper;
     BookMarksHelper listenHelper;
     ArrayList ListenId = new ArrayList();
@@ -69,6 +72,7 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+       // Stetho.initializeWithDefaults(getActivity());
     }
 
     @Override
@@ -78,6 +82,12 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
         View view = inflater.inflate(R.layout.player_fragment, container, false);
 
         idbook = getActivity().getSharedPreferences("Category", Context.MODE_PRIVATE);
+        playing = getActivity().getSharedPreferences("Playing", Context.MODE_PRIVATE);
+        editor = playing.edit();
+        Bundle bundle = this.getArguments();
+        String check_play =  bundle.getString("open");
+
+        //Log.d("MyLog",  bundle.getString("open"));
 
         back_arrow = (ImageView) view.findViewById(R.id.back);
         logo = (ImageView) view.findViewById(R.id.logo);
@@ -123,31 +133,59 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
             createPlayList(idbook.getString("book_name", ""));
         }
 
+
+
         init();
         songManager = new SongsManager();
         utils = new Utilities();
         mp.setOnCompletionListener(this);
 
-        if (!mp.isPlaying()) {
-            Log.d("MyLog", "Check");
-            if (mp != null) {
+        songsList = songManager.getPlayList(idbook.getString("book_name", ""));
+
+        if (idbook.contains("intent")) {
+            if (check_play.equals("play")) {
+
                 if (ListenId.size() != 0) {
                     for (int i = 0; i < ListenId.size(); i++) {
                         listenHelper = dataBasesHelper.getProductListen(ListenId.get(i).toString());
-
                         if (idbook.getString("book_name", "").equals(listenHelper.getName_book())) {
                             positon = Integer.parseInt(listenHelper.getCurrent_position());
-                            // now_listening = listenHelper.getNow_listening();
-                            mp.seekTo(positon);
-                            //  playSong(0);
+                            old_listen = Integer.parseInt(listenHelper.getSeekbar_value());
+                            duration = Integer.parseInt(listenHelper.getTotal_duration());
+                            currentSongIndex = positon;
+                            playSong(positon);
+                            mp.seekTo(old_listen);
+                            updateProgressBar();
+                            editor.putString("play", "play").apply();
                             play_pause.setBackgroundResource(R.mipmap.pause_button);
+
                             break;
                         }
                     }
+                } else {
+                    playSong(0);
+                    play_pause.setBackgroundResource(R.mipmap.pause_button);
+                }
+            }
+            else
+            {
+                if (ListenId.size() != 0) {
+                    for (int i = 0; i < ListenId.size(); i++) {
+                        listenHelper = dataBasesHelper.getProductListen(ListenId.get(i).toString());
+                        if (idbook.getString("book_name", "").equals(listenHelper.getName_book())) {
+                            positon = Integer.parseInt(listenHelper.getCurrent_position());
+                            currentSongIndex = positon;
+                            String songTitle = songsList.get(currentSongIndex).get("songTitle");
+                            part.setText(songTitle);
+                            break;
+                        }
+                    }
+                } else {
+                    playSong(0);
+                    play_pause.setBackgroundResource(R.mipmap.pause_button);
                 }
             }
         }
-        //playSong(0);
 
 
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
@@ -177,7 +215,6 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
         });
 
 
-        songsList = songManager.getPlayList(idbook.getString("book_name", ""));
 
 
         back_track.setOnClickListener(new View.OnClickListener() {
@@ -219,16 +256,50 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
                 if (mp.isPlaying()) {
                     if (mp != null) {
                         play_pause.setBackgroundResource(R.mipmap.play_button_player);
-                        dataBasesHelper.updatedetails(idbook.getString("idbook", ""), "5" ,String.valueOf(currentSongIndex), String.valueOf(seekBar.getProgress()));
-                        mp.pause();
+                        total_duration = mp.getDuration();
+                        now_listening = utils.progressToTimer(seekBar.getProgress(), total_duration);
+                        Log.d("MyLog", " now_listening" + now_listening + " old_listen"  + old_listen +  " duration" + duration);
+                        double procent = ((old_listen + now_listening)/1000) / duration;
+
+                        if (currentSongIndex == 0) {
+
+                            dataBasesHelper.updatedetails(idbook.getString("idbook", ""), String.valueOf(procent), String.valueOf(positon), String.valueOf(old_listen + now_listening));
+                        }
+                        else
+                        {
+                            dataBasesHelper.updatedetails(idbook.getString("idbook", ""), String.valueOf(procent), String.valueOf(currentSongIndex), String.valueOf(old_listen + now_listening));
+                        }
+                            mp.pause();
+                        editor.clear().apply();
 
                     }
                 } else {
                     // Resume song
                     if (mp != null) {
-                        mp.start();
-                        play_pause.setBackgroundResource(R.mipmap.pause_button);
+                        //mp.start();
+                        if (ListenId.size() != 0) {
+                            for (int i = 0; i < ListenId.size(); i++) {
+                                listenHelper = dataBasesHelper.getProductListen(ListenId.get(i).toString());
+                                if (idbook.getString("book_name", "").equals(listenHelper.getName_book())) {
+                                    positon = Integer.parseInt(listenHelper.getCurrent_position());
+                                    old_listen = Integer.parseInt(listenHelper.getSeekbar_value());
+                                    duration = Integer.parseInt(listenHelper.getTotal_duration());
+                                    currentSongIndex = positon;
+                                    playSong(positon);
+                                    mp.seekTo(old_listen);
+                                    updateProgressBar();
+                                    editor.putString("play", "play").apply();
+                                    play_pause.setBackgroundResource(R.mipmap.pause_button);
 
+                                    break;
+                                }
+                            }
+                        } else {
+                            playSong(0);
+                            play_pause.setBackgroundResource(R.mipmap.pause_button);
+                        }
+                        play_pause.setBackgroundResource(R.mipmap.pause_button);
+                        editor.putString("play", "play").apply();
                     }
                 }
 
@@ -240,13 +311,13 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
             public void onClick(View view) {
                 mHandler.removeCallbacks(mUpdateTimeTask);
                 int totalDuration = mp.getDuration();
-                int newprogress = seekBar.getProgress() - 4;
-                int currentPosition = utils.progressToTimer(newprogress, totalDuration);
+
+                int currentPosition = utils.progressToTimer(seekBar.getProgress(), totalDuration);
+
+                Log.d("MyLog", " current " + currentPosition);
 
                 // forward or backward to certain seconds
-                mp.seekTo(currentPosition);
-
-                // update timer progress again
+                mp.seekTo(currentPosition - 30000);
                 updateProgressBar();
             }
         });
@@ -255,11 +326,10 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
             public void onClick(View view) {
                 mHandler.removeCallbacks(mUpdateTimeTask);
                 int totalDuration = mp.getDuration();
-                int newprogress = seekBar.getProgress() + 4;
-                int currentPosition = utils.progressToTimer(newprogress, totalDuration);
+                int currentPosition = utils.progressToTimer(seekBar.getProgress(), totalDuration);
 
                 // forward or backward to certain seconds
-                mp.seekTo(currentPosition);
+                mp.seekTo(currentPosition + 30000);
 
                 // update timer progress again
                 updateProgressBar();

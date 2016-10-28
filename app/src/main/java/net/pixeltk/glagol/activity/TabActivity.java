@@ -1,5 +1,7 @@
 package net.pixeltk.glagol.activity;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -21,6 +23,8 @@ public class  TabActivity extends AppCompatActivity {
 
     LinearLayout main, catalog, player, book, other;
     static TabLayout tabLayout;
+    SharedPreferences playing;
+    SharedPreferences.Editor editor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +37,9 @@ public class  TabActivity extends AppCompatActivity {
         tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.layout_tab_icon_player));
         tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.layout_tab_icon_mybook));
         tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.layout_tab_icon_other));
+
+        playing = getSharedPreferences("Playing", Context.MODE_PRIVATE);
+        editor = playing.edit();
 
         main = (LinearLayout) tabLayout.findViewById(R.id.line1);
         catalog = (LinearLayout) tabLayout.findViewById(R.id.catalog);
@@ -47,6 +54,7 @@ public class  TabActivity extends AppCompatActivity {
             public void onClick(View view) {
                 replaceFragment(new MainFragment());
                 tabLayout.getTabAt(0).select();
+                editor.remove("play").apply();
             }
         });
 
@@ -56,6 +64,7 @@ public class  TabActivity extends AppCompatActivity {
 
                 replaceFragment(new ListFragmentGlagol());
                 tabLayout.getTabAt(1).select();
+                editor.remove("play").apply();
             }
         });
 
@@ -63,7 +72,17 @@ public class  TabActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                replaceFragment(new PlayerFragment());
+                Fragment fragment = new PlayerFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("open", "not play");
+                fragment.setArguments(bundle);
+                if (fragment != null) {
+                    FragmentManager fragmentManager = getSupportFragmentManager();
+                    android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
+                    transaction.replace(R.id.main_frame, fragment);
+                    transaction.commit();
+
+                }
                 tabLayout.getTabAt(2).select();
             }
         });
@@ -74,6 +93,7 @@ public class  TabActivity extends AppCompatActivity {
 
                 replaceFragment(new MyBooks());
                 tabLayout.getTabAt(3).select();
+                editor.remove("play").apply();
             }
         });
 
@@ -83,6 +103,7 @@ public class  TabActivity extends AppCompatActivity {
 
                 replaceFragment(new OtherInfoFragment());
                 tabLayout.getTabAt(4).select();
+                editor.remove("play").apply();
             }
         });
 
@@ -104,6 +125,7 @@ public class  TabActivity extends AppCompatActivity {
         }
     }
     private void replaceFragment(Fragment fragment) {
+
         FragmentManager fragmentManager = getSupportFragmentManager();
         android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.replace(R.id.main_frame, fragment);

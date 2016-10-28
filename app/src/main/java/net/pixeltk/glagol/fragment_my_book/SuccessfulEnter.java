@@ -34,6 +34,7 @@ import net.pixeltk.glagol.adapter.DrawerListListening;
 import net.pixeltk.glagol.fargment_catalog.CardBook;
 import net.pixeltk.glagol.fargment_catalog.OnBackPressedListener;
 import net.pixeltk.glagol.fragment.MainFragment;
+import net.pixeltk.glagol.fragment.PlayerFragment;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -137,6 +138,28 @@ public class SuccessfulEnter extends Fragment implements OnBackPressedListener{
         }
         listen_adapter = new DrawerListListening(getActivity(), navDrawerListenItems);
         listlisten.setAdapter(listen_adapter);
+
+        listlisten.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                editor.putString("idbook", navDrawerListenItems.get(i).getId());
+                editor.putString("book_name", navDrawerListenItems.get(i).getName_book());
+                editor.putString("name_author", navDrawerListenItems.get(i).getName_author());
+                editor.putString("intent", "open");
+                editor.putString("url_img", navDrawerListenItems.get(i).getImg_url()).apply();
+                editor.putString("intent", "Successful").apply();
+
+                Fragment fragment = new PlayerFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("open", "play");
+                fragment.setArguments(bundle);
+                if (fragment != null) {
+                    android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.main_frame, fragment).commit();
+                }
+            }
+        });
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

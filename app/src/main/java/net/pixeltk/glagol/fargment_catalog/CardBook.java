@@ -381,6 +381,10 @@ public class CardBook extends Fragment implements OnBackPressedListener {
                 }
 
                 fragment = new PlayerFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("open", "play");
+                fragment.setArguments(bundle);
+
                 if (fragment != null) {
                     android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
                     fragmentManager.beginTransaction()
