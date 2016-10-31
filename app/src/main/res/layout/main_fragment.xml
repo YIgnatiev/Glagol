@@ -81,7 +81,7 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_below="@+id/button_line"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent">
             <include layout="@layout/variant_fragment"
                 android:visibility="gone"
                 android:id="@+id/variant_frag"/>
@@ -91,14 +91,11 @@
             <include layout="@layout/main_frag_part"
                 android:id="@+id/main_frag_part"/>
         </RelativeLayout>
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_height="300dp">
             <include layout="@layout/list_for_search_variant"
-                android:id="@+id/search_variant"/>
-        </RelativeLayout>
+                android:layout_height="300dp"
+                android:visibility="gone"
+                android:id="@+id/search_variant"
+                android:layout_width="match_parent" />
 
         </RelativeLayout>
     </LinearLayout>

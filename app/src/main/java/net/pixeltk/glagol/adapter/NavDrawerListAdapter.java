@@ -9,6 +9,8 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+
 import net.pixeltk.glagol.R;
 
 import java.util.ArrayList;
@@ -51,10 +53,11 @@ public class NavDrawerListAdapter extends BaseAdapter {
         ImageView imgIcon = (ImageView) convertView.findViewById(R.id.icon);
         TextView txtTitle = (TextView) convertView.findViewById(R.id.title);
         ImageView arrow = (ImageView) convertView.findViewById(R.id.arrow);
-         
-        imgIcon.setImageResource(navDrawerItems.get(position).getIcon());        
+
         txtTitle.setText(navDrawerItems.get(position).getTitle());
 		arrow.setImageResource(navDrawerItems.get(position).getArrow());
+		Glide.with(context).load(navDrawerItems.get(position).getIcon()).into(imgIcon);
+
 
 
 		return convertView;

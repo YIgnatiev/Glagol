@@ -3,14 +3,14 @@ package net.pixeltk.glagol.adapter;
 public class NavDrawerItem {
 	
 
-	private int icon;
+	private String icon;
 	private String title;
 	private int arrow;
 
 	
 	public NavDrawerItem(){}
 
-	public NavDrawerItem(int icon, String title, int arrow){
+	public NavDrawerItem(String icon, String title, int arrow){
 		this.title = title;
 		this.icon = icon;
 		this.arrow = arrow;
@@ -21,7 +21,7 @@ public class NavDrawerItem {
 		return this.title;
 	}
 	
-	public int getIcon(){
+	public String getIcon(){
 		return this.icon;
 	}
 
@@ -31,7 +31,7 @@ public class NavDrawerItem {
 		this.title = title;
 	}
 	
-	public void setIcon(int icon){
+	public void setIcon(String icon){
 		this.icon = icon;
 	}
 

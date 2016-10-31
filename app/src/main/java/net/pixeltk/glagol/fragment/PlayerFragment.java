@@ -72,7 +72,7 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-       // Stetho.initializeWithDefaults(getActivity());
+        Stetho.initializeWithDefaults(getActivity());
     }
 
     @Override
@@ -86,8 +86,6 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
         editor = playing.edit();
         Bundle bundle = this.getArguments();
         String check_play =  bundle.getString("open");
-
-        //Log.d("MyLog",  bundle.getString("open"));
 
         back_arrow = (ImageView) view.findViewById(R.id.back);
         logo = (ImageView) view.findViewById(R.id.logo);
@@ -126,65 +124,66 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
             }
         });
 
-        if (idbook.contains("book_name")) {
-            name_book.setText(idbook.getString("book_name", ""));
-            name_author.setText(idbook.getString("name_author", ""));
-            Glide.with(getActivity()).load(idbook.getString("url_img", "")).into(cover);
-            createPlayList(idbook.getString("book_name", ""));
-        }
-
-
-
         init();
         songManager = new SongsManager();
         utils = new Utilities();
         mp.setOnCompletionListener(this);
 
-        songsList = songManager.getPlayList(idbook.getString("book_name", ""));
+        if (idbook.contains("book_name")) {
+            name_book.setText(idbook.getString("book_name", ""));
+            name_author.setText(idbook.getString("name_author", ""));
+            Glide.with(getActivity()).load(idbook.getString("url_img", "")).placeholder(R.drawable.cpver).into(cover);
+            createPlayList(idbook.getString("book_name", ""));
+            songsList = songManager.getPlayList(idbook.getString("book_name", ""));
+        }
 
-        if (idbook.contains("intent")) {
-            if (check_play.equals("play")) {
+        if (!mp.isPlaying()) {
+            if (idbook.contains("intent")) {
+                if (check_play.equals("play")) {
 
-                if (ListenId.size() != 0) {
-                    for (int i = 0; i < ListenId.size(); i++) {
-                        listenHelper = dataBasesHelper.getProductListen(ListenId.get(i).toString());
-                        if (idbook.getString("book_name", "").equals(listenHelper.getName_book())) {
-                            positon = Integer.parseInt(listenHelper.getCurrent_position());
-                            old_listen = Integer.parseInt(listenHelper.getSeekbar_value());
-                            duration = Integer.parseInt(listenHelper.getTotal_duration());
-                            currentSongIndex = positon;
-                            playSong(positon);
-                            mp.seekTo(old_listen);
-                            updateProgressBar();
-                            editor.putString("play", "play").apply();
-                            play_pause.setBackgroundResource(R.mipmap.pause_button);
+                    if (ListenId.size() != 0) {
+                        for (int i = 0; i < ListenId.size(); i++) {
+                            listenHelper = dataBasesHelper.getProductListen(ListenId.get(i).toString());
+                            if (idbook.getString("book_name", "").equals(listenHelper.getName_book())) {
+                                positon = Integer.parseInt(listenHelper.getCurrent_position());
+                                old_listen = Integer.parseInt(listenHelper.getSeekbar_value());
+                                duration = Integer.parseInt(listenHelper.getTotal_duration());
+                                currentSongIndex = positon;
+                                playSong(positon);
+                                mp.seekTo(old_listen);
+                                updateProgressBar();
+                                editor.putString("play", "play").apply();
+                                play_pause.setBackgroundResource(R.mipmap.pause_button);
 
-                            break;
+                                break;
+                            }
                         }
+                    } else {
+                        playSong(0);
+                        play_pause.setBackgroundResource(R.mipmap.pause_button);
                     }
                 } else {
-                    playSong(0);
-                    play_pause.setBackgroundResource(R.mipmap.pause_button);
-                }
-            }
-            else
-            {
-                if (ListenId.size() != 0) {
-                    for (int i = 0; i < ListenId.size(); i++) {
-                        listenHelper = dataBasesHelper.getProductListen(ListenId.get(i).toString());
-                        if (idbook.getString("book_name", "").equals(listenHelper.getName_book())) {
-                            positon = Integer.parseInt(listenHelper.getCurrent_position());
-                            currentSongIndex = positon;
-                            String songTitle = songsList.get(currentSongIndex).get("songTitle");
-                            part.setText(songTitle);
-                            break;
+                    /*if (ListenId.size() != 0) {
+                        for (int i = 0; i < ListenId.size(); i++) {
+                            listenHelper = dataBasesHelper.getProductListen(ListenId.get(i).toString());
+                            if (idbook.getString("book_name", "").equals(listenHelper.getName_book())) {
+                                positon = Integer.parseInt(listenHelper.getCurrent_position());
+                                currentSongIndex = positon;
+                                String songTitle = songsList.get(currentSongIndex).get("songTitle");
+                                part.setText(songTitle);
+                                break;
+                            }
                         }
-                    }
-                } else {
-                    playSong(0);
-                    play_pause.setBackgroundResource(R.mipmap.pause_button);
+                    } else {
+                        playSong(0);
+                        play_pause.setBackgroundResource(R.mipmap.pause_button);
+                    }*/
                 }
             }
+        }
+        else
+        {
+            play_pause.setBackgroundResource(R.mipmap.pause_button);
         }
 
 

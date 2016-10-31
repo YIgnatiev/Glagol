@@ -1,8 +1,11 @@
 package net.pixeltk.glagol.activity;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.DeadObjectException;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -30,6 +33,7 @@ public class  TabActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tab);
+
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
 
         tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.layout_tab_icon_main));
@@ -37,6 +41,8 @@ public class  TabActivity extends AppCompatActivity {
         tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.layout_tab_icon_player));
         tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.layout_tab_icon_mybook));
         tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.layout_tab_icon_other));
+
+        tabLayout.setLayerType(View.LAYER_TYPE_HARDWARE, null);
 
         playing = getSharedPreferences("Playing", Context.MODE_PRIVATE);
         editor = playing.edit();

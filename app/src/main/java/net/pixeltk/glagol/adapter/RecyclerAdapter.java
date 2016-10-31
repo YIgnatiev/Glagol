@@ -66,7 +66,7 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
 
         holder.book_name.setText(itemsData.get(position).getName_book());
         holder.author.setText(itemsData.get(position).getName_authors());
-        Glide.with(context).load(itemsData.get(position).getIcon()).into(holder.cover);
+        Glide.with(context).load(itemsData.get(position).getIcon()).placeholder(R.drawable.cpver).into(holder.cover);
 
 
     }
