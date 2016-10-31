@@ -7,6 +7,7 @@
     android:layout_height="match_parent">
     <include layout="@layout/toolbar"
         android:id="@+id/toolbar"/>
+
     <ScrollView
         android:orientation="vertical"
         android:layout_width="match_parent"
@@ -24,13 +25,13 @@
                 android:layout_marginBottom="15dp"
                 android:layout_marginTop="15dp"
                 android:textColor="#646b6b"
-                android:text="Larry King"/>
+                android:text="Автор"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/name_book"
-                android:text="Как разговаривать когда угодно и где угодно"
+                android:text="Название книги"
                 android:layout_gravity="center"
                 android:textSize="18sp"
                 android:textColor="#FFFFFF"
@@ -39,7 +40,7 @@
             <ImageView
                 android:layout_width="200dp"
                 android:layout_height="200dp"
-                app:srcCompat="@drawable/cpver"
+                app:srcCompat="@drawable/notcover"
                 android:layout_gravity="center"
                 android:layout_margin="15dp"
                 android:id="@+id/cover" />
@@ -47,7 +48,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/part"
-                android:text="Часть 1. Глава 2: никогда не разговаривайте с неизвестными"
+                android:text="Название главы"
                 android:layout_gravity="center"
                 android:textSize="15sp"
                 android:textColor="#646b6b"
@@ -84,11 +85,13 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"/>
-                <Button
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
+                <CheckBox
+                    android:gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:id="@+id/play_pause"
-                    android:background="@mipmap/play_button_player"
+                    android:checked="false"
+                    android:button="@drawable/selecor_for_play_pause"
                     />
                 <Space
                     android:layout_width="wrap_content"

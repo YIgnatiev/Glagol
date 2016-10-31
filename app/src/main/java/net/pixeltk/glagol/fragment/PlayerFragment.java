@@ -13,16 +13,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.facebook.stetho.Stetho;
 
 import net.pixeltk.glagol.R;
+import net.pixeltk.glagol.Splash;
 import net.pixeltk.glagol.activity.TabActivity;
 import net.pixeltk.glagol.adapter.BookMarksHelper;
 import net.pixeltk.glagol.adapter.DataBasesHelper;
@@ -36,6 +40,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static net.pixeltk.glagol.Splash.mp;
+import static net.pixeltk.glagol.Splash.songsList;
+
 /**
  * Created by root on 04.10.16.
  */
@@ -46,26 +53,29 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
         // Required empty public constructor
     }
     ImageView back_arrow, logo, cover;
-    TextView name_frag, now_time, all_time, name_book, name_author, part, left_30, right_30;
+    TextView name_frag, now_time, all_time, name_book, name_author, left_30, right_30;
+    public static TextView part;
     String ATTRIBUTE_NAME_TEXT = "text";
     ListView playList;
     private int currentSongIndex = 0;
     int positon = 0;
-    SeekBar seekBar;
-    private MediaPlayer mp;
+    public static SeekBar seekBar;
+
     private SongsManager songManager;
     private Utilities utils;
-    private ArrayList<HashMap<String, String>> songsList = new ArrayList<HashMap<String, String>>();
+
     SharedPreferences idbook, playing;
     SharedPreferences.Editor editor;
     Fragment fragment = null;
-    Button play_pause, back_track, next_track;
+    Button back_track, next_track;
+    CheckBox play_pause;
     private Handler mHandler = new Handler();
     int now_listening, total_duration, duration;
     int old_listen = 0;
     DataBasesHelper dataBasesHelper;
     BookMarksHelper listenHelper;
     ArrayList ListenId = new ArrayList();
+    Splash splash = new Splash();
 
 
     @Override
@@ -113,7 +123,7 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
         name_frag = (TextView) view.findViewById(R.id.name_frag);
         name_frag.setText("Плеер");
 
-        play_pause = (Button) view.findViewById(R.id.play_pause);
+        play_pause = (CheckBox) view.findViewById(R.id.play_pause);
         back_track = (Button) view.findViewById(R.id.back_track);
         next_track = (Button) view.findViewById(R.id.next_track);
 
@@ -124,7 +134,6 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
             }
         });
 
-        init();
         songManager = new SongsManager();
         utils = new Utilities();
         mp.setOnCompletionListener(this);
@@ -132,15 +141,93 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
         if (idbook.contains("book_name")) {
             name_book.setText(idbook.getString("book_name", ""));
             name_author.setText(idbook.getString("name_author", ""));
-            Glide.with(getActivity()).load(idbook.getString("url_img", "")).placeholder(R.drawable.cpver).into(cover);
+            Glide.with(getActivity()).load(idbook.getString("url_img", "")).placeholder(R.drawable.notcover).into(cover);
             createPlayList(idbook.getString("book_name", ""));
             songsList = songManager.getPlayList(idbook.getString("book_name", ""));
+            play_pause.setEnabled(true);
         }
+        else {
+            play_pause.setEnabled(false);
+            Toast toast = Toast.makeText(getActivity(),
+                    "Для прослушивание выбирете книгу в каталоге!", Toast.LENGTH_LONG);
+            toast.show();
+        }
+        if (playing.contains("checked"))
+        {
+            play_pause.setChecked(true);
+            mHandler.removeCallbacks(mUpdateTimeTask);
 
+            // forward or bacward to certain seconds
+            seekBar.setProgress(mp.getCurrentPosition());
+
+            // update timer progress again
+            updateProgressBar();
+        }
+        play_pause.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                if (b == true)
+                {
+                    if (!mp.isPlaying())
+                    {
+                        if (mp != null) {
+                            if (ListenId.size() != 0) {
+                                for (int i = 0; i < ListenId.size(); i++) {
+                                    listenHelper = dataBasesHelper.getProductListen(ListenId.get(i).toString());
+                                    if (idbook.getString("book_name", "").equals(listenHelper.getName_book())) {
+                                        positon = Integer.parseInt(listenHelper.getCurrent_position());
+                                        old_listen = Integer.parseInt(listenHelper.getSeekbar_value());
+                                        duration = Integer.parseInt(listenHelper.getTotal_duration());
+                                        currentSongIndex = positon;
+                                        splash.playSong(positon);
+                                        mp.seekTo(old_listen);
+                                        updateProgressBar();
+                                        editor.putBoolean("checked", true).apply();
+                                        break;
+                                    }
+                                }
+                            } else {
+                                splash.playSong(0);
+                            }
+
+                            editor.putBoolean("checked", true).apply();
+                        }
+                    }
+                }
+                else
+                {
+                    if (mp != null) {
+                        double procent;
+                        total_duration = mp.getDuration();
+                        now_listening = utils.progressToTimer(seekBar.getProgress(), total_duration);
+                        Log.d("MyLog", " now_listening" + now_listening + " old_listen"  + old_listen +  " duration" + duration);
+                        if (duration == 0)
+                        {
+                            procent = ((old_listen + now_listening)/1000);
+                        }
+                        else
+                        {
+                            procent = ((old_listen + now_listening) / 1000) / duration;
+                        }
+                        if (currentSongIndex == 0) {
+
+                            dataBasesHelper.updatedetails(idbook.getString("idbook", ""), String.valueOf(procent), String.valueOf(positon), String.valueOf(old_listen + now_listening));
+                        }
+                        else
+                        {
+                            dataBasesHelper.updatedetails(idbook.getString("idbook", ""), String.valueOf(procent), String.valueOf(currentSongIndex), String.valueOf(old_listen + now_listening));
+                        }
+                        mp.pause();
+                        editor.clear().apply();
+
+                    }
+                }
+            }
+        });
         if (!mp.isPlaying()) {
             if (idbook.contains("intent")) {
                 if (check_play.equals("play")) {
-
+                    play_pause.setChecked(true);
                     if (ListenId.size() != 0) {
                         for (int i = 0; i < ListenId.size(); i++) {
                             listenHelper = dataBasesHelper.getProductListen(ListenId.get(i).toString());
@@ -149,21 +236,21 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
                                 old_listen = Integer.parseInt(listenHelper.getSeekbar_value());
                                 duration = Integer.parseInt(listenHelper.getTotal_duration());
                                 currentSongIndex = positon;
-                                playSong(positon);
+                                splash.playSong(positon);
+                                updateProgressBar();
                                 mp.seekTo(old_listen);
                                 updateProgressBar();
                                 editor.putString("play", "play").apply();
-                                play_pause.setBackgroundResource(R.mipmap.pause_button);
 
                                 break;
                             }
                         }
                     } else {
-                        playSong(0);
-                        play_pause.setBackgroundResource(R.mipmap.pause_button);
+                        splash.playSong(0);
+                        updateProgressBar();
                     }
                 } else {
-                    /*if (ListenId.size() != 0) {
+                    if (ListenId.size() != 0) {
                         for (int i = 0; i < ListenId.size(); i++) {
                             listenHelper = dataBasesHelper.getProductListen(ListenId.get(i).toString());
                             if (idbook.getString("book_name", "").equals(listenHelper.getName_book())) {
@@ -175,15 +262,16 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
                             }
                         }
                     } else {
-                        playSong(0);
-                        play_pause.setBackgroundResource(R.mipmap.pause_button);
-                    }*/
+                        splash.playSong(0);
+                        updateProgressBar();
+
+                    }
                 }
             }
         }
         else
         {
-            play_pause.setBackgroundResource(R.mipmap.pause_button);
+            play_pause.setChecked(true);
         }
 
 
@@ -221,13 +309,16 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
             @Override
             public void onClick(View arg0) {
                 if (currentSongIndex > 0) {
-                    playSong(currentSongIndex - 1);
+                    splash.playSong(currentSongIndex - 1);
+                    updateProgressBar();
                     currentSongIndex = currentSongIndex - 1;
                 } else {
                     // play last song
-                    playSong(songsList.size() - 1);
+                    splash.playSong(songsList.size() - 1);
+                    updateProgressBar();
                     currentSongIndex = songsList.size() - 1;
                 }
+                play_pause.setChecked(true);
 
             }
         });
@@ -238,69 +329,16 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
             public void onClick(View arg0) {
                 // check if next song is there or not
                 if (currentSongIndex < (songsList.size() - 1)) {
-                    playSong(currentSongIndex + 1);
+                    splash.playSong(currentSongIndex + 1);
+                    updateProgressBar();
                     currentSongIndex = currentSongIndex + 1;
                 } else {
                     // play first song
-                    playSong(0);
-                    play_pause.setBackgroundResource(R.mipmap.pause_button);
+                    splash.playSong(0);
+                    updateProgressBar();
                     currentSongIndex = 0;
                 }
-
-            }
-        });
-        play_pause.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mp.isPlaying()) {
-                    if (mp != null) {
-                        play_pause.setBackgroundResource(R.mipmap.play_button_player);
-                        total_duration = mp.getDuration();
-                        now_listening = utils.progressToTimer(seekBar.getProgress(), total_duration);
-                        Log.d("MyLog", " now_listening" + now_listening + " old_listen"  + old_listen +  " duration" + duration);
-                        double procent = ((old_listen + now_listening)/1000) / duration;
-
-                        if (currentSongIndex == 0) {
-
-                            dataBasesHelper.updatedetails(idbook.getString("idbook", ""), String.valueOf(procent), String.valueOf(positon), String.valueOf(old_listen + now_listening));
-                        }
-                        else
-                        {
-                            dataBasesHelper.updatedetails(idbook.getString("idbook", ""), String.valueOf(procent), String.valueOf(currentSongIndex), String.valueOf(old_listen + now_listening));
-                        }
-                            mp.pause();
-                        editor.clear().apply();
-
-                    }
-                } else {
-                    // Resume song
-                    if (mp != null) {
-                        //mp.start();
-                        if (ListenId.size() != 0) {
-                            for (int i = 0; i < ListenId.size(); i++) {
-                                listenHelper = dataBasesHelper.getProductListen(ListenId.get(i).toString());
-                                if (idbook.getString("book_name", "").equals(listenHelper.getName_book())) {
-                                    positon = Integer.parseInt(listenHelper.getCurrent_position());
-                                    old_listen = Integer.parseInt(listenHelper.getSeekbar_value());
-                                    duration = Integer.parseInt(listenHelper.getTotal_duration());
-                                    currentSongIndex = positon;
-                                    playSong(positon);
-                                    mp.seekTo(old_listen);
-                                    updateProgressBar();
-                                    editor.putString("play", "play").apply();
-                                    play_pause.setBackgroundResource(R.mipmap.pause_button);
-
-                                    break;
-                                }
-                            }
-                        } else {
-                            playSong(0);
-                            play_pause.setBackgroundResource(R.mipmap.pause_button);
-                        }
-                        play_pause.setBackgroundResource(R.mipmap.pause_button);
-                        editor.putString("play", "play").apply();
-                    }
-                }
+                play_pause.setChecked(true);
 
             }
         });
@@ -318,6 +356,7 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
                 // forward or backward to certain seconds
                 mp.seekTo(currentPosition - 30000);
                 updateProgressBar();
+                play_pause.setChecked(true);
             }
         });
         right_30.setOnClickListener(new View.OnClickListener() {
@@ -332,37 +371,13 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
 
                 // update timer progress again
                 updateProgressBar();
+                play_pause.setChecked(true);
             }
         });
         return view;
     }
 
-    public MediaPlayer playSong(int songIndex) {
-        // Play song
-        try {
-            mp.stop();
-            mp.reset();
-            mp.setDataSource(songsList.get(songIndex).get("songPath"));
-            mp.prepare();
-            mp.start();
-            // Displaying Song title
-            String songTitle = songsList.get(songIndex).get("songTitle");
-            part.setText(songTitle);
-            // set Progress bar values
-            seekBar.setProgress(0);
-            seekBar.setMax(100);
 
-            // Updating progress bar
-            updateProgressBar();
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (IllegalStateException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return mp;
-    }
     public void updateProgressBar() {
         mHandler.postDelayed(mUpdateTimeTask, 100);
     }
@@ -389,11 +404,7 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
         }
 
     };
-    public MediaPlayer init() {
-        mp = new MediaPlayer();
-        Log.d("myLogs", "mp " + mp);
-        return mp;
-    }
+
     public void createPlayList(String book_name) {
         File dir = new File(Environment.getExternalStorageDirectory() + "/Music/" + book_name);
         Log.d("Files", "f: " + dir);
@@ -430,8 +441,9 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
                 playList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
-                        playSong(position);
-                        play_pause.setBackgroundResource(R.mipmap.pause_button);
+                        splash.playSong(position);
+                        play_pause.setChecked(true);
+                        updateProgressBar();
                         currentSongIndex = position;
                     }
                 });
@@ -469,11 +481,11 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
     @Override
     public void onCompletion(MediaPlayer mediaPlayer) {
         if (currentSongIndex < (songsList.size() - 1)) {
-            playSong(currentSongIndex + 1);
+            splash.playSong(currentSongIndex + 1);
             currentSongIndex = currentSongIndex + 1;
         } else {
             // play first song
-            playSong(0);
+            splash.playSong(0);
             currentSongIndex = 0;
         }
     }
