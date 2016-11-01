@@ -502,12 +502,38 @@ public class CardBook extends Fragment implements OnBackPressedListener {
 
             Gson gson = new Gson();
             audios = gson.fromJson(data.toString(),  new TypeToken<List<Audio>>(){}.getType());
-
+            String name_audio = null;
             if (audios!= null) {
                 for (int i=0; i<audios.size(); i++)
                 {
                     Audio audio = audios.get(i);
-                    load(name_book.getText().toString(), audio.getName_audio(), audio.getPath_audio());
+                    if (!audio.getDescription().equals(""))
+                    {
+                        name_audio = audio.getDescription();
+                        load(name_book.getText().toString(), name_audio, audio.getPath_audio());
+                        name_audio = null;
+                    }
+                    else
+                    {
+                        if (audio.getTrack_number().length() == 1)
+                        {
+                            name_audio = "00" + audio.getTrack_number();
+                            load(name_book.getText().toString(), name_audio, audio.getPath_audio());
+                            name_audio = null;
+                        }
+                        else if (audio.getTrack_number().length() == 2)
+                        {
+                            name_audio = "0" + audio.getTrack_number();
+                            load(name_book.getText().toString(), name_audio, audio.getPath_audio());
+                            name_audio = null;
+                        }
+                        else if (audio.getTrack_number().length() > 2)
+                        {
+                            name_audio = audio.getTrack_number();
+                            load(name_book.getText().toString(), name_audio, audio.getPath_audio());
+                            name_audio = null;
+                        }
+                    }
                 }
             }
 
@@ -567,7 +593,6 @@ public class CardBook extends Fragment implements OnBackPressedListener {
     }
     public void load(String book_name, String file_name, String url_file) throws Exception {
 
-        Log.d("MyLog", file_name + " url " + url_file.trim());
 
         if (Build.VERSION.SDK_INT > 9) {
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -595,8 +620,6 @@ public class CardBook extends Fragment implements OnBackPressedListener {
             //set BroadcastReceiver to install app when .apk is downloaded
             BroadcastReceiver onComplete = new BroadcastReceiver() {
                 public void onReceive(Context ctxt, Intent intent) {
-
-//готово тост
 
                 }
             };

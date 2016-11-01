@@ -133,4 +133,14 @@ public class Audio {
     public void setPath_audio(String path_audio) {
         this.path_audio = path_audio;
     }
+
+    @SerializedName("track_number") String track_number;
+
+    public String getTrack_number() {
+        return track_number;
+    }
+
+    public void setTrack_number(String track_number) {
+        this.track_number = track_number;
+    }
 }

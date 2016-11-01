@@ -1,21 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <include layout="@layout/toolbar"
         android:id="@+id/toolbar"/>
 
-    <RelativeLayout
-        android:layout_below="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:gravity="center"
-        android:layout_height="match_parent">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:textSize="18sp"
+        android:layout_marginTop="80dp"
         android:textColor="#FFFFFF"
         android:layout_marginBottom="15dp"
         android:id="@+id/text"
@@ -26,7 +24,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:id="@+id/line1"
-        android:layout_below="@+id/text"
+
         android:orientation="horizontal"
         android:background="#FFFFFF"
         />
@@ -36,7 +34,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/enter_mail"
         android:background="@android:color/transparent"
-        android:layout_below="@+id/line1"
+
         android:textColor="#FFFFFF"
         android:layout_margin="15dp"
         android:hint="@string/example_mail"
@@ -48,7 +46,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:id="@+id/line2"
-        android:layout_below="@+id/enter_mail"
+
         android:orientation="horizontal"
         android:background="#FFFFFF"
         />
@@ -60,7 +58,7 @@
         android:textColor="#FFFFFF"
         android:inputType="textPassword"
         android:background="@android:color/transparent"
-        android:layout_below="@+id/line2"
+
         android:layout_margin="15dp"
         android:hint="*****"
         android:textColorHint="#6e6e6e"
@@ -71,7 +69,7 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:id="@+id/line3"
-        android:layout_below="@+id/enter_password"
+
         android:orientation="horizontal"
         android:background="#FFFFFF"
         />
@@ -80,7 +78,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/text_info"
-        android:layout_below="@+id/line3"
+
         android:layout_margin="15dp"
         android:gravity="center"
         android:textColor="#646464"
@@ -91,7 +89,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/login"
-        android:layout_below="@+id/text_info"
+
         android:layout_margin="15dp"
         android:textAllCaps="false"
         android:textSize="18sp"
@@ -103,7 +101,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/send_mail"
-        android:layout_below="@+id/login"
         android:layout_margin="15dp"
         android:textAllCaps="false"
         android:textSize="18sp"
@@ -112,5 +109,4 @@
         android:text="@string/send_pass"
         />
 
-</RelativeLayout>
-</RelativeLayout>
+</LinearLayout>
