@@ -41,7 +41,7 @@ public class ListFragmentGlagol extends Fragment implements OnBackPressedListene
     public ListFragmentGlagol() {
         // Required empty public constructor
     }
-    private String[] navMenuTitles;
+
     private TypedArray navMenuIcons;
     private ListView mDrawerList;
     private ArrayList<NavDrawerItem> navDrawerItems;

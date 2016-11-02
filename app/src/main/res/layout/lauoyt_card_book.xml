@@ -41,7 +41,6 @@
                 android:layout_margin="15dp"
                 android:background="@drawable/background"
                 android:text="Купить за 199 р."
-                android:visibility="visible"
                 android:textAllCaps="false"
                 />
             <Button
@@ -65,6 +64,37 @@
                 android:visibility="invisible"
                 android:textColor="#000"
                 android:text="Слушать"/>
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:id="@+id/progress_line"
+                android:visibility="invisible"
+                android:layout_centerVertical="true"
+                android:layout_height="wrap_content">
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:progressDrawable="@drawable/progress"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"
+                    android:layout_margin="10dp"
+                    android:indeterminate="false"
+                    android:max="100"
+                    android:progress="0" />
+                <TextView
+                    android:id="@+id/tv_progress_horizontal"
+                    android:layout_width="fill_parent"
+                    android:text="0%"
+                    android:textColor="#000"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBottom="@id/progressBar"
+                    android:background="@android:color/transparent"
+                    android:gravity="center" />
+            </RelativeLayout>
+
         </RelativeLayout>
 
         <LinearLayout
@@ -124,6 +154,8 @@
                 android:textColor="#FFFFFF"
                 android:id="@+id/delete_audio"
                 android:layout_height="wrap_content" />
+
+
 
 
         </LinearLayout>

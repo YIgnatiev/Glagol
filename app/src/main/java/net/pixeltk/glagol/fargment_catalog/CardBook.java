@@ -1,11 +1,13 @@
 package net.pixeltk.glagol.fargment_catalog;
 
+import android.app.Dialog;
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Paint;
 import android.net.Uri;
@@ -21,9 +23,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -60,6 +65,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import static net.pixeltk.glagol.activity.TabActivity.load;
+
 /**
  * Created by Yaroslav on 09.10.2016.
  */
@@ -70,17 +77,29 @@ public class CardBook extends Fragment implements OnBackPressedListener {
         // Required empty public constructor
     }
 
-    Button buy, download, listen, book_marks, del_marks, delete_audio;
+    Button buy;
+    Button download;
+    static Button listen;
+    Button book_marks;
+    Button del_marks;
+    Button delete_audio;
     Fragment fragment = null;
     SharedPreferences sharedPreferences, idbook, subscription, checklogin;
     SharedPreferences.Editor editor, editorsubscription;
-    ImageView cover;
+
+    TabActivity tabActivity = new TabActivity();
+
     TextView name_author, name_book, text_reader, text_publisher, text_time, text_teg, description;
-    private ArrayList<Audio> audios = new ArrayList<>();
-    getHttpGet request = new getHttpGet();
-    LinearLayout content_line1, content_line2, content_line3;
     TextView name_frag;
+    static TextView tv_progress_horizontal;
+
+    getHttpGet request = new getHttpGet();
+
+    LinearLayout content_line1, content_line2, content_line3;
+    static RelativeLayout progressbar_line;
+
     ImageView back_arrow, logo;
+    ImageView cover;
     String id_book, file_path, url_img, total_duration, book, author, reader;
     DataBasesHelper dataBookMarks, dataHistory, dataBuy, dataDownload, dataListen;
     ArrayList IdList = new ArrayList();
@@ -88,6 +107,14 @@ public class CardBook extends Fragment implements OnBackPressedListener {
     ArrayList BuyListId = new ArrayList();
     ArrayList DownloadListId = new ArrayList();
     ArrayList ListenId = new ArrayList();
+    private ArrayList<Audio> audios = new ArrayList<>();
+
+    static ProgressBar progressBar;
+    static double procent = 0.0;
+    static double tv_procent = 0.0;
+    public static int count = 0, size = 0;
+
+
 
     BookMarksHelper historyHelper, bookMarksHelper, buyHelper, downloadHelper, listenHelper;
 
@@ -145,12 +172,18 @@ public class CardBook extends Fragment implements OnBackPressedListener {
         text_time = (TextView) view.findViewById(R.id.text_time);
         text_teg = (TextView) view.findViewById(R.id.text_teg);
         description = (TextView) view.findViewById(R.id.description);
+        tv_progress_horizontal = (TextView) view.findViewById(R.id.tv_progress_horizontal);
 
         content_line1 = (LinearLayout) view.findViewById(R.id.content_line1);
         content_line2 = (LinearLayout) view.findViewById(R.id.content_line2);
         content_line3 = (LinearLayout) view.findViewById(R.id.content_line10);
 
+        progressbar_line = (RelativeLayout) view.findViewById(R.id.progress_line);
+
         cover = (ImageView) view.findViewById(R.id.cover);
+
+        progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
+
 
         IdList = dataBookMarks.getidRow();
         HistoryListId = dataHistory.getIdHistory();
@@ -242,6 +275,7 @@ public class CardBook extends Fragment implements OnBackPressedListener {
 
             if (audios.get(0).getId().equals(buyHelper.getId_book())) {
                 buy.setVisibility(View.INVISIBLE);
+                progressbar_line.setVisibility(View.INVISIBLE);
                 download.setVisibility(View.VISIBLE);
                 del_marks.setVisibility(View.GONE);
                 book_marks.setVisibility(View.GONE);
@@ -286,14 +320,28 @@ public class CardBook extends Fragment implements OnBackPressedListener {
             }
             downloadHelper = null;
         }
+        if (idbook.contains("download"))
+        {
+            download.setVisibility(View.INVISIBLE);
+            listen.setVisibility(View.INVISIBLE);
+            buy.setVisibility(View.INVISIBLE);
+            progressbar_line.setVisibility(View.VISIBLE);
+            delete_audio.setVisibility(View.VISIBLE);
+            book_marks.setVisibility(View.GONE);
+            del_marks.setVisibility(View.GONE);
+
+            progressBar.setProgress(idbook.getInt("download", 0));
+            tv_progress_horizontal.setText(idbook.getInt("download", 0) + "%");
+        }
 
         delete_audio.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 download.setVisibility(View.VISIBLE);
                 listen.setVisibility(View.INVISIBLE);
-
+                progressbar_line.setVisibility(View.GONE);
                 delete_audio.setVisibility(View.GONE);
+                editor.remove("download").apply();
 
                 File dir = new File(Environment.getExternalStorageDirectory()+"/Music/" + file_path);
                 if (dir.isDirectory())
@@ -307,6 +355,7 @@ public class CardBook extends Fragment implements OnBackPressedListener {
 
                 SQLiteDatabase db = dataDownload.getWritableDatabase();
                 db.delete("Download", "id_book = " + id_book, null);
+                db.delete("Listen", "id_book = " + id_book, null);
                 db.close();
             }
         });
@@ -314,7 +363,8 @@ public class CardBook extends Fragment implements OnBackPressedListener {
             @Override
             public void onClick(View view) {
                 download.setVisibility(View.INVISIBLE);
-                listen.setVisibility(View.VISIBLE);
+                progressbar_line.setVisibility(View.VISIBLE);
+                listen.setVisibility(View.INVISIBLE);
 
                 del_marks.setVisibility(View.GONE);
                 book_marks.setVisibility(View.GONE);
@@ -504,36 +554,32 @@ public class CardBook extends Fragment implements OnBackPressedListener {
             audios = gson.fromJson(data.toString(),  new TypeToken<List<Audio>>(){}.getType());
             String name_audio = null;
             if (audios!= null) {
-                for (int i=0; i<audios.size(); i++)
-                {
+                size = audios.size();
+                procent = 100 / audios.size();
+                book = name_book.getText().toString();
+                Log.d("MyLog", procent + "%");
+                for (int i = 0; i < audios.size(); i++) {
                     Audio audio = audios.get(i);
-                    if (!audio.getDescription().equals(""))
-                    {
+                    if (!audio.getDescription().equals("")) {
                         name_audio = audio.getDescription();
-                        load(name_book.getText().toString(), name_audio, audio.getPath_audio());
+                        load(book, name_audio, audios.get(i).getPath_audio(), getActivity());
                         name_audio = null;
-                    }
-                    else
-                    {
-                        if (audio.getTrack_number().length() == 1)
-                        {
+                    } else {
+                        if (audio.getTrack_number().length() == 1) {
                             name_audio = "00" + audio.getTrack_number();
-                            load(name_book.getText().toString(), name_audio, audio.getPath_audio());
+                            load(book, name_audio, audios.get(i).getPath_audio(), getActivity());
                             name_audio = null;
-                        }
-                        else if (audio.getTrack_number().length() == 2)
-                        {
+                        } else if (audio.getTrack_number().length() == 2) {
                             name_audio = "0" + audio.getTrack_number();
-                            load(name_book.getText().toString(), name_audio, audio.getPath_audio());
+                            load(book, name_audio, audios.get(i).getPath_audio(), getActivity());
                             name_audio = null;
-                        }
-                        else if (audio.getTrack_number().length() > 2)
-                        {
+                        } else if (audio.getTrack_number().length() > 2) {
                             name_audio = audio.getTrack_number();
-                            load(name_book.getText().toString(), name_audio, audio.getPath_audio());
+                            load(book, name_audio, audios.get(i).getPath_audio(), getActivity());
                             name_audio = null;
                         }
                     }
+
                 }
             }
 
@@ -591,41 +637,17 @@ public class CardBook extends Fragment implements OnBackPressedListener {
 
 
     }
-    public void load(String book_name, String file_name, String url_file) throws Exception {
-
-
-        if (Build.VERSION.SDK_INT > 9) {
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-            StrictMode.setThreadPolicy(policy);
-        }
-        File dir = new File(Environment.getExternalStorageDirectory() + "/Music/" + book_name + "/");
-        dir.mkdir();
-            String destination = Environment.getExternalStorageDirectory() + "/Music/" + book_name + "/";
-
-            destination += file_name;
-            Log.d("MyLog", "destin "  + destination);
-            final Uri uri = Uri.parse("file://" + destination);
-
-            //set downloadmanager
-            DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url_file.replace(" ", "%20")));
-            request.setTitle("Идет загрузка...");
-
-            //set destination
-            request.setDestinationUri(uri);
-
-            // get download service and enqueue file
-            final DownloadManager manager = (DownloadManager) getActivity().getSystemService(Context.DOWNLOAD_SERVICE);
-            final long downloadId = manager.enqueue(request);
-
-            //set BroadcastReceiver to install app when .apk is downloaded
-            BroadcastReceiver onComplete = new BroadcastReceiver() {
-                public void onReceive(Context ctxt, Intent intent) {
-
-                }
-            };
-            //register receiver for when .apk download is compete
-            getActivity().registerReceiver(onComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
-
+    public static int changeProgress()
+    {
+        tv_procent += procent;
+        progressBar.setProgress((int) tv_procent);
+        tv_progress_horizontal.setText(tv_procent + "%");
+       return (int) tv_procent;
+    }
+    public  static void changeVisibility()
+    {
+        progressbar_line.setVisibility(View.GONE);
+        listen.setVisibility(View.VISIBLE);
     }
 
 }

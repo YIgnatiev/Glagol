@@ -183,6 +183,8 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
                                         mp.seekTo(old_listen);
                                         updateProgressBar();
                                         editor.putBoolean("checked", true).apply();
+                                        positon = 0;
+                                        old_listen = 0;
                                         break;
                                     }
                                 }
@@ -219,6 +221,8 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
                         }
                         mp.pause();
                         editor.clear().apply();
+                        total_duration = 0;
+                        duration = 0;
 
                     }
                 }
@@ -241,6 +245,8 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
                                 mp.seekTo(old_listen);
                                 updateProgressBar();
                                 editor.putString("play", "play").apply();
+                                positon = 0;
+                                old_listen = 0;
 
                                 break;
                             }
@@ -258,6 +264,7 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
                                 currentSongIndex = positon;
                                 String songTitle = songsList.get(currentSongIndex).get("songTitle");
                                 part.setText(songTitle);
+                                positon = 0;
                                 break;
                             }
                         }
