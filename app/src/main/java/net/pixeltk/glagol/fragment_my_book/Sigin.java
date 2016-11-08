@@ -53,6 +53,7 @@ public class Sigin extends Fragment implements OnBackPressedListener{
     Fragment fragment = null;
     ImageView back_arrow, logo;
     TextView name_frag;
+    String[] str_log;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -123,6 +124,8 @@ public class Sigin extends Fragment implements OnBackPressedListener{
                         }
                         else
                         {
+                            str_log = mail.split("@");
+                            editor.putString("login", str_log[0]);
                             int id=Integer.parseInt(data.toString().replaceAll("[\\D]", ""));
                             editor.putString("id", String.valueOf(id)).apply();
                             final Dialog dialog = new Dialog(getActivity());

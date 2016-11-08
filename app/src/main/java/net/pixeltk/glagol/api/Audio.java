@@ -143,4 +143,16 @@ public class Audio {
     public void setTrack_number(String track_number) {
         this.track_number = track_number;
     }
+
+    @SerializedName("demo") String demo;
+
+    public String getDemo() {
+        return demo;
+    }
+
+    public void setDemo(String demo) {
+        this.demo = demo;
+    }
+
+
 }

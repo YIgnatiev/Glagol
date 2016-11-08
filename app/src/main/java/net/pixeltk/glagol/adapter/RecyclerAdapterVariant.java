@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
 import com.bumptech.glide.Glide;
 
 import net.pixeltk.glagol.R;
@@ -19,7 +20,7 @@ import net.pixeltk.glagol.api.Audio;
 import java.util.ArrayList;
 
 
-public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHolder> {
+public class RecyclerAdapterVariant extends RecyclerView.Adapter<RecyclerAdapterVariant.ViewHolder> {
 
     private ArrayList<Audio> itemsData;
     private Context context;
@@ -35,25 +36,23 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
         public ViewHolder(View v) {
             super(v);
             book_name = (TextView) v.findViewById(R.id.book_name);
-            author = (TextView) v.findViewById(R.id.author);
-            reader = (TextView) v.findViewById(R.id.reader);
             cover = (ImageView) v.findViewById(R.id.cover);
         }
     }
 
     // Конструктор
-    public RecyclerAdapter(Context context, ArrayList<Audio> itemDatas)  {
+    public RecyclerAdapterVariant(Context context, ArrayList<Audio> itemDatas)  {
         this.context = context;
         this.itemsData = itemDatas;
     }
 
     // Создает новые views (вызывается layout manager-ом)
     @Override
-    public RecyclerAdapter.ViewHolder onCreateViewHolder(ViewGroup parent,
-                                                         int viewType) {
+    public RecyclerAdapterVariant.ViewHolder onCreateViewHolder(ViewGroup parent,
+                                                                int viewType) {
         // create a new view
         View v = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.layout_recycle_item, parent, false);
+                .inflate(R.layout.layout_recycle_item_variant, parent, false);
 
         // тут можно программно менять атрибуты лэйаута (size, margins, paddings и др.)
 
@@ -66,8 +65,6 @@ public class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ViewHo
     public void onBindViewHolder(ViewHolder holder, int position) {
 
         holder.book_name.setText(itemsData.get(position).getName_book());
-        holder.author.setText(itemsData.get(position).getName_authors());
-        holder.reader.setText("Чтец: " + itemsData.get(position).getReaders());
         Glide.with(context).load(itemsData.get(position).getIcon()).placeholder(R.drawable.notcover).into(holder.cover);
 
 

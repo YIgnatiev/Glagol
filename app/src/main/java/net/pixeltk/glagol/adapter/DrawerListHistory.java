@@ -66,8 +66,8 @@ public class DrawerListHistory extends BaseAdapter {
 
         name_author.setText(navDrawerItems.get(position).getName_author());
         book_name.setText(navDrawerItems.get(position).getName_book());
-        name_reader.setText(navDrawerItems.get(position).getName_reader());
-        price.setText("  " + navDrawerItems.get(position).getPrice() + "  ");
+        name_reader.setText("Чтец: " + navDrawerItems.get(position).getName_reader());
+        price.setText("  " + navDrawerItems.get(position).getPrice() + " р. ");
 
         Glide.with(context).load(navDrawerItems.get(position).getImg_url()).into(cover);
 

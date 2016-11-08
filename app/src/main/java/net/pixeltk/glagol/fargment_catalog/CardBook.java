@@ -1,29 +1,19 @@
 package net.pixeltk.glagol.fargment_catalog;
 
-import android.app.Dialog;
-import android.app.DownloadManager;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Paint;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Build;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StrictMode;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -40,7 +30,6 @@ import net.pixeltk.glagol.R;
 import net.pixeltk.glagol.activity.TabActivity;
 import net.pixeltk.glagol.adapter.BookMarksHelper;
 import net.pixeltk.glagol.adapter.DataBasesHelper;
-import net.pixeltk.glagol.adapter.DrawItemBookMarks;
 import net.pixeltk.glagol.api.Audio;
 import net.pixeltk.glagol.api.getHttpGet;
 import net.pixeltk.glagol.fragment.ClickOnMainPart;
@@ -55,16 +44,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
+import static net.pixeltk.glagol.activity.TabActivity.calculat_total_size;
 import static net.pixeltk.glagol.activity.TabActivity.load;
 
 /**
@@ -77,12 +61,9 @@ public class CardBook extends Fragment implements OnBackPressedListener {
         // Required empty public constructor
     }
 
-    Button buy;
-    Button download;
+    Button buy, download, book_marks, del_marks, delete_audio, listen_demo, stoping_demo;
     static Button listen;
-    Button book_marks;
-    Button del_marks;
-    Button delete_audio;
+
     Fragment fragment = null;
     SharedPreferences sharedPreferences, idbook, subscription, checklogin;
     SharedPreferences.Editor editor, editorsubscription;
@@ -91,7 +72,7 @@ public class CardBook extends Fragment implements OnBackPressedListener {
 
     TextView name_author, name_book, text_reader, text_publisher, text_time, text_teg, description;
     TextView name_frag;
-    static TextView tv_progress_horizontal;
+    public static TextView tv_progress_horizontal;
 
     getHttpGet request = new getHttpGet();
 
@@ -100,21 +81,18 @@ public class CardBook extends Fragment implements OnBackPressedListener {
 
     ImageView back_arrow, logo;
     ImageView cover;
-    String id_book, file_path, url_img, total_duration, book, author, reader;
+    String id_book, file_path, url_img, total_duration, author, reader, url_demo;
     DataBasesHelper dataBookMarks, dataHistory, dataBuy, dataDownload, dataListen;
     ArrayList IdList = new ArrayList();
     ArrayList HistoryListId = new ArrayList();
     ArrayList BuyListId = new ArrayList();
     ArrayList DownloadListId = new ArrayList();
     ArrayList ListenId = new ArrayList();
-    private ArrayList<Audio> audios = new ArrayList<>();
+    public ArrayList<Audio> audios = new ArrayList<>();
+    public String book;
+    public static int total_size = 0;
 
-    static ProgressBar progressBar;
-    static double procent = 0.0;
-    static double tv_procent = 0.0;
-    public static int count = 0, size = 0;
-
-
+    MediaPlayer mediaPlayer = new MediaPlayer();
 
     BookMarksHelper historyHelper, bookMarksHelper, buyHelper, downloadHelper, listenHelper;
 
@@ -164,6 +142,8 @@ public class CardBook extends Fragment implements OnBackPressedListener {
         book_marks = (Button) view.findViewById(R.id.book_marks);
         del_marks = (Button) view.findViewById(R.id.del_marks);
         delete_audio = (Button) view.findViewById(R.id.delete_audio);
+        listen_demo = (Button) view.findViewById(R.id.listen_demo);
+        stoping_demo = (Button) view.findViewById(R.id.stop_demo);
 
         name_author = (TextView) view.findViewById(R.id.name_author);
         name_book = (TextView) view.findViewById(R.id.name_book);
@@ -182,14 +162,13 @@ public class CardBook extends Fragment implements OnBackPressedListener {
 
         cover = (ImageView) view.findViewById(R.id.cover);
 
-        progressBar = (ProgressBar) view.findViewById(R.id.progressBar);
-
-
         IdList = dataBookMarks.getidRow();
         HistoryListId = dataHistory.getIdHistory();
         BuyListId = dataBuy.getIdBuy();
         DownloadListId = dataDownload.getIdDownload();
         ListenId = dataListen.getIdListen();
+
+        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 
 
         if (android.os.Build.VERSION.SDK_INT > 9) {
@@ -204,6 +183,8 @@ public class CardBook extends Fragment implements OnBackPressedListener {
 
             if (audios!= null) {
                 id_book = audios.get(0).getId();
+                url_demo = audios.get(0).getDemo();
+                total_size = Integer.parseInt(audios.get(0).getSize());
                 file_path = audios.get(0).getName_book();
                 author = audios.get(0).getName_authors();
                 reader = audios.get(0).getReaders();
@@ -214,22 +195,36 @@ public class CardBook extends Fragment implements OnBackPressedListener {
                 total_duration = audios.get(0).getDuration();
                 if (audios.get(0).getDuration() != null && audios.get(0).getSize() != null) {
                     text_time.setText(getTime(Long.valueOf(audios.get(0).getDuration())) + " " + Integer.parseInt(String.valueOf(Integer.parseInt(audios.get(0).getSize()) / 1000)) + " мб.");
+                    download.setText("Скачать " + Integer.parseInt(String.valueOf(Integer.parseInt(audios.get(0).getSize()) / 1000)) + " мб.");
                 }
                 else
                 {
                     text_time.setText(0 + " ч. " + 0 + " мин. " + 0+ " сек. " + " " + 0 + " мб.");
+                    download.setText("Скачать " + 0 + " мб.");
                 }
-                download.setText("Скачать " + Integer.parseInt(String.valueOf(Integer.parseInt(audios.get(0).getSize()) / 1000)) + " мб.");
                 text_teg.setText(audios.get(0).getCategorys());
                 text_teg.setPaintFlags(text_teg.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
                 description.setText(audios.get(0).getDescription());
                 url_img = audios.get(0).getIcon();
-                Glide.with(getActivity()).load(audios.get(0).getIcon()).into(cover);
+                Glide.with(getActivity()).load(audios.get(0).getIcon()).placeholder(R.drawable.notcover).into(cover);
                 buy.setText("Купить за " + audios.get(0).getPrice() + " p.");
             }
 
         } catch (JSONException e) {
             e.printStackTrace();
+        }
+        book = name_book.getText().toString();
+        if (!url_demo.equals("0")) {
+            try {
+                mediaPlayer.setDataSource(url_demo);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                mediaPlayer.prepare();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         if (checklogin.contains("id"))
         {
@@ -320,18 +315,19 @@ public class CardBook extends Fragment implements OnBackPressedListener {
             }
             downloadHelper = null;
         }
-        if (idbook.contains("download"))
-        {
-            download.setVisibility(View.INVISIBLE);
-            listen.setVisibility(View.INVISIBLE);
-            buy.setVisibility(View.INVISIBLE);
-            progressbar_line.setVisibility(View.VISIBLE);
-            delete_audio.setVisibility(View.VISIBLE);
-            book_marks.setVisibility(View.GONE);
-            del_marks.setVisibility(View.GONE);
-
-            progressBar.setProgress(idbook.getInt("download", 0));
-            tv_progress_horizontal.setText(idbook.getInt("download", 0) + "%");
+        if (idbook.contains("download_book")) {
+            if (idbook.getString("download_book", "").equals(id_book)) {
+                if (idbook.contains("download")) {
+                    download.setVisibility(View.INVISIBLE);
+                    listen.setVisibility(View.INVISIBLE);
+                    buy.setVisibility(View.INVISIBLE);
+                    progressbar_line.setVisibility(View.VISIBLE);
+                    delete_audio.setVisibility(View.VISIBLE);
+                    book_marks.setVisibility(View.GONE);
+                    del_marks.setVisibility(View.GONE);
+                    tv_progress_horizontal.setText("Скачано:" + idbook.getInt("download", 0) + "МБ из " + calculat_total_size + "МБ");
+                }
+            }
         }
 
         delete_audio.setOnClickListener(new View.OnClickListener() {
@@ -341,7 +337,6 @@ public class CardBook extends Fragment implements OnBackPressedListener {
                 listen.setVisibility(View.INVISIBLE);
                 progressbar_line.setVisibility(View.GONE);
                 delete_audio.setVisibility(View.GONE);
-                editor.remove("download").apply();
 
                 File dir = new File(Environment.getExternalStorageDirectory()+"/Music/" + file_path);
                 if (dir.isDirectory())
@@ -371,6 +366,8 @@ public class CardBook extends Fragment implements OnBackPressedListener {
                 delete_audio.setVisibility(View.VISIBLE);
 
                 setDownload();
+
+                editor.putString("download_book", id_book).apply();
                 if (DownloadListId.size() == 0)
                 {
                     dataDownload.insertDownload(id_book);
@@ -380,7 +377,6 @@ public class CardBook extends Fragment implements OnBackPressedListener {
                     int check = 0;
                     for (int i = 0; i < DownloadListId.size(); i++) {
                         downloadHelper = dataDownload.getProductDownload(DownloadListId.get(i).toString());
-                        Log.d("MyLog", "id " + audios.get(0).getId());
                         if (id_book.equals(downloadHelper.getId_book())) {
                             check=1;
                             break;
@@ -537,54 +533,42 @@ public class CardBook extends Fragment implements OnBackPressedListener {
                 }
             }
         });
+
+        listen_demo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!url_demo.equals("0"))
+                {
+                        listen_demo.setVisibility(View.GONE);
+                        stoping_demo.setVisibility(View.VISIBLE);
+                        mediaPlayer.start();
+                }
+            }
+        });
+
+        stoping_demo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mediaPlayer!=null)
+                {
+                    mediaPlayer.pause();
+                    stoping_demo.setVisibility(View.GONE);
+                    listen_demo.setVisibility(View.VISIBLE);
+                }
+            }
+        });
         return  view;
 
 
     }
-    public void setDownload ( )
+    public void onDestroy() {
+        super.onDestroy();
+        mediaPlayer.stop();
+    }
+    public void setDownload ()
     {
-        if (android.os.Build.VERSION.SDK_INT > 9) {
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-            StrictMode.setThreadPolicy(policy);
-        }
         try {
-            JSONArray data = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/getbookfiles?salt=df90sdfgl9854gjs54os59gjsogsdf&book_id=" + idbook.getString("idbook", "")));
-
-            Gson gson = new Gson();
-            audios = gson.fromJson(data.toString(),  new TypeToken<List<Audio>>(){}.getType());
-            String name_audio = null;
-            if (audios!= null) {
-                size = audios.size();
-                procent = 100 / audios.size();
-                book = name_book.getText().toString();
-                Log.d("MyLog", procent + "%");
-                for (int i = 0; i < audios.size(); i++) {
-                    Audio audio = audios.get(i);
-                    if (!audio.getDescription().equals("")) {
-                        name_audio = audio.getDescription();
-                        load(book, name_audio, audios.get(i).getPath_audio(), getActivity());
-                        name_audio = null;
-                    } else {
-                        if (audio.getTrack_number().length() == 1) {
-                            name_audio = "00" + audio.getTrack_number();
-                            load(book, name_audio, audios.get(i).getPath_audio(), getActivity());
-                            name_audio = null;
-                        } else if (audio.getTrack_number().length() == 2) {
-                            name_audio = "0" + audio.getTrack_number();
-                            load(book, name_audio, audios.get(i).getPath_audio(), getActivity());
-                            name_audio = null;
-                        } else if (audio.getTrack_number().length() > 2) {
-                            name_audio = audio.getTrack_number();
-                            load(book, name_audio, audios.get(i).getPath_audio(), getActivity());
-                            name_audio = null;
-                        }
-                    }
-
-                }
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
+            load(idbook.getString("idbook", ""), book, total_size, getActivity());
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -636,13 +620,6 @@ public class CardBook extends Fragment implements OnBackPressedListener {
         }
 
 
-    }
-    public static int changeProgress()
-    {
-        tv_procent += procent;
-        progressBar.setProgress((int) tv_procent);
-        tv_progress_horizontal.setText(tv_procent + "%");
-       return (int) tv_procent;
     }
     public  static void changeVisibility()
     {

@@ -315,7 +315,7 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
     }
     @Override
     public void onBackPressed() {
-        fragment = new MainFragment();
+        fragment = new CardBook();
         if (sharedPreferences.contains("Author"))
         {
             editor.remove("Author").apply();

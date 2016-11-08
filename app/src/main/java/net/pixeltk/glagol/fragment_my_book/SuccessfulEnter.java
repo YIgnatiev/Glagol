@@ -175,6 +175,19 @@ public class SuccessfulEnter extends Fragment implements OnBackPressedListener{
                 }
             }
         });
+        listBuy.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                editor.putString("idbook", navDrawerBuyItems.get(i).getId());
+                editor.putString("intent", "Successful").apply();
+                Fragment fragment = new CardBook();
+                if (fragment != null) {
+                    android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.main_frame, fragment).commit();
+                }
+            }
+        });
         listHistory.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {

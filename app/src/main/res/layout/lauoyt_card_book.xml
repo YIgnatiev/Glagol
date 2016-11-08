@@ -5,326 +5,332 @@
     android:layout_height="match_parent">
     <include layout="@layout/toolbar"
         android:id="@+id/toolbar"/>
-<ScrollView
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
+
+    <ScrollView
+        android:orientation="vertical" android:layout_width="match_parent"
         android:layout_height="match_parent">
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
 
-    <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="200dp"
-        app:srcCompat="@drawable/cpver"
-        android:layout_margin="15dp"
-        android:id="@+id/cover" />
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            app:srcCompat="@drawable/cpver"
+            android:layout_margin="15dp"
+            android:id="@+id/cover" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/name_book"
-            android:text="Как разговаривать когда угодно и где угодно"
-            android:layout_gravity="center"
-            android:textSize="18sp"
-            android:textColor="#FFFFFF"
-            android:gravity="center"/>
-
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-            <Button
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/buy"
-                android:layout_margin="15dp"
-                android:background="@drawable/background"
-                android:text="Купить за 199 р."
-                android:textAllCaps="false"
-                />
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/download"
-                android:background="@drawable/background"
-                android:textAllCaps="false"
-                android:layout_margin="15dp"
-                android:visibility="invisible"
-                android:textColor="#000"
-                android:text="Скачать 245 мб."/>
-
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/listen"
-                android:background="@drawable/background"
-                android:textAllCaps="false"
-                android:layout_margin="15dp"
-                android:visibility="invisible"
-                android:textColor="#000"
-                android:text="Слушать"/>
+                android:id="@+id/name_book"
+                android:text="Как разговаривать когда угодно и где угодно"
+                android:layout_gravity="center"
+                android:textSize="18sp"
+                android:textColor="#FFFFFF"
+                android:gravity="center"/>
 
             <RelativeLayout
                 android:layout_width="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:id="@+id/progress_line"
-                android:visibility="invisible"
-                android:layout_centerVertical="true"
                 android:layout_height="wrap_content">
-                <ProgressBar
-                    android:id="@+id/progressBar"
-                    style="?android:attr/progressBarStyleHorizontal"
+                <Button
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:progressDrawable="@drawable/progress"
-                    android:layout_centerHorizontal="true"
-                    android:layout_centerVertical="true"
-                    android:layout_margin="10dp"
-                    android:indeterminate="false"
-                    android:max="100"
-                    android:progress="0" />
-                <TextView
-                    android:id="@+id/tv_progress_horizontal"
-                    android:layout_width="fill_parent"
-                    android:text="0%"
-                    android:textColor="#000"
+                    android:id="@+id/buy"
+                    android:visibility="visible"
+                    android:layout_margin="15dp"
+                    android:background="@drawable/background"
+                    android:text="Купить за 199 р."
+                    android:textAllCaps="false"
+                    />
+                <Button
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignBottom="@id/progressBar"
-                    android:background="@android:color/transparent"
-                    android:gravity="center" />
+                    android:id="@+id/download"
+                    android:background="@drawable/background"
+                    android:textAllCaps="false"
+                    android:layout_margin="15dp"
+                    android:visibility="invisible"
+                    android:textColor="#000"
+                    android:text="Скачать 245 мб."/>
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/listen"
+                    android:background="@drawable/background"
+                    android:textAllCaps="false"
+                    android:layout_margin="15dp"
+                    android:visibility="invisible"
+                    android:textColor="#000"
+                    android:text="Слушать"/>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_centerHorizontal="true"
+                    android:id="@+id/progress_line"
+                    android:background="@drawable/background"
+                    android:visibility="invisible"
+                    android:layout_margin="15dp"
+                    android:layout_centerVertical="true"
+                    android:layout_height="match_parent">
+                    <TextView
+                        android:id="@+id/tv_progress_horizontal"
+                        android:layout_width="match_parent"
+                        android:text="Скачано: 0 МБ из 0 МБ"
+                        android:textColor="#000"
+                        android:layout_height="match_parent"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        android:background="@android:color/transparent"
+                        android:gravity="center" />
+                </RelativeLayout>
+
             </RelativeLayout>
 
-        </RelativeLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:orientation="horizontal"
-            android:layout_height="wrap_content">
-
-            <Button
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/listen_demo"
-                android:background="@drawable/backsearch"
-                android:textAllCaps="false"
-                android:textColor="#FFFFFF"
-                android:layout_weight="1"
+                android:orientation="horizontal"
+                android:layout_height="wrap_content">
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/listen_demo"
+                    android:background="@drawable/backsearch"
+                    android:textAllCaps="false"
+                    android:visibility="visible"
+                    android:textColor="#FFFFFF"
+                    android:layout_weight="1"
+                    android:layout_margin="15dp"
+                    android:text="Слушать демо"/>
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/stop_demo"
+                    android:background="@drawable/backsearch"
+                    android:textAllCaps="false"
+                    android:visibility="gone"
+                    android:textColor="#FFFFFF"
+                    android:layout_weight="1"
+                    android:layout_margin="15dp"
+                    android:text="Остановить демо"/>
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:background="@drawable/backmain"
+                    android:text="В закладках"
+                    android:textAllCaps="false"
+                    android:visibility="gone"
+                    android:textColor="#FFFFFF"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginBottom="15dp"
+                    android:layout_marginRight="15dp"
+                    android:id="@+id/del_marks"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content" />
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:background="@drawable/backsearch"
+                    android:text="В закладки"
+                    android:layout_weight="1"
+                    android:textAllCaps="false"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginBottom="15dp"
+                    android:layout_marginRight="15dp"
+                    android:visibility="visible"
+                    android:textColor="#FFFFFF"
+                    android:id="@+id/book_marks"
+                    android:layout_height="wrap_content" />
+
+                <Button
+                    android:layout_width="match_parent"
+                    android:background="@drawable/backsearch"
+                    android:text="Удалить"
+                    android:layout_weight="1"
+                    android:textAllCaps="false"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginBottom="15dp"
+                    android:layout_marginRight="15dp"
+                    android:visibility="gone"
+                    android:textColor="#FFFFFF"
+                    android:id="@+id/delete_audio"
+                    android:layout_height="wrap_content" />
+
+
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:id="@+id/line1"
+                android:orientation="horizontal"
                 android:layout_margin="15dp"
-                android:text="Слушать демо"/>
-
-            <Button
+                android:background="#FFFFFF"
+                android:layout_height="1dp"/>
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:background="@drawable/backmain"
-                android:text="В закладках"
-                android:textAllCaps="false"
-                android:visibility="gone"
-                android:textColor="#FFFFFF"
-                android:layout_marginTop="15dp"
-                android:layout_marginBottom="15dp"
+                android:id="@+id/content_line10"
+                android:orientation="horizontal"
+                android:layout_marginLeft="15dp"
                 android:layout_marginRight="15dp"
-                android:id="@+id/del_marks"
-                android:layout_weight="1"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/name_author"
+                    android:layout_gravity="center"
+                    android:textColor="#FFF"
+                    android:layout_weight="1"
+                    android:text="Автор: Larry King"/>
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@mipmap/back_icon"
+                    android:id="@+id/image_name_author"/>
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:id="@+id/line20"
+                android:orientation="horizontal"
+                android:layout_margin="15dp"
+                android:background="#FFFFFF"
+                android:layout_height="1dp"/>
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:id="@+id/content_line1"
+                android:orientation="horizontal"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:text="Чтец: Юрий Абрамов"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/text_reader"
+                    android:textColor="#FFFFFF"
+                    android:layout_weight="1" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@mipmap/back_icon"
+                    android:id="@+id/image_recover"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:id="@+id/line2"
+                android:orientation="horizontal"
+                android:layout_margin="15dp"
+                android:background="#FFFFFF"
+                android:layout_height="1dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:id="@+id/content_line2"
+                android:orientation="horizontal"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:text="Издательство: Альпина Диджитал"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/text_publisher"
+                    android:textColor="#FFFFFF"
+                    android:layout_weight="1" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:srcCompat="@mipmap/back_icon"
+                    android:id="@+id/image_info"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:id="@+id/line3"
+                android:orientation="horizontal"
+                android:layout_margin="15dp"
+                android:background="#FFFFFF"
+                android:layout_height="1dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:id="@+id/content_line3"
+                android:orientation="horizontal"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:text="2ч. 1 мин. 45 сек., 215 мб."
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/text_time"
+                    android:textColor="#FFFFFF"
+                    android:layout_weight="1" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:id="@+id/line4"
+                android:orientation="horizontal"
+                android:layout_margin="15dp"
+                android:background="#FFFFFF"
+                android:layout_height="1dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:id="@+id/content_line4"
+                android:orientation="horizontal"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:text="Категории: "
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="#FFFFFF" />
+                <TextView
+                    android:text=""
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/text_teg"
+                    android:textColor="#FFFFFF" />
+
+            </LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:id="@+id/line5"
+                android:orientation="horizontal"
+                android:layout_margin="15dp"
+                android:background="#FFFFFF"
+                android:layout_height="1dp"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:id="@+id/description"
+                android:text="Some Description"
+                android:textColor="#FFFFFF"
                 android:layout_height="wrap_content" />
 
-            <Button
-                android:layout_width="match_parent"
-                android:background="@drawable/backsearch"
-                android:text="В закладки"
-                android:layout_weight="1"
-                android:textAllCaps="false"
-                android:layout_marginTop="15dp"
-                android:layout_marginBottom="15dp"
-                android:layout_marginRight="15dp"
-                android:visibility="visible"
-                android:textColor="#FFFFFF"
-                android:id="@+id/book_marks"
-                android:layout_height="wrap_content" />
-
-            <Button
-                android:layout_width="match_parent"
-                android:background="@drawable/backsearch"
-                android:text="Удалить"
-                android:layout_weight="1"
-                android:textAllCaps="false"
-                android:layout_marginTop="15dp"
-                android:layout_marginBottom="15dp"
-                android:layout_marginRight="15dp"
-                android:visibility="gone"
-                android:textColor="#FFFFFF"
-                android:id="@+id/delete_audio"
-                android:layout_height="wrap_content" />
-
-
-
-
         </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:id="@+id/line1"
-            android:orientation="horizontal"
-            android:layout_margin="15dp"
-            android:background="#FFFFFF"
-            android:layout_height="1dp"/>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:id="@+id/content_line10"
-            android:orientation="horizontal"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:layout_height="wrap_content">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/name_author"
-                android:layout_gravity="center"
-                android:textColor="#FFF"
-                android:layout_weight="1"
-                android:text="Автор: Larry King"/>
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:srcCompat="@mipmap/back_icon"
-                android:id="@+id/image_name_author"/>
-
-        </LinearLayout>
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:id="@+id/line20"
-            android:orientation="horizontal"
-            android:layout_margin="15dp"
-            android:background="#FFFFFF"
-            android:layout_height="1dp"/>
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:id="@+id/content_line1"
-            android:orientation="horizontal"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:layout_height="wrap_content">
-            <TextView
-                android:text="Чтец: Юрий Абрамов"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/text_reader"
-                android:textColor="#FFFFFF"
-                android:layout_weight="1" />
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:srcCompat="@mipmap/back_icon"
-                android:id="@+id/image_recover"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:id="@+id/line2"
-            android:orientation="horizontal"
-            android:layout_margin="15dp"
-            android:background="#FFFFFF"
-            android:layout_height="1dp"/>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:id="@+id/content_line2"
-            android:orientation="horizontal"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:layout_height="wrap_content">
-            <TextView
-                android:text="Издательство: Альпина Диджитал"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/text_publisher"
-                android:textColor="#FFFFFF"
-                android:layout_weight="1" />
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:srcCompat="@mipmap/back_icon"
-                android:id="@+id/image_info"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:id="@+id/line3"
-            android:orientation="horizontal"
-            android:layout_margin="15dp"
-            android:background="#FFFFFF"
-            android:layout_height="1dp"/>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:id="@+id/content_line3"
-            android:orientation="horizontal"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:layout_height="wrap_content">
-            <TextView
-                android:text="2ч. 1 мин. 45 сек., 215 мб."
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/text_time"
-                android:textColor="#FFFFFF"
-                android:layout_weight="1" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:id="@+id/line4"
-            android:orientation="horizontal"
-            android:layout_margin="15dp"
-            android:background="#FFFFFF"
-            android:layout_height="1dp"/>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:id="@+id/content_line4"
-            android:orientation="horizontal"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:layout_height="wrap_content">
-            <TextView
-                android:text="Категории: "
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="#FFFFFF" />
-            <TextView
-                android:text=""
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/text_teg"
-                android:textColor="#FFFFFF" />
-
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:id="@+id/line5"
-            android:orientation="horizontal"
-            android:layout_margin="15dp"
-            android:background="#FFFFFF"
-            android:layout_height="1dp"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_marginLeft="15dp"
-            android:layout_marginRight="15dp"
-            android:id="@+id/description"
-            android:text="Some Description"
-            android:textColor="#FFFFFF"
-            android:layout_height="wrap_content" />
-
-    </LinearLayout>
-</ScrollView>
-    </LinearLayout>
+    </ScrollView>
+</LinearLayout>

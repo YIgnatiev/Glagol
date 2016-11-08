@@ -2,10 +2,23 @@ package net.pixeltk.glagol.player;
 
 import android.app.Activity;
 import android.os.Environment;
+import android.util.Log;
+
+import net.pixeltk.glagol.api.Audio;
 
 import java.io.File;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 public class SongsManager {
@@ -30,17 +43,19 @@ public class SongsManager {
         File f = new File(path);
         File file[] = f.listFiles();
         // return songs list array
-        if (!f.equals("")) {
+        Collections.sort(Arrays.asList(file), new Comparator<File>(){
+            public int compare(File emp1, File emp2) {
+                 return Integer.valueOf(emp1.getName()).compareTo(Integer.valueOf(emp2.getName())); // To compare integer values
+            }
+        });
 
+        if (!f.equals("")) {
             for (int i = 0; i < file.length; i++) {
                 HashMap<String, String> song = new HashMap<String, String>();
                 song.put("songTitle", file[i].getName());
                 song.put("songPath", file[i].getPath());
-
-                // Adding each song to SongList
                 songsList.add(song);
             }
-
         }
         return songsList;
     }

@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 
 import static net.pixeltk.glagol.fragment.PlayerFragment.part;
 import static net.pixeltk.glagol.fragment.PlayerFragment.seekBar;
+import static net.pixeltk.glagol.fragment.PlayerFragment.track_name;
 
 public class Splash extends AppCompatActivity {
 
@@ -71,7 +72,7 @@ public class Splash extends AppCompatActivity {
             mp.prepare();
             mp.start();
             // Displaying Song title
-            String songTitle = songsList.get(songIndex).get("songTitle");
+            String songTitle = String.valueOf(track_name.get(songIndex));
             part.setText(songTitle);
             // set Progress bar values
             seekBar.setProgress(0);

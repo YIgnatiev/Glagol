@@ -36,6 +36,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/enter_mail"
         android:textColor="#FFFFFF"
+        android:textCursorDrawable="@drawable/cursor"
         android:background="@android:color/transparent"
         android:layout_below="@+id/line1"
         android:textColorHint="#6e6e6e"

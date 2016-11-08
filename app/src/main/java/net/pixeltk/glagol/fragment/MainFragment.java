@@ -36,6 +36,7 @@ import net.pixeltk.glagol.R;
 import net.pixeltk.glagol.activity.TabActivity;
 import net.pixeltk.glagol.adapter.ChoiceListAdapter;
 import net.pixeltk.glagol.adapter.RecyclerAdapter;
+import net.pixeltk.glagol.adapter.RecyclerAdapterVariant;
 import net.pixeltk.glagol.adapter.RecyclerClickListener;
 import net.pixeltk.glagol.api.Audio;
 import net.pixeltk.glagol.api.getHttpGet;
@@ -60,19 +61,21 @@ public class MainFragment extends Fragment implements View.OnClickListener {
     SearchView searchView;
     Button my_news, my_variant;
     private RecyclerView variant, news, top_sale, sale, choice_editor, soon_be;
-    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.Adapter mAdapter, mAdapterVariant;
     private RecyclerView.LayoutManager mLayoutManager, mnews, mtop_sale, msale, mchoice_editor, msoon_be;
     private ArrayList<Audio> itemData = new ArrayList<>();
+    private ArrayList<Audio> itemDataVariant = new ArrayList<>();
     private ArrayList<Audio> audios = new ArrayList<>();
+    private ArrayList<Audio> audiosVariant = new ArrayList<>();
     private ArrayList<Audio> auto_compliet = new ArrayList<>();
     getHttpGet request = new getHttpGet();
     Fragment fragment = null;
     LinearLayout variant_frag, news_frag, search_variant, main_frag_part;
     ImageView back_arrow;
     ListView list_variant;
-    TextView variant_text, text_news, text_top_sale, text_sale, text_choice_editor, text_soon_be;
-    SharedPreferences sharedPreferences;
-    SharedPreferences.Editor editor;
+    TextView variant_text, text_news, text_top_sale, text_sale, text_choice_editor, text_soon_be, log;
+    SharedPreferences sharedPreferences, sig;
+    SharedPreferences.Editor editor, edit_sign;
 
 
 
@@ -93,7 +96,9 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         searchView.clearFocus();
 
         sharedPreferences = getActivity().getSharedPreferences("ClickMain", Context.MODE_PRIVATE);
+        sig = getActivity().getSharedPreferences("Sign", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
+        edit_sign = sig.edit();
 
         variant_frag = (LinearLayout) view.findViewById(R.id.variant_frag);
         news_frag = (LinearLayout) view.findViewById(R.id.news_frag);
@@ -114,6 +119,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         text_sale = (TextView) view.findViewById(R.id.text_sale);
         text_choice_editor = (TextView) view.findViewById(R.id.text_choice_editor);
         text_soon_be = (TextView) view.findViewById(R.id.text_soon_be);
+        log = (TextView) view.findViewById(R.id.log);
 
         variant_text.setOnClickListener(this);
         text_news.setOnClickListener(this);
@@ -123,6 +129,12 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         text_soon_be.setOnClickListener(this);
 
         back_arrow.setVisibility(View.INVISIBLE);
+
+        if (sig.contains("login"))
+        {
+            log.setVisibility(View.VISIBLE);
+            log.setText(sig.getString("login", ""));
+        }
 
         my_news.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -209,10 +221,30 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        try {
+            Log.d("myLogs","in ");
+            JSONArray data = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/customCollections?salt=df90sdfgl9854gjs54os59gjsogsdf"));
+            Gson gson = new Gson();
+            audiosVariant = gson.fromJson(data.toString(),  new TypeToken<List<Audio>>(){}.getType());
+
+            if (audiosVariant!= null) {
+
+                for (int i=0; i<audiosVariant.size(); i++)
+                {
+                    Audio audio = audiosVariant.get(i);
+                    itemDataVariant.add(audio);
+                }
+
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         mAdapter = new RecyclerAdapter(getActivity(), itemData);
+        mAdapterVariant = new RecyclerAdapterVariant(getActivity(), itemDataVariant);
 
-        variant.setAdapter(mAdapter);
+        variant.setAdapter(mAdapterVariant);
         news.setAdapter(mAdapter);
         top_sale.setAdapter(mAdapter);
         sale.setAdapter(mAdapter);
@@ -297,7 +329,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         variant.addOnItemTouchListener(new RecyclerClickListener(getActivity()) {
             @Override
             public void onItemClick(RecyclerView recyclerView, View itemView, int position) {
-              clickCard(position);
+                clickCardVariant(position);
             }
 
             @Override
@@ -373,6 +405,28 @@ public class MainFragment extends Fragment implements View.OnClickListener {
                     .replace(R.id.main_frame, fragment).commit();
         }
     }
+    public void clickTextVariant(String text)
+    {
+        editor.putString("var", text).apply();
+        fragment = new Variant();
+        if (fragment != null) {
+            android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.main_frame, fragment).commit();
+        }
+    }
+    public void clickCardVariant(int position)
+    {
+        editor.putString("id_collection", itemDataVariant.get(position).getId());
+        editor.putString("intent", "variant");
+        editor.apply();
+        fragment = new ClickOnMainPart();
+        if (fragment != null) {
+            android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
+            fragmentManager.beginTransaction()
+                    .replace(R.id.main_frame, fragment).commit();
+        }
+    }
     public void clickCard(int position)
     {
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences("Category", Context.MODE_PRIVATE);
@@ -393,7 +447,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         switch (view.getId())
         {
             case R.id.variant:
-                clickVariant(variant_text.getText().toString());
+                clickTextVariant(variant_text.getText().toString());
                 return;
             case R.id.text_news:
                 clickVariant(text_news.getText().toString());

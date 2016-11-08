@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
@@ -23,6 +22,7 @@ import com.google.gson.reflect.TypeToken;
 import net.pixeltk.glagol.R;
 import net.pixeltk.glagol.activity.TabActivity;
 import net.pixeltk.glagol.adapter.ChoiceListAdapter;
+import net.pixeltk.glagol.adapter.ChoiceListAdapterVariant;
 import net.pixeltk.glagol.api.Audio;
 import net.pixeltk.glagol.api.getHttpGet;
 import net.pixeltk.glagol.fargment_catalog.CardBook;
@@ -35,19 +35,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Yaroslav on 21.10.2016.
+ * Created by Yaroslav on 08.11.2016.
  */
 
-public class ClickOnMainPart extends Fragment implements OnBackPressedListener {
+public class Variant extends Fragment implements OnBackPressedListener {
 
-    public ClickOnMainPart() {
+    public Variant() {
         // Required empty public constructor
     }
     Fragment fragment = null;
-    String[] sort = {"Сортировка", "По цене", "По имени", "Новинки", "По популярности"};
-    Spinner sort_spinner;
     private ArrayList<Audio> choiceItemFromCatalogs;
-    private ChoiceListAdapter choiceListAdapter;
+    private ChoiceListAdapterVariant choiceListAdapter;
     ListView listView;
     private ArrayList<Audio> audios = new ArrayList<>();
     getHttpGet request = new getHttpGet();
@@ -65,13 +63,10 @@ public class ClickOnMainPart extends Fragment implements OnBackPressedListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_choise_item, container, false);
+        View view = inflater.inflate(R.layout.fragment_choise_item_variant, container, false);
 
         sharedPreferences = getActivity().getSharedPreferences("ClickMain", Context.MODE_PRIVATE);
-        idbook = getActivity().getSharedPreferences("Category", Context.MODE_PRIVATE);
-        editorclick = sharedPreferences.edit();
-        editor = idbook.edit();
-
+        editor = sharedPreferences.edit();
 
         back_arrow = (ImageView) view.findViewById(R.id.back);
         logo = (ImageView) view.findViewById(R.id.logo);
@@ -89,36 +84,6 @@ public class ClickOnMainPart extends Fragment implements OnBackPressedListener {
             }
         });
 
-        sort_spinner = (Spinner) view.findViewById(R.id.spinner);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, sort);
-        sort_spinner.setAdapter(adapter);
-
-        sort_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                switch (i)
-                {
-                    case 1:
-                        sortCatalog("price");
-                        break;
-                    case 2:
-                        sortCatalog("name");
-                        break;
-                    case 3:
-                        sortCatalog("new");
-                        break;
-                    case 4:
-                        sortCatalog("popular");
-                        break;
-                }
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> adapterView) {
-
-            }
-        });
-
         listView = (ListView)  view.findViewById(R.id.list_choice_item);
 
         choiceItemFromCatalogs = new ArrayList<Audio>();
@@ -127,17 +92,8 @@ public class ClickOnMainPart extends Fragment implements OnBackPressedListener {
             StrictMode.setThreadPolicy(policy);
         }
         try {
-            Log.d("myLogs", "in ");
-            JSONArray data = null;
-            if (sharedPreferences.contains("intent")) {
-                if (sharedPreferences.getString("intent", "").equals("variant")) {
-                   data = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/getCollectionBooks?salt=df90sdfgl9854gjs54os59gjsogsdf&collection_id=" + sharedPreferences.getString("id_collections", "") + "&model=collection"));
-                }
-            } else
-            {
-                 data = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/newbooks?salt=df90sdfgl9854gjs54os59gjsogsdf"));
-            }
-
+            Log.d("myLogs","in ");
+            JSONArray data = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/customCollections?salt=df90sdfgl9854gjs54os59gjsogsdf"));
             Gson gson = new Gson();
             audios = gson.fromJson(data.toString(),  new TypeToken<List<Audio>>(){}.getType());
 
@@ -145,8 +101,8 @@ public class ClickOnMainPart extends Fragment implements OnBackPressedListener {
 
                 for (int i=0; i<audios.size(); i++)
                 {
-                        Audio audio = audios.get(i);
-                        choiceItemFromCatalogs.add(audio);
+                    Audio audio = audios.get(i);
+                    choiceItemFromCatalogs.add(audio);
                 }
 
             }
@@ -160,16 +116,16 @@ public class ClickOnMainPart extends Fragment implements OnBackPressedListener {
         }
         else
         {
-            choiceListAdapter = new ChoiceListAdapter(getActivity(), choiceItemFromCatalogs);
+            choiceListAdapter = new ChoiceListAdapterVariant(getActivity(), choiceItemFromCatalogs);
             listView.setAdapter(choiceListAdapter);
         }
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                editor.putString("idbook", choiceItemFromCatalogs.get(i).getId());
-                editor.putString("intent", "mainpart").apply();
-                fragment = new CardBook();
+                editor.putString("id_collections", choiceItemFromCatalogs.get(i).getId());
+                editor.putString("intent", "variant").apply();
+                fragment = new ClickOnMainPart();
                 if (fragment != null) {
                     android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
                     fragmentManager.beginTransaction()
@@ -182,53 +138,9 @@ public class ClickOnMainPart extends Fragment implements OnBackPressedListener {
         return view;
     }
 
-    public void sortCatalog(String method)
-    {
-        choiceItemFromCatalogs.clear();
-        if (android.os.Build.VERSION.SDK_INT > 9) {
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-            StrictMode.setThreadPolicy(policy);
-        }
-        try {
-            Log.d("myLogs","in ");
-            JSONArray data = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/sort?salt=df90sdfgl9854gjs54os59gjsogsdf&sortby=" + method));
-            Gson gson = new Gson();
-            audios = gson.fromJson(data.toString(),  new TypeToken<List<Audio>>(){}.getType());
-
-            if (audios!= null) {
-
-                for (int i=0; i<audios.size(); i++)
-                {
-                        Audio audio = audios.get(i);
-                        choiceItemFromCatalogs.add(audio);
-                }
-
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        if (choiceItemFromCatalogs.size()==0)
-        {
-            Toast.makeText(getActivity(), "Список пуст!", Toast.LENGTH_LONG).show();
-        }
-        else
-        {
-            choiceListAdapter = new ChoiceListAdapter(getActivity(), choiceItemFromCatalogs);
-            listView.setAdapter(choiceListAdapter);
-        }
-    }
-
     @Override
     public void onBackPressed() {
-        if (sharedPreferences.contains("intent"))
-        {
-            fragment = new Variant();
-        }
-        else {
-            fragment = new MainFragment();
-        }
-        editorclick.clear();
+        fragment = new MainFragment();
         TabActivity tabActivity = new TabActivity();
         tabActivity.changePage();
         if (fragment != null) {
@@ -238,7 +150,5 @@ public class ClickOnMainPart extends Fragment implements OnBackPressedListener {
 
         }
 
-
     }
-
 }

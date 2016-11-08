@@ -37,6 +37,7 @@ public class Login extends Fragment implements OnBackPressedListener{
     EditText enter_mail, enter_pass;
     getHttpGet request = new getHttpGet();
     String mail, pass;
+    String [] str_log;
     Fragment fragment = null;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
@@ -84,7 +85,10 @@ public class Login extends Fragment implements OnBackPressedListener{
 
                 mail = enter_mail.getText().toString();
                 pass = enter_pass.getText().toString();
+
                 if (mail != "" && pass != "") {
+                    str_log = mail.split("@");
+                    editor.putString("login", str_log[0]).apply();
                     fragment = new SuccessfulEnter();
                     if (android.os.Build.VERSION.SDK_INT > 9) {
                         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -128,6 +132,8 @@ public class Login extends Fragment implements OnBackPressedListener{
                 }
             }
         });
+
+
 
         send_mail.setOnClickListener(new View.OnClickListener() {
             @Override
