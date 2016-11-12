@@ -85,6 +85,7 @@ public class ClickOnMainPart extends Fragment implements OnBackPressedListener {
         back_arrow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                back_arrow.setBackgroundResource(R.drawable.bakground_arrow);
                 onBackPressed();
             }
         });
@@ -128,16 +129,7 @@ public class ClickOnMainPart extends Fragment implements OnBackPressedListener {
         }
         try {
             Log.d("myLogs", "in ");
-            JSONArray data = null;
-            if (sharedPreferences.contains("intent")) {
-                if (sharedPreferences.getString("intent", "").equals("variant")) {
-                   data = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/getCollectionBooks?salt=df90sdfgl9854gjs54os59gjsogsdf&collection_id=" + sharedPreferences.getString("id_collections", "") + "&model=collection"));
-                }
-            } else
-            {
-                 data = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/newbooks?salt=df90sdfgl9854gjs54os59gjsogsdf"));
-            }
-
+            JSONArray data =  new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/newbooks?salt=df90sdfgl9854gjs54os59gjsogsdf"));
             Gson gson = new Gson();
             audios = gson.fromJson(data.toString(),  new TypeToken<List<Audio>>(){}.getType());
 
@@ -221,13 +213,7 @@ public class ClickOnMainPart extends Fragment implements OnBackPressedListener {
 
     @Override
     public void onBackPressed() {
-        if (sharedPreferences.contains("intent"))
-        {
-            fragment = new Variant();
-        }
-        else {
-            fragment = new MainFragment();
-        }
+        fragment = new MainFragment();
         editorclick.clear();
         TabActivity tabActivity = new TabActivity();
         tabActivity.changePage();

@@ -25,6 +25,7 @@ import net.pixeltk.glagol.adapter.ChoiceListAdapter;
 import net.pixeltk.glagol.api.Audio;
 import net.pixeltk.glagol.api.getHttpGet;
 import net.pixeltk.glagol.fragment.MainFragment;
+import net.pixeltk.glagol.fragment.Variant;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -45,7 +46,7 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
     Fragment fragment = null;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
-    String id, collection, subscribe_collection, author, publisher, reader;
+    String id, collection, subscribe_collection, author, publisher, reader, name_collection;
     Button subscription, cancel_subscription;
     getHttpGet request = new getHttpGet();
     ListView listView;
@@ -81,6 +82,7 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
         back_arrow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                back_arrow.setBackgroundResource(R.drawable.bakground_arrow);
                 onBackPressed();
             }
         });
@@ -93,10 +95,10 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
 
         choiceItemFromCatalogs = new ArrayList<Audio>();
 
-        if (sharedPreferences.contains("Author"))
+        if (sharedPreferences.contains("author"))
         {
             collection = "author";
-            author = sharedPreferences.getString("Author", "");
+            author = sharedPreferences.getString("author", "");
             name_frag.setText(author);
             if (android.os.Build.VERSION.SDK_INT > 9) {
                 StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -142,10 +144,10 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
                 e.printStackTrace();
             }
         }
-        else  if (sharedPreferences.contains("Reader"))
+        else  if (sharedPreferences.contains("reader"))
         {
             collection = "reader";
-            reader = sharedPreferences.getString("Reader", "");
+            reader = sharedPreferences.getString("reader", "");
             name_frag.setText(reader);
             if (android.os.Build.VERSION.SDK_INT > 9) {
                 StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -192,10 +194,10 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
                 e.printStackTrace();
             }
         }
-        else  if (sharedPreferences.contains("Publisher"))
+        else  if (sharedPreferences.contains("publisher"))
         {
             collection = "publisher";
-            publisher = sharedPreferences.getString("Publisher", "");
+            publisher = sharedPreferences.getString("publisher", "");
             name_frag.setText(publisher);
             if (android.os.Build.VERSION.SDK_INT > 9) {
                 StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -241,6 +243,74 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
                 e.printStackTrace();
             }
         }
+        else  if (sharedPreferences.contains("collection"))
+        {
+            collection = "collection";
+            id = sharedPreferences.getString("collection", "");
+            name_collection = sharedPreferences.getString("nameCollection", "");
+            name_frag.setText(sharedPreferences.getString("nameCollection", ""));
+            Log.d("MyLog", name_collection);
+            subscribe_collection = name_collection;
+            if (sharedPreferences.contains(subscribe_collection))
+            {
+                subscription.setVisibility(View.INVISIBLE);
+                cancel_subscription.setVisibility(View.VISIBLE);
+            }
+            if (android.os.Build.VERSION.SDK_INT > 9) {
+                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                StrictMode.setThreadPolicy(policy);
+            }
+            try {
+                JSONArray data_selection = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/getCollectionBooks?salt=df90sdfgl9854gjs54os59gjsogsdf&collection_id=" + id + "&model=collection"));
+                Gson gson_selection = new Gson();
+                audios = gson_selection.fromJson(data_selection.toString(),  new TypeToken<List<Audio>>(){}.getType());
+
+                if (audios!= null) {
+
+                    for (int j = 0; j < audios.size(); j++) {
+                        Audio audio = audios.get(j);
+                        choiceItemFromCatalogs.add(audio);
+                    }
+
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        else  if (sharedPreferences.contains("name_sel"))
+        {
+            collection = sharedPreferences.getString("nameCollection", "");
+            id = sharedPreferences.getString("put_selection", "");
+            name_collection = sharedPreferences.getString("name_sel", "");
+
+            name_frag.setText(name_collection);
+            subscribe_collection = name_collection;
+            if (sharedPreferences.contains(subscribe_collection))
+            {
+                subscription.setVisibility(View.INVISIBLE);
+                cancel_subscription.setVisibility(View.VISIBLE);
+            }
+            if (android.os.Build.VERSION.SDK_INT > 9) {
+                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                StrictMode.setThreadPolicy(policy);
+            }
+            try {
+                JSONArray data_selection = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/getCollectionBooks?salt=df90sdfgl9854gjs54os59gjsogsdf&collection_id=" + id + "&model=" + collection));
+                Gson gson_selection = new Gson();
+                audios = gson_selection.fromJson(data_selection.toString(),  new TypeToken<List<Audio>>(){}.getType());
+
+                if (audios!= null) {
+
+                    for (int j = 0; j < audios.size(); j++) {
+                        Audio audio = audios.get(j);
+                        choiceItemFromCatalogs.add(audio);
+                    }
+
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
         if (choiceItemFromCatalogs.size()==0)
         {
             Toast.makeText(getActivity(), "Список пуст!", Toast.LENGTH_LONG).show();
@@ -272,6 +342,9 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
                         case "publisher":
                             Toast.makeText(getActivity(), "Вы подписаны на  новинки издательства - " + publisher + "!", Toast.LENGTH_LONG).show();
                             return;
+                        case "collection":
+                            Toast.makeText(getActivity(), "Вы подписаны на  новинки издательства - " + name_collection + "!", Toast.LENGTH_LONG).show();
+                            return;
                     }
                 }
                 else
@@ -287,7 +360,7 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
             @Override
             public void onClick(View view) {
                 SharedPreferences sharedPreferences = getActivity().getSharedPreferences("Sign", Context.MODE_PRIVATE);
-                request.getHttpGet("http://www.glagolapp.ru/api/subscribe?salt=df90sdfgl9854gjs54os59gjsogsdf&collection_id=" + id + "&model=" + collection + "&user_id=" + sharedPreferences.getString("id", ""));
+                request.getHttpGet("http://www.glagolapp.ru/api/subscribe?salt=df90sdfgl9854gjs54os59gjsogsdf&collection_id=" + id + "&model=" + collection + "&user_id=" + sharedPreferences.getString("id", "") + "&remove=1");
                 editor.remove(subscribe_collection).apply();
                 cancel_subscription.setVisibility(View.INVISIBLE);
                 subscription.setVisibility(View.VISIBLE);
@@ -315,17 +388,33 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
     }
     @Override
     public void onBackPressed() {
-        fragment = new CardBook();
-        if (sharedPreferences.contains("Author"))
+
+        if (sharedPreferences.contains("author"))
         {
-            editor.remove("Author").apply();
+            editor.remove("author").apply();
+            fragment = new CardBook();
         }
-        else  if (sharedPreferences.contains("Reader"))
+        else  if (sharedPreferences.contains("reader"))
         {
-            editor.remove("Reader").apply();
+            fragment = new CardBook();
+            editor.remove("reader").apply();
         }
+        else  if (sharedPreferences.contains("collection"))
+        {
+            fragment = new Variant();
+            editor.remove("nameCollection");
+            editor.remove("collection").apply();
+        }
+        else  if (sharedPreferences.contains("put_selection")) {
+            fragment = new MainFragment();
+            editor.remove("name_sel");
+            editor.remove("nameCollection");
+            editor.remove("put_selection").apply();
+        }
+
         else {
-            editor.remove("Publisher").apply();
+        fragment = new CardBook();
+        editor.remove("publisher").apply();
         }
         if (fragment != null) {
             android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();

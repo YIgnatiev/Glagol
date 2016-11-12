@@ -132,6 +132,7 @@ public class CardBook extends Fragment implements OnBackPressedListener {
         back_arrow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                back_arrow.setBackgroundResource(R.drawable.bakground_arrow);
                 onBackPressed();
             }
         });
@@ -495,7 +496,8 @@ public class CardBook extends Fragment implements OnBackPressedListener {
         content_line1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                editorsubscription.putString("Reader", audios.get(0).getReaders()).apply();
+                content_line1.setBackgroundColor(getResources().getColor(R.color.back));
+                editorsubscription.putString("reader", audios.get(0).getReaders()).apply();
                 fragment = new FragmentSubscription();
                 if (fragment != null) {
                     android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
@@ -509,7 +511,8 @@ public class CardBook extends Fragment implements OnBackPressedListener {
         content_line2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                editorsubscription.putString("Publisher", audios.get(0).getPublisher()).apply();
+                content_line2.setBackgroundColor(getResources().getColor(R.color.back));
+                editorsubscription.putString("publisher", audios.get(0).getPublisher()).apply();
                 fragment = new FragmentSubscription();
                 if (fragment != null) {
                     android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
@@ -523,7 +526,8 @@ public class CardBook extends Fragment implements OnBackPressedListener {
         content_line3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                editorsubscription.putString("Author", audios.get(0).getName_authors()).apply();
+                content_line3.setBackgroundColor(getResources().getColor(R.color.back));
+                editorsubscription.putString("author", audios.get(0).getName_authors()).apply();
                 fragment = new FragmentSubscription();
                 if (fragment != null) {
                     android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();

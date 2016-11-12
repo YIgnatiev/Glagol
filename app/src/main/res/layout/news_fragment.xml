@@ -9,5 +9,14 @@
         android:layout_width="match_parent"
         android:textColor="#707070"
         android:layout_height="wrap_content"
-        android:id="@+id/textView3" />
+        android:id="@+id/not_login_news" />
+    <ListView
+        android:id="@+id/news"
+        android:layout_width="match_parent"
+        style="@style/CustomListView"
+        android:dividerHeight="2dp"
+        android:visibility="gone"
+        android:listSelector="#4d545e"
+        android:divider="#2B2B2B"
+        android:layout_height="600dp" />
 </LinearLayout>

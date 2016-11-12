@@ -76,6 +76,7 @@ public class Login extends Fragment implements OnBackPressedListener{
             @Override
             public void onClick(View view) {
                 onBackPressed();
+                back_arrow.setBackgroundResource(R.drawable.bakground_arrow);
             }
         });
 

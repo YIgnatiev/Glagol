@@ -26,6 +26,7 @@ import net.pixeltk.glagol.adapter.ChoiceListAdapterVariant;
 import net.pixeltk.glagol.api.Audio;
 import net.pixeltk.glagol.api.getHttpGet;
 import net.pixeltk.glagol.fargment_catalog.CardBook;
+import net.pixeltk.glagol.fargment_catalog.FragmentSubscription;
 import net.pixeltk.glagol.fargment_catalog.OnBackPressedListener;
 
 import org.json.JSONArray;
@@ -49,8 +50,8 @@ public class Variant extends Fragment implements OnBackPressedListener {
     ListView listView;
     private ArrayList<Audio> audios = new ArrayList<>();
     getHttpGet request = new getHttpGet();
-    SharedPreferences sharedPreferences, idbook;
-    SharedPreferences.Editor editor, editorclick;
+    SharedPreferences sharedPreferences, subscription;
+    SharedPreferences.Editor editor, editorsubscripton;
     ImageView back_arrow, logo;
     TextView name_frag;
 
@@ -66,7 +67,9 @@ public class Variant extends Fragment implements OnBackPressedListener {
         View view = inflater.inflate(R.layout.fragment_choise_item_variant, container, false);
 
         sharedPreferences = getActivity().getSharedPreferences("ClickMain", Context.MODE_PRIVATE);
+        subscription = getActivity().getSharedPreferences("Subscription", Context.MODE_PRIVATE);
         editor = sharedPreferences.edit();
+        editorsubscripton = subscription.edit();
 
         back_arrow = (ImageView) view.findViewById(R.id.back);
         logo = (ImageView) view.findViewById(R.id.logo);
@@ -80,6 +83,8 @@ public class Variant extends Fragment implements OnBackPressedListener {
         back_arrow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                back_arrow.setBackgroundResource(R.drawable.bakground_arrow);
                 onBackPressed();
             }
         });
@@ -123,9 +128,9 @@ public class Variant extends Fragment implements OnBackPressedListener {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                editor.putString("id_collections", choiceItemFromCatalogs.get(i).getId());
-                editor.putString("intent", "variant").apply();
-                fragment = new ClickOnMainPart();
+                editorsubscripton.putString("nameCollection", choiceItemFromCatalogs.get(i).getName_book());
+                editorsubscripton.putString("collection", choiceItemFromCatalogs.get(i).getId()).apply();
+                fragment = new FragmentSubscription();
                 if (fragment != null) {
                     android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
                     fragmentManager.beginTransaction()

@@ -81,6 +81,8 @@ public class ListFragmentGlagol extends Fragment implements OnBackPressedListene
         back_arrow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
+                back_arrow.setBackgroundResource(R.drawable.bakground_arrow);
                 onBackPressed();
             }
         });

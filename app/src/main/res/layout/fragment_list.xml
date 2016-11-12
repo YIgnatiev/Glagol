@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         style="@style/CustomListView"
         android:dividerHeight="2dp"
-        android:listSelector="#2B2B2B"
+        android:listSelector="#4d545e"
         android:divider="#2B2B2B"
         android:layout_height="match_parent" />
 

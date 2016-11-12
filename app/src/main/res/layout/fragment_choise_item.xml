@@ -30,6 +30,7 @@
         android:layout_marginRight="10dp"
         android:layout_height="wrap_content">
         <include layout="@layout/list_for_search_variant"
+            android:visibility="gone"
             android:id="@+id/search_variant"/>
     </RelativeLayout>
 
@@ -41,9 +42,13 @@
         android:id="@+id/spinner" />
 
     <ListView
-        android:layout_width="match_parent"
         android:id="@+id/list_choice_item"
-        android:layout_height="match_parent" />
+        android:layout_width="match_parent"
+        style="@style/CustomListView"
+        android:dividerHeight="2dp"
+        android:listSelector="#4d545e"
+        android:divider="#2B2B2B"
+        android:layout_height="match_parent"/>
 
 
 </LinearLayout>
