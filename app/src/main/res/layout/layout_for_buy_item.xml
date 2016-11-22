@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_margin="10dp"
+        app:srcCompat="@drawable/notcover"
+        android:id="@+id/cover" />
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:id="@+id/content"
+        android:layout_toRightOf="@+id/cover"
+        android:layout_marginLeft="20dp"
+        android:gravity="center_vertical"
+        android:layout_marginRight="20dp"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/cover">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/name_author"
+            android:textSize="12sp"
+            android:textColor="#9CA3AD"
+            android:text="Larry King"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/book_name"
+            android:textSize="16sp"
+            android:layout_marginTop="5dp"
+            android:layout_below="@+id/name_author"
+            android:textColor="#F1F1F1"
+            android:text="как разговаривать"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/name_reader"
+            android:layout_below="@+id/book_name"
+            android:layout_marginTop="5dp"
+            android:textSize="12sp"
+            android:textColor="#9CA3AD"
+            android:text="Larry King"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/price"
+            android:gravity="center"
+            android:visibility="gone"
+            android:layout_marginTop="5dp"
+            android:textSize="12sp"
+            android:layout_below="@+id/name_reader"
+            android:textColor="#F1F1F1"
+            android:background="@drawable/backsearch"
+            android:text=" 149 р. " />
+
+
+    </RelativeLayout>
+
+</RelativeLayout>

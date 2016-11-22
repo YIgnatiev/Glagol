@@ -1,7 +1,10 @@
 package net.pixeltk.glagol.fargment_catalog;
 
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v4.app.Fragment;
@@ -21,6 +24,8 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import net.pixeltk.glagol.R;
+import net.pixeltk.glagol.Splash;
+import net.pixeltk.glagol.activity.TabActivity;
 import net.pixeltk.glagol.adapter.ChoiceListAdapter;
 import net.pixeltk.glagol.api.Audio;
 import net.pixeltk.glagol.api.getHttpGet;
@@ -32,6 +37,7 @@ import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Created by root on 18.10.16.
@@ -56,6 +62,7 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
     private ArrayList<Audio> choiceItemFromCatalogs;
     ImageView back_arrow, logo;
     TextView name_frag;
+    ProgressDialog pdia;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -100,148 +107,25 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
             collection = "author";
             author = sharedPreferences.getString("author", "");
             name_frag.setText(author);
-            if (android.os.Build.VERSION.SDK_INT > 9) {
-                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-                StrictMode.setThreadPolicy(policy);
-            }
-            try {
-                Log.d("myLogs","in ");
-                JSONArray data = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/authors?salt=df90sdfgl9854gjs54os59gjsogsdf"));
-                Gson gson = new Gson();
-                listcheck = gson.fromJson(data.toString(),  new TypeToken<List<Audio>>(){}.getType());
+            new getBooksAuthor().execute();
 
-                if (listcheck!= null) {
-
-                    for (int i=0; i<listcheck.size(); i++)
-                    {
-                        if (listcheck.get(i).getName_book().equals(author)) {
-                            id = listcheck.get(i).getId();
-                            subscribe_collection = listcheck.get(i).getName_book();
-                            if (sharedPreferences.contains(subscribe_collection))
-                            {
-                                subscription.setVisibility(View.INVISIBLE);
-                                cancel_subscription.setVisibility(View.VISIBLE);
-                            }
-                            JSONArray data_selection = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/getCollectionBooks?salt=df90sdfgl9854gjs54os59gjsogsdf&collection_id=" + id + "&model=author"));
-                            Gson gson_selection = new Gson();
-                            audios = gson_selection.fromJson(data_selection.toString(),  new TypeToken<List<Audio>>(){}.getType());
-
-                            if (audios!= null) {
-
-                                for (int j=0; j<audios.size(); j++)
-                                {
-                                    Audio audio = audios.get(j);
-                                    choiceItemFromCatalogs.add(audio);
-                                }
-
-                            }
-                        }
-                    }
-
-                }
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
         }
         else  if (sharedPreferences.contains("reader"))
         {
             collection = "reader";
             reader = sharedPreferences.getString("reader", "");
             name_frag.setText(reader);
-            if (android.os.Build.VERSION.SDK_INT > 9) {
-                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-                StrictMode.setThreadPolicy(policy);
-            }
-            try {
-                Log.d("myLogs","in ");
-                JSONArray data = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/readers?salt=df90sdfgl9854gjs54os59gjsogsdf"));
-                Gson gson = new Gson();
-                listcheck = gson.fromJson(data.toString(),  new TypeToken<List<Audio>>(){}.getType());
 
-                if (listcheck!= null) {
+            new getBooksReader().execute();
 
-                    for (int i=0; i<listcheck.size(); i++)
-                    {
-                        if (listcheck.get(i).getName_book().equals(reader)) {
-                            id = listcheck.get(i).getId();
-                            subscribe_collection = listcheck.get(i).getName_book();
-                            Log.d("MyLog", String.valueOf(sharedPreferences.contains(subscribe_collection)));
-                            if (sharedPreferences.contains(subscribe_collection))
-                            {
-                                subscription.setVisibility(View.INVISIBLE);
-                                cancel_subscription.setVisibility(View.VISIBLE);
-                            }
-                            JSONArray data_selection = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/getCollectionBooks?salt=df90sdfgl9854gjs54os59gjsogsdf&collection_id=" + id + "&model=reader"));
-                            Gson gson_selection = new Gson();
-                            audios = gson_selection.fromJson(data_selection.toString(),  new TypeToken<List<Audio>>(){}.getType());
-
-                            if (audios!= null) {
-
-                                for (int j=0; j<audios.size(); j++)
-                                {
-                                    Audio audio = audios.get(j);
-                                    choiceItemFromCatalogs.add(audio);
-                                }
-
-                            }
-                        }
-                    }
-
-                }
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
         }
         else  if (sharedPreferences.contains("publisher"))
         {
             collection = "publisher";
             publisher = sharedPreferences.getString("publisher", "");
             name_frag.setText(publisher);
-            if (android.os.Build.VERSION.SDK_INT > 9) {
-                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-                StrictMode.setThreadPolicy(policy);
-            }
-            try {
-                Log.d("myLogs","in ");
-                JSONArray data = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/publishers?salt=df90sdfgl9854gjs54os59gjsogsdf"));
-                Gson gson = new Gson();
-                listcheck = gson.fromJson(data.toString(),  new TypeToken<List<Audio>>(){}.getType());
+            new getBooksPublishers().execute();
 
-                if (listcheck!= null) {
-
-                    for (int i=0; i<listcheck.size(); i++)
-                    {
-                        if (listcheck.get(i).getName_book().equals(publisher)) {
-                            id = listcheck.get(i).getId();
-                            subscribe_collection = listcheck.get(i).getName_book();
-                            if (sharedPreferences.contains(subscribe_collection))
-                            {
-                                subscription.setVisibility(View.INVISIBLE);
-                                cancel_subscription.setVisibility(View.VISIBLE);
-                            }
-                            JSONArray data_selection = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/getCollectionBooks?salt=df90sdfgl9854gjs54os59gjsogsdf&collection_id=" + id + "&model=publisher"));
-                            Gson gson_selection = new Gson();
-                            audios = gson_selection.fromJson(data_selection.toString(),  new TypeToken<List<Audio>>(){}.getType());
-
-                            if (audios!= null) {
-
-                                for (int j=0; j<audios.size(); j++)
-                                {
-                                    Audio audio = audios.get(j);
-                                    choiceItemFromCatalogs.add(audio);
-                                }
-
-                            }
-                        }
-                    }
-
-                }
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
         }
         else  if (sharedPreferences.contains("collection"))
         {
@@ -256,26 +140,8 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
                 subscription.setVisibility(View.INVISIBLE);
                 cancel_subscription.setVisibility(View.VISIBLE);
             }
-            if (android.os.Build.VERSION.SDK_INT > 9) {
-                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-                StrictMode.setThreadPolicy(policy);
-            }
-            try {
-                JSONArray data_selection = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/getCollectionBooks?salt=df90sdfgl9854gjs54os59gjsogsdf&collection_id=" + id + "&model=collection"));
-                Gson gson_selection = new Gson();
-                audios = gson_selection.fromJson(data_selection.toString(),  new TypeToken<List<Audio>>(){}.getType());
+            new getCollections().execute();
 
-                if (audios!= null) {
-
-                    for (int j = 0; j < audios.size(); j++) {
-                        Audio audio = audios.get(j);
-                        choiceItemFromCatalogs.add(audio);
-                    }
-
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
         }
         else  if (sharedPreferences.contains("name_sel"))
         {
@@ -290,36 +156,9 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
                 subscription.setVisibility(View.INVISIBLE);
                 cancel_subscription.setVisibility(View.VISIBLE);
             }
-            if (android.os.Build.VERSION.SDK_INT > 9) {
-                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-                StrictMode.setThreadPolicy(policy);
-            }
-            try {
-                JSONArray data_selection = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/getCollectionBooks?salt=df90sdfgl9854gjs54os59gjsogsdf&collection_id=" + id + "&model=" + collection));
-                Gson gson_selection = new Gson();
-                audios = gson_selection.fromJson(data_selection.toString(),  new TypeToken<List<Audio>>(){}.getType());
-
-                if (audios!= null) {
-
-                    for (int j = 0; j < audios.size(); j++) {
-                        Audio audio = audios.get(j);
-                        choiceItemFromCatalogs.add(audio);
-                    }
-
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+            new getNameSell().execute();
         }
-        if (choiceItemFromCatalogs.size()==0)
-        {
-            Toast.makeText(getActivity(), "Список пуст!", Toast.LENGTH_LONG).show();
-        }
-        else
-        {
-            choiceListAdapter = new ChoiceListAdapter(getActivity(), choiceItemFromCatalogs);
-            listView.setAdapter(choiceListAdapter);
-        }
+
 
         subscription.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -423,5 +262,332 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
 
         }
 
+    }
+
+    class getNameSell extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pdia = new ProgressDialog(getActivity());
+            pdia.setMessage("Загрузка...");
+            pdia.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            if (android.os.Build.VERSION.SDK_INT > 9) {
+                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                StrictMode.setThreadPolicy(policy);
+            }
+            try {
+                JSONArray data_selection = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/getCollectionBooks?salt=df90sdfgl9854gjs54os59gjsogsdf&collection_id=" + id + "&model=" + collection));
+                Gson gson_selection = new Gson();
+                audios = gson_selection.fromJson(data_selection.toString(),  new TypeToken<List<Audio>>(){}.getType());
+
+                if (audios!= null) {
+
+                    for (int j = 0; j < audios.size(); j++) {
+                        Audio audio = audios.get(j);
+                        choiceItemFromCatalogs.add(audio);
+                    }
+
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            if (choiceItemFromCatalogs.size()==0)
+            {
+                Toast.makeText(getActivity(), "Список пуст!", Toast.LENGTH_LONG).show();
+            }
+            else
+            {
+                choiceListAdapter = new ChoiceListAdapter(getActivity(), choiceItemFromCatalogs);
+                listView.setAdapter(choiceListAdapter);
+            }
+            pdia.dismiss();
+        }
+    }
+    class getCollections extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pdia = new ProgressDialog(getActivity());
+            pdia.setMessage("Загрузка...");
+            pdia.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            if (android.os.Build.VERSION.SDK_INT > 9) {
+                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                StrictMode.setThreadPolicy(policy);
+            }
+            try {
+                JSONArray data_selection = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/getCollectionBooks?salt=df90sdfgl9854gjs54os59gjsogsdf&collection_id=" + id + "&model=collection"));
+                Gson gson_selection = new Gson();
+                audios = gson_selection.fromJson(data_selection.toString(),  new TypeToken<List<Audio>>(){}.getType());
+
+                if (audios!= null) {
+
+                    for (int j = 0; j < audios.size(); j++) {
+                        Audio audio = audios.get(j);
+                        choiceItemFromCatalogs.add(audio);
+                    }
+
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            if (choiceItemFromCatalogs.size()==0)
+            {
+                Toast.makeText(getActivity(), "Список пуст!", Toast.LENGTH_LONG).show();
+            }
+            else
+            {
+                choiceListAdapter = new ChoiceListAdapter(getActivity(), choiceItemFromCatalogs);
+                listView.setAdapter(choiceListAdapter);
+            }
+            pdia.dismiss();
+        }
+    }
+
+    class getBooksAuthor extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pdia = new ProgressDialog(getActivity());
+            pdia.setMessage("Загрузка...");
+            pdia.show();
+
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            if (android.os.Build.VERSION.SDK_INT > 9) {
+                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                StrictMode.setThreadPolicy(policy);
+            }
+            try {
+                Log.d("myLogs","in ");
+                JSONArray data = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/authors?salt=df90sdfgl9854gjs54os59gjsogsdf"));
+                Gson gson = new Gson();
+                listcheck = gson.fromJson(data.toString(),  new TypeToken<List<Audio>>(){}.getType());
+
+                if (listcheck!= null) {
+
+                    for (int i=0; i<listcheck.size(); i++)
+                    {
+                        if (listcheck.get(i).getName_book().equals(author)) {
+                            id = listcheck.get(i).getId();
+                            subscribe_collection = listcheck.get(i).getName_book();
+                            JSONArray data_selection = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/getCollectionBooks?salt=df90sdfgl9854gjs54os59gjsogsdf&collection_id=" + id + "&model=author"));
+                            Gson gson_selection = new Gson();
+                            audios = gson_selection.fromJson(data_selection.toString(),  new TypeToken<List<Audio>>(){}.getType());
+
+                            if (audios!= null) {
+
+                                for (int j=0; j<audios.size(); j++)
+                                {
+                                    Audio audio = audios.get(j);
+                                    choiceItemFromCatalogs.add(audio);
+                                }
+
+                            }
+                        }
+                    }
+
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            if (sharedPreferences.contains(subscribe_collection))
+            {
+                subscription.setVisibility(View.INVISIBLE);
+                cancel_subscription.setVisibility(View.VISIBLE);
+            }
+            if (choiceItemFromCatalogs.size()==0)
+            {
+                Toast.makeText(getActivity(), "Список пуст!", Toast.LENGTH_LONG).show();
+            }
+            else
+            {
+                choiceListAdapter = new ChoiceListAdapter(getActivity(), choiceItemFromCatalogs);
+                listView.setAdapter(choiceListAdapter);
+            }
+            pdia.dismiss();
+
+        }
+    }
+    class getBooksReader extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pdia = new ProgressDialog(getActivity());
+            pdia.setMessage("Загрузка...");
+            pdia.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            if (android.os.Build.VERSION.SDK_INT > 9) {
+                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                StrictMode.setThreadPolicy(policy);
+            }
+            try {
+                Log.d("myLogs","in ");
+                JSONArray data = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/readers?salt=df90sdfgl9854gjs54os59gjsogsdf"));
+                Gson gson = new Gson();
+                listcheck = gson.fromJson(data.toString(),  new TypeToken<List<Audio>>(){}.getType());
+
+                if (listcheck!= null) {
+
+                    for (int i=0; i<listcheck.size(); i++)
+                    {
+                        if (listcheck.get(i).getName_book().equals(reader)) {
+                            id = listcheck.get(i).getId();
+                            subscribe_collection = listcheck.get(i).getName_book();
+
+                            JSONArray data_selection = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/getCollectionBooks?salt=df90sdfgl9854gjs54os59gjsogsdf&collection_id=" + id + "&model=reader"));
+                            Gson gson_selection = new Gson();
+                            audios = gson_selection.fromJson(data_selection.toString(),  new TypeToken<List<Audio>>(){}.getType());
+
+                            if (audios!= null) {
+
+                                for (int j=0; j<audios.size(); j++)
+                                {
+                                    Audio audio = audios.get(j);
+                                    choiceItemFromCatalogs.add(audio);
+                                }
+
+                            }
+                        }
+                    }
+
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            if (sharedPreferences.contains(subscribe_collection))
+            {
+                subscription.setVisibility(View.INVISIBLE);
+                cancel_subscription.setVisibility(View.VISIBLE);
+            }
+            if (choiceItemFromCatalogs.size()==0)
+            {
+                Toast.makeText(getActivity(), "Список пуст!", Toast.LENGTH_LONG).show();
+            }
+            else
+            {
+                choiceListAdapter = new ChoiceListAdapter(getActivity(), choiceItemFromCatalogs);
+                listView.setAdapter(choiceListAdapter);
+            }
+            pdia.dismiss();
+        }
+    }
+    class getBooksPublishers extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pdia = new ProgressDialog(getActivity());
+            pdia.setMessage("Загрузка...");
+            pdia.show();
+
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            if (android.os.Build.VERSION.SDK_INT > 9) {
+                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                StrictMode.setThreadPolicy(policy);
+            }
+            try {
+                Log.d("myLogs","in ");
+                JSONArray data = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/publishers?salt=df90sdfgl9854gjs54os59gjsogsdf"));
+                Gson gson = new Gson();
+                listcheck = gson.fromJson(data.toString(),  new TypeToken<List<Audio>>(){}.getType());
+
+                if (listcheck!= null) {
+
+                    for (int i=0; i<listcheck.size(); i++)
+                    {
+                        if (listcheck.get(i).getName_book().equals(publisher)) {
+                            id = listcheck.get(i).getId();
+                            subscribe_collection = listcheck.get(i).getName_book();
+
+                            JSONArray data_selection = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/getCollectionBooks?salt=df90sdfgl9854gjs54os59gjsogsdf&collection_id=" + id + "&model=publisher"));
+                            Gson gson_selection = new Gson();
+                            audios = gson_selection.fromJson(data_selection.toString(),  new TypeToken<List<Audio>>(){}.getType());
+
+                            if (audios!= null) {
+
+                                for (int j=0; j<audios.size(); j++)
+                                {
+                                    Audio audio = audios.get(j);
+                                    choiceItemFromCatalogs.add(audio);
+                                }
+
+                            }
+                        }
+                    }
+
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            if (sharedPreferences.contains(subscribe_collection))
+            {
+                subscription.setVisibility(View.INVISIBLE);
+                cancel_subscription.setVisibility(View.VISIBLE);
+            }
+            if (choiceItemFromCatalogs.size()==0)
+            {
+                Toast.makeText(getActivity(), "Список пуст!", Toast.LENGTH_LONG).show();
+            }
+            else
+            {
+                choiceListAdapter = new ChoiceListAdapter(getActivity(), choiceItemFromCatalogs);
+                listView.setAdapter(choiceListAdapter);
+            }
+            pdia.dismiss();
+
+        }
     }
 }

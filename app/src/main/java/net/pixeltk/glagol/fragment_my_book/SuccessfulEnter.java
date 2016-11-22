@@ -29,6 +29,7 @@ import net.pixeltk.glagol.adapter.BookMarksHelper;
 import net.pixeltk.glagol.adapter.DataBasesHelper;
 import net.pixeltk.glagol.adapter.DrawItemBookMarks;
 import net.pixeltk.glagol.adapter.DrawerListBookMarks;
+import net.pixeltk.glagol.adapter.DrawerListBuy;
 import net.pixeltk.glagol.adapter.DrawerListHistory;
 import net.pixeltk.glagol.adapter.DrawerListListening;
 import net.pixeltk.glagol.fargment_catalog.CardBook;
@@ -55,7 +56,8 @@ public class SuccessfulEnter extends Fragment implements OnBackPressedListener{
     private ArrayList<DrawItemBookMarks> navDrawerBuyItems;
     private ArrayList<DrawItemBookMarks> navDrawerListenItems;
     public static DrawerListBookMarks adapter;
-    private DrawerListHistory history_adapter, buy_adapter;
+    private DrawerListHistory history_adapter;
+    private DrawerListBuy buy_adapter;
     private DrawerListListening listen_adapter;
     ListView listView, listHistory, listBuy, listlisten;
     DataBasesHelper dataBookMarks, dataHistory, dataBuy, dataDownload, dataListen;
@@ -264,7 +266,7 @@ public class SuccessfulEnter extends Fragment implements OnBackPressedListener{
                     navDrawerBuyItems.add(new DrawItemBookMarks(buyHelper.getName_author(), buyHelper.getName_book(), buyHelper.getName_reader(), buyHelper.getPrice(), buyHelper.getImg_url(), buyHelper.getId_book()));
                     buyHelper = null;
                 }
-                buy_adapter = new DrawerListHistory(getActivity(), navDrawerBuyItems);
+                buy_adapter = new DrawerListBuy(getActivity(), navDrawerBuyItems);
                 listBuy.setAdapter(buy_adapter);
             }
         });

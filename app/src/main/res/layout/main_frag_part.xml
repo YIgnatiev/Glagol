@@ -41,6 +41,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginRight="15dp"
             android:layout_marginLeft="15dp"
+            android:overScrollMode="never"
             android:layout_marginBottom="20dp"
             android:layout_height="wrap_content"/>
     </LinearLayout>
@@ -84,6 +85,7 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/recycler_view_news"
             android:layout_width="match_parent"
+            android:overScrollMode="never"
             android:layout_marginBottom="20dp"
             android:layout_marginRight="15dp"
             android:layout_marginLeft="15dp"
@@ -132,6 +134,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginRight="15dp"
             android:layout_marginLeft="15dp"
+            android:overScrollMode="never"
             android:layout_marginBottom="20dp"
             android:layout_height="wrap_content"/>
     </LinearLayout>
@@ -174,6 +177,7 @@
             android:id="@+id/recycler_view_sale"
             android:layout_width="match_parent"
             android:layout_marginTop="10dp"
+            android:overScrollMode="never"
             android:layout_marginRight="15dp"
             android:layout_marginLeft="15dp"
             android:layout_marginBottom="20dp"
@@ -220,6 +224,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginRight="15dp"
             android:layout_marginLeft="15dp"
+            android:overScrollMode="never"
             android:layout_marginBottom="20dp"
             android:layout_height="wrap_content"/>
     </LinearLayout>
@@ -262,6 +267,7 @@
             android:id="@+id/recycler_view_soon_be"
             android:layout_width="match_parent"
             android:layout_marginTop="10dp"
+            android:overScrollMode="never"
             android:layout_marginRight="15dp"
             android:layout_marginLeft="15dp"
             android:layout_marginBottom="20dp"

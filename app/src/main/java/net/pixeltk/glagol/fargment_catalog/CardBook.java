@@ -1,11 +1,14 @@
 package net.pixeltk.glagol.fargment_catalog;
 
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Paint;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.StrictMode;
@@ -27,6 +30,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import net.pixeltk.glagol.R;
+import net.pixeltk.glagol.Splash;
 import net.pixeltk.glagol.activity.TabActivity;
 import net.pixeltk.glagol.adapter.BookMarksHelper;
 import net.pixeltk.glagol.adapter.DataBasesHelper;
@@ -47,6 +51,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static net.pixeltk.glagol.activity.TabActivity.calculat_total_size;
 import static net.pixeltk.glagol.activity.TabActivity.load;
@@ -91,6 +96,8 @@ public class CardBook extends Fragment implements OnBackPressedListener {
     public ArrayList<Audio> audios = new ArrayList<>();
     public String book;
     public static int total_size = 0;
+
+    private ProgressDialog pdia;
 
     MediaPlayer mediaPlayer = new MediaPlayer();
 
@@ -171,86 +178,8 @@ public class CardBook extends Fragment implements OnBackPressedListener {
 
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 
+        new UploadInfoBook().execute();
 
-        if (android.os.Build.VERSION.SDK_INT > 9) {
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-            StrictMode.setThreadPolicy(policy);
-        }
-        try {
-            JSONArray data = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/getbook?salt=df90sdfgl9854gjs54os59gjsogsdf&book_id=" + idbook.getString("idbook", "")));
-
-            Gson gson = new Gson();
-            audios = gson.fromJson(data.toString(),  new TypeToken<List<Audio>>(){}.getType());
-
-            if (audios!= null) {
-                id_book = audios.get(0).getId();
-                url_demo = audios.get(0).getDemo();
-                total_size = Integer.parseInt(audios.get(0).getSize());
-                file_path = audios.get(0).getName_book();
-                author = audios.get(0).getName_authors();
-                reader = audios.get(0).getReaders();
-                name_author.setText("Автор: " + audios.get(0).getName_authors());
-                name_book.setText(audios.get(0).getName_book());
-                text_reader.setText("Чтец: " + audios.get(0).getReaders());
-                text_publisher.setText("Издательство: " + audios.get(0).getPublisher());
-                total_duration = audios.get(0).getDuration();
-                if (audios.get(0).getDuration() != null && audios.get(0).getSize() != null) {
-                    text_time.setText(getTime(Long.valueOf(audios.get(0).getDuration())) + " " + Integer.parseInt(String.valueOf(Integer.parseInt(audios.get(0).getSize()) / 1000)) + " мб.");
-                    download.setText("Скачать " + Integer.parseInt(String.valueOf(Integer.parseInt(audios.get(0).getSize()) / 1000)) + " мб.");
-                }
-                else
-                {
-                    text_time.setText(0 + " ч. " + 0 + " мин. " + 0+ " сек. " + " " + 0 + " мб.");
-                    download.setText("Скачать " + 0 + " мб.");
-                }
-                text_teg.setText(audios.get(0).getCategorys());
-                text_teg.setPaintFlags(text_teg.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
-                description.setText(audios.get(0).getDescription());
-                url_img = audios.get(0).getIcon();
-                Glide.with(getActivity()).load(audios.get(0).getIcon()).placeholder(R.drawable.notcover).into(cover);
-                buy.setText("Купить за " + audios.get(0).getPrice() + " p.");
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        book = name_book.getText().toString();
-        if (!url_demo.equals("0")) {
-            try {
-                mediaPlayer.setDataSource(url_demo);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            try {
-                mediaPlayer.prepare();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        if (checklogin.contains("id"))
-        {
-            if (HistoryListId.size() == 0)
-            {
-                dataHistory.insertHistory(audios.get(0).getName_authors(), audios.get(0).getName_book(), audios.get(0).getReaders(), audios.get(0).getPrice(), audios.get(0).getIcon(), audios.get(0).getId());
-                dataHistory.close();
-            }
-            else {
-                int check = 0;
-                for (int i = 0; i < HistoryListId.size(); i++) {
-                    historyHelper = dataHistory.getProduct(HistoryListId.get(i).toString(), "History");
-
-                    if (audios.get(0).getId().equals(historyHelper.getId_book())) {
-                        check=1;
-                        break;
-                    }
-                }
-                if (check == 0)
-                {
-                    dataHistory.insertHistory(audios.get(0).getName_authors(), audios.get(0).getName_book(), audios.get(0).getReaders(), audios.get(0).getPrice(), audios.get(0).getIcon(), audios.get(0).getId());
-                    dataHistory.close();
-                }
-            }
-        }
 
         text_teg.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -266,70 +195,7 @@ public class CardBook extends Fragment implements OnBackPressedListener {
                 }
             }
         });
-        for (int i = 0; i < BuyListId.size(); i++) {
-            buyHelper = dataBuy.getProduct(BuyListId.get(i).toString(), "Buy");
 
-            if (audios.get(0).getId().equals(buyHelper.getId_book())) {
-                buy.setVisibility(View.INVISIBLE);
-                progressbar_line.setVisibility(View.INVISIBLE);
-                download.setVisibility(View.VISIBLE);
-                del_marks.setVisibility(View.GONE);
-                book_marks.setVisibility(View.GONE);
-                delete_audio.setVisibility(View.GONE);
-                break;
-            }
-        }
-
-        if (audios.get(0).getPrice() == null)
-        {
-            fragment = new MainFragment();
-            if (fragment != null) {
-                android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
-                fragmentManager.beginTransaction()
-                        .replace(R.id.main_frame, fragment).commit();
-
-            }
-        }
-        for (int i = 0; i < IdList.size(); i++)
-        {
-
-            bookMarksHelper = dataBookMarks.getProduct(IdList.get(i).toString(), "Bookmarks");
-            if (audios.get(0).getId().equals(bookMarksHelper.getId_book()))
-            {
-                book_marks.setVisibility(View.GONE);
-                del_marks.setVisibility(View.VISIBLE);
-            }
-            bookMarksHelper = null;
-        }
-        for (int i = 0; i < DownloadListId.size(); i++)
-        {
-
-            downloadHelper = dataDownload.getProductDownload(DownloadListId.get(i).toString());
-            Log.d("MyLog", " check " + downloadHelper.getId_book());
-            if (id_book.equals(downloadHelper.getId_book()))
-            {
-                download.setVisibility(View.INVISIBLE);
-                book_marks.setVisibility(View.GONE);
-                del_marks.setVisibility(View.GONE);
-                delete_audio.setVisibility(View.VISIBLE);
-                listen.setVisibility(View.VISIBLE);
-            }
-            downloadHelper = null;
-        }
-        if (idbook.contains("download_book")) {
-            if (idbook.getString("download_book", "").equals(id_book)) {
-                if (idbook.contains("download")) {
-                    download.setVisibility(View.INVISIBLE);
-                    listen.setVisibility(View.INVISIBLE);
-                    buy.setVisibility(View.INVISIBLE);
-                    progressbar_line.setVisibility(View.VISIBLE);
-                    delete_audio.setVisibility(View.VISIBLE);
-                    book_marks.setVisibility(View.GONE);
-                    del_marks.setVisibility(View.GONE);
-                    tv_progress_horizontal.setText("Скачано:" + idbook.getInt("download", 0) + "МБ из " + calculat_total_size + "МБ");
-                }
-            }
-        }
 
         delete_audio.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -348,7 +214,7 @@ public class CardBook extends Fragment implements OnBackPressedListener {
                         new File(dir, children[i]).delete();
                     }
                 }
-
+                editor.clear().apply();
                 SQLiteDatabase db = dataDownload.getWritableDatabase();
                 db.delete("Download", "id_book = " + id_book, null);
                 db.delete("Listen", "id_book = " + id_book, null);
@@ -577,6 +443,12 @@ public class CardBook extends Fragment implements OnBackPressedListener {
             e.printStackTrace();
         }
     }
+
+    public void setSomeText()
+    {
+
+
+    }
     private String getTime(Long s){
         Long hours = s / 3600;
         Long minutes = (s % 3600) / 60;
@@ -630,5 +502,172 @@ public class CardBook extends Fragment implements OnBackPressedListener {
         progressbar_line.setVisibility(View.GONE);
         listen.setVisibility(View.VISIBLE);
     }
+    class UploadInfoBook extends AsyncTask<Void, Void, Void> {
 
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pdia = new ProgressDialog(getActivity());
+            pdia.setMessage("Загрузка...");
+            pdia.show();
+
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            if (android.os.Build.VERSION.SDK_INT > 9) {
+                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                StrictMode.setThreadPolicy(policy);
+            }
+            try {
+                JSONArray data = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/getbook?salt=df90sdfgl9854gjs54os59gjsogsdf&book_id=" + idbook.getString("idbook", "")));
+
+                Gson gson = new Gson();
+                audios = gson.fromJson(data.toString(),  new TypeToken<List<Audio>>(){}.getType());
+
+                if (audios!= null) {
+                    id_book = audios.get(0).getId();
+                    url_demo = audios.get(0).getDemo();
+                    total_size = Integer.parseInt(audios.get(0).getSize());
+                    file_path = audios.get(0).getName_book();
+                    author = audios.get(0).getName_authors();
+                    reader = audios.get(0).getReaders();
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            name_author.setText("Автор: " + audios.get(0).getName_authors());
+            name_book.setText(audios.get(0).getName_book());
+            text_reader.setText("Чтец: " + audios.get(0).getReaders());
+            text_publisher.setText("Издательство: " + audios.get(0).getPublisher());
+            total_duration = audios.get(0).getDuration();
+            if (audios.get(0).getDuration() != null && audios.get(0).getSize() != null) {
+                text_time.setText(getTime(Long.valueOf(audios.get(0).getDuration())) + " " + Integer.parseInt(String.valueOf(Integer.parseInt(audios.get(0).getSize()) / 1000)) + " мб.");
+                download.setText("Скачать " + Integer.parseInt(String.valueOf(Integer.parseInt(audios.get(0).getSize()) / 1000)) + " мб.");
+            }
+            else
+            {
+                text_time.setText(0 + " ч. " + 0 + " мин. " + 0+ " сек. " + " " + 0 + " мб.");
+                download.setText("Скачать " + 0 + " мб.");
+            }
+            text_teg.setText(audios.get(0).getCategorys());
+            text_teg.setPaintFlags(text_teg.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+            description.setText(audios.get(0).getDescription());
+            url_img = audios.get(0).getIcon();
+            Glide.with(getActivity()).load(audios.get(0).getIcon()).placeholder(R.drawable.notcover).into(cover);
+            buy.setText("Купить за " + audios.get(0).getPrice() + " p.");
+
+           /* book = name_book.getText().toString();
+
+            if (!url_demo.equals("0")) {
+                try {
+                    mediaPlayer.setDataSource(url_demo);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                try {
+                    mediaPlayer.prepare();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (checklogin.contains("id"))
+            {
+                if (HistoryListId.size() == 0)
+                {
+                    dataHistory.insertHistory(audios.get(0).getName_authors(), audios.get(0).getName_book(), audios.get(0).getReaders(), audios.get(0).getPrice(), audios.get(0).getIcon(), audios.get(0).getId());
+                    dataHistory.close();
+                }
+                else {
+                    int check = 0;
+                    for (int i = 0; i < HistoryListId.size(); i++) {
+                        historyHelper = dataHistory.getProduct(HistoryListId.get(i).toString(), "History");
+
+                        if (audios.get(0).getId().equals(historyHelper.getId_book())) {
+                            check=1;
+                            break;
+                        }
+                    }
+                    if (check == 0)
+                    {
+                        dataHistory.insertHistory(audios.get(0).getName_authors(), audios.get(0).getName_book(), audios.get(0).getReaders(), audios.get(0).getPrice(), audios.get(0).getIcon(), audios.get(0).getId());
+                        dataHistory.close();
+                    }
+                }
+            }
+            for (int i = 0; i < BuyListId.size(); i++) {
+                buyHelper = dataBuy.getProduct(BuyListId.get(i).toString(), "Buy");
+
+                if (audios.get(0).getId().equals(buyHelper.getId_book())) {
+                    buy.setVisibility(View.INVISIBLE);
+                    progressbar_line.setVisibility(View.INVISIBLE);
+                    download.setVisibility(View.VISIBLE);
+                    del_marks.setVisibility(View.GONE);
+                    book_marks.setVisibility(View.GONE);
+                    delete_audio.setVisibility(View.GONE);
+                    break;
+                }
+            }
+
+            if (audios.get(0).getPrice() == null)
+            {
+                fragment = new MainFragment();
+                if (fragment != null) {
+                    android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.main_frame, fragment).commit();
+
+                }
+            }
+            for (int i = 0; i < IdList.size(); i++)
+            {
+
+                bookMarksHelper = dataBookMarks.getProduct(IdList.get(i).toString(), "Bookmarks");
+                if (audios.get(0).getId().equals(bookMarksHelper.getId_book()))
+                {
+                    book_marks.setVisibility(View.GONE);
+                    del_marks.setVisibility(View.VISIBLE);
+                }
+                bookMarksHelper = null;
+            }
+            for (int i = 0; i < DownloadListId.size(); i++)
+            {
+
+                downloadHelper = dataDownload.getProductDownload(DownloadListId.get(i).toString());
+                Log.d("MyLog", " check " + downloadHelper.getId_book());
+                if (id_book.equals(downloadHelper.getId_book()))
+                {
+                    download.setVisibility(View.INVISIBLE);
+                    book_marks.setVisibility(View.GONE);
+                    del_marks.setVisibility(View.GONE);
+                    delete_audio.setVisibility(View.VISIBLE);
+                    listen.setVisibility(View.VISIBLE);
+                }
+                downloadHelper = null;
+            }
+            if (idbook.contains("download_book")) {
+                if (idbook.getString("download_book", "").equals(id_book)) {
+                    if (idbook.contains("download")) {
+                        download.setVisibility(View.INVISIBLE);
+                        listen.setVisibility(View.INVISIBLE);
+                        buy.setVisibility(View.INVISIBLE);
+                        progressbar_line.setVisibility(View.VISIBLE);
+                        delete_audio.setVisibility(View.VISIBLE);
+                        book_marks.setVisibility(View.GONE);
+                        del_marks.setVisibility(View.GONE);
+                        tv_progress_horizontal.setText("Скачано:" + idbook.getInt("download", 0) + "МБ из " + calculat_total_size + "МБ");
+                    }
+                }
+            }*/
+            pdia.dismiss();
+           // setSomeText();
+        }
+    }
 }

@@ -1,9 +1,12 @@
 package net.pixeltk.glagol.fragment;
 
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v4.app.Fragment;
@@ -35,6 +38,7 @@ import com.google.gson.reflect.TypeToken;
 
 
 import net.pixeltk.glagol.R;
+import net.pixeltk.glagol.Splash;
 import net.pixeltk.glagol.activity.TabActivity;
 import net.pixeltk.glagol.adapter.ChoiceListAdapter;
 import net.pixeltk.glagol.adapter.RecyclerAdapter;
@@ -55,6 +59,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -86,7 +91,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
     getHttpGet request = new getHttpGet();
     Fragment fragment = null;
     LinearLayout variant_frag, news_frag, search_variant, main_frag_part;
-    ImageView back_arrow;
+    ImageView back_arrow, news_point;
     ListView list_variant, list_selection, list_news;
     TextView variant_text, text_news, text_top_sale, text_sale, text_choice_editor, text_soon_be, log;
     TextView not_login_selection, not_login_news;
@@ -95,6 +100,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
 
     String dateSubscription, dateBook;
     Date dateSub, dateB;
+    ProgressDialog pdia;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -134,11 +140,13 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         list_selection = (ListView) view.findViewById(R.id.variants);
         list_news = (ListView) view.findViewById(R.id.news);
 
+        new NewsTask().execute();
 
         my_news = (Button) view.findViewById(R.id.my_news);
         my_variant = (Button) view.findViewById(R.id.my_variant);
 
         back_arrow = (ImageView) view.findViewById(R.id.back);
+        news_point = (ImageView) view.findViewById(R.id.news_point);
 
         variant_text = (TextView) view.findViewById(R.id.variant);
         text_news = (TextView) view.findViewById(R.id.text_news);
@@ -169,6 +177,11 @@ public class MainFragment extends Fragment implements View.OnClickListener {
             log.setText(sig.getString("login", ""));
         }
 
+        if (sig.getInt("News", 0) < newsList.size())
+        {
+            news_point.setVisibility(View.VISIBLE);
+        }
+
         my_news.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -180,107 +193,42 @@ public class MainFragment extends Fragment implements View.OnClickListener {
                 news_frag.setVisibility(View.VISIBLE);
                 main_frag_part.setVisibility(View.GONE);
                 variant_frag.setVisibility(View.GONE);
-                if (sig.contains("id")) {
-                    if (android.os.Build.VERSION.SDK_INT > 9) {
-                        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-                        StrictMode.setThreadPolicy(policy);
-                    }
-                    try {
-                        JSONArray data = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/getUserSubscribe?salt=df90sdfgl9854gjs54os59gjsogsdf&user_id=" + sig.getString("id", "")));
-                        if (data.toString().equals("[{}]")) {
-                            list_news.setVisibility(View.GONE);
-                            not_login_news.setVisibility(View.VISIBLE);
-                        } else {
-                            Gson gson = new Gson();
-                            audiosSelection = gson.fromJson(data.toString(), new TypeToken<List<Audio>>() {
-                            }.getType());
-
-                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd hh:mm:ss");
-
-                        if (audiosSelection != null) {
-                            for (int i = 0; i < audiosSelection.size(); i++) {
-                                Audio audio = audiosSelection.get(i);
-
-                                dateSubscription = audiosSelection.get(i).getCreated_at();
-                                dateSubscription = dateSubscription.replace("-", ".");
-                                try {
-                                    dateSub = dateFormat.parse(dateSubscription);
-                                } catch (ParseException e) {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
-                                }
-                                JSONArray data_selection = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/getCollectionBooks?salt=df90sdfgl9854gjs54os59gjsogsdf&collection_id=" + audio.getModel_id() + "&model=" + audio.getModel()));
-                                Gson gson_selection = new Gson();
-                                audios = gson_selection.fromJson(data_selection.toString(), new TypeToken<List<Audio>>() {
-                                }.getType());
-
-                                if (audios != null) {
-
-                                    for (int j = audios.size() - 1; j >= 0; j--) {
-                                        dateBook = audios.get(j).getCreated_at();
-                                        dateBook = dateBook.replace("-", ".");
-                                        try {
-                                            dateB = dateFormat.parse(dateBook);
-                                        } catch (ParseException e) {
-                                            // TODO Auto-generated catch block
-                                            e.printStackTrace();
-                                        }
-                                        if (dateSub.compareTo(dateB) == -1) {
-                                            newsList.add(audios.get(j));
-                                        }
-                                    }
-                                    audios = null;
-
-                                }
-                            }
-                            if (newsList.size() == 0)
-                            {
-                                Toast toast = Toast.makeText(getActivity(),
-                                        "По вашим подпискам новостей нет!", Toast.LENGTH_SHORT);
-                                toast.show();
-                            }
-                            newsListAdapter = new ChoiceListAdapter(getActivity(), newsList);
-                            list_news.setAdapter(newsListAdapter);
-                            list_news.setOnTouchListener(new View.OnTouchListener() {
-                                // Setting on Touch Listener for handling the touch inside ScrollView
-                                @Override
-                                public boolean onTouch(View v, MotionEvent event) {
-                                    // Disallow the touch request for parent scroll on touch of child view
-                                    v.getParent().requestDisallowInterceptTouchEvent(true);
-                                    return false;
-                                }
-                            });
-                            list_news.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                                @Override
-                                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
-                                    SharedPreferences sharedPreferences = getActivity().getSharedPreferences("Category", Context.MODE_PRIVATE);
-                                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                                    editor.putString("idbook", newsList.get(i).getId());
-                                    editor.putString("intent", "Main");
-                                    editor.apply();
-                                    fragment = new CardBook();
-                                    if (fragment != null) {
-                                        android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
-                                        fragmentManager.beginTransaction()
-                                                .replace(R.id.main_frame, fragment).commit();
-                                    }
-                                }
-                            });
-
-                        }
-                    }
-
-                    }catch(JSONException e){
-                        e.printStackTrace();
-                    }
-                }
-                else
+                news_point.setVisibility(View.INVISIBLE);
+                if (newsList.size() == 0)
                 {
+                    list_news.setVisibility(View.GONE);
+                    not_login_news.setVisibility(View.VISIBLE);
                     Toast toast = Toast.makeText(getActivity(),
-                            "Вы не зарегистрированы, либо не вошли в свой аккаунт!", Toast.LENGTH_SHORT);
+                            "По вашим подпискам новостей нет!", Toast.LENGTH_SHORT);
                     toast.show();
                 }
+                list_news.setAdapter(newsListAdapter);
+                list_news.setOnTouchListener(new View.OnTouchListener() {
+                    // Setting on Touch Listener for handling the touch inside ScrollView
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        // Disallow the touch request for parent scroll on touch of child view
+                        v.getParent().requestDisallowInterceptTouchEvent(true);
+                        return false;
+                    }
+                });
+                list_news.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("Category", Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putString("idbook", newsList.get(i).getId());
+                        editor.putString("intent", "Main");
+                        editor.apply();
+                        fragment = new CardBook();
+                        if (fragment != null) {
+                            android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
+                            fragmentManager.beginTransaction()
+                                    .replace(R.id.main_frame, fragment).commit();
+                        }
+                    }
+                });
             }
         });
         my_variant.setOnClickListener(new View.OnClickListener() {
@@ -478,54 +426,8 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         soon_be.setLayoutManager(msoon_be);
         itemData.clear();
         // создаем адаптер
-        try {
-            Log.d("myLogs","in ");
-            JSONArray data = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/newbooks?salt=df90sdfgl9854gjs54os59gjsogsdf"));
-            Gson gson = new Gson();
-            audios = gson.fromJson(data.toString(),  new TypeToken<List<Audio>>(){}.getType());
 
-            if (audios!= null) {
-
-                for (int i=0; i<audios.size(); i++)
-                {
-                    Audio audio = audios.get(i);
-                    itemData.add(audio);
-                }
-
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        try {
-            Log.d("myLogs","in ");
-            JSONArray data = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/customCollections?salt=df90sdfgl9854gjs54os59gjsogsdf"));
-            Gson gson = new Gson();
-            audiosVariant = gson.fromJson(data.toString(),  new TypeToken<List<Audio>>(){}.getType());
-
-            if (audiosVariant!= null) {
-
-                for (int i=0; i<audiosVariant.size(); i++)
-                {
-                    Audio audio = audiosVariant.get(i);
-                    itemDataVariant.add(audio);
-                }
-
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        mAdapter = new RecyclerAdapter(getActivity(), itemData);
-        mAdapterVariant = new RecyclerAdapterVariant(getActivity(), itemDataVariant);
-
-        variant.setAdapter(mAdapterVariant);
-        news.setAdapter(mAdapter);
-        top_sale.setAdapter(mAdapter);
-        sale.setAdapter(mAdapter);
-        choice_editor.setAdapter(mAdapter);
-        soon_be.setAdapter(mAdapter);
+        new getVariant().execute();
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
@@ -540,16 +442,17 @@ public class MainFragment extends Fragment implements View.OnClickListener {
 
                 newText = newText.trim();
                 if (newText.toCharArray().length > 2) {
-                    search_variant.setVisibility(View.VISIBLE);
                     try {
                         JSONArray data = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/autocomplete?salt=df90sdfgl9854gjs54os59gjsogsdf&search=" + newText));
                         if (data.toString().equals("[{}]"))
                         {
+                            search_variant.setVisibility(View.GONE);
                             Toast toast = Toast.makeText(getActivity(),
                                     "Совпадений не обнаружено, повторте запрос!", Toast.LENGTH_SHORT);
                             toast.show();
                         }
                         else {
+                            search_variant.setVisibility(View.VISIBLE);
                             Gson gson = new Gson();
                             auto_compliet = gson.fromJson(data.toString(), new TypeToken<List<Audio>>() {
                             }.getType());
@@ -682,6 +585,75 @@ public class MainFragment extends Fragment implements View.OnClickListener {
 
         return view;
     }
+    class getVariant extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pdia = new ProgressDialog(getActivity());
+            pdia.setMessage("Загрузка...");
+            pdia.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            try {
+                Log.d("myLogs","in ");
+                JSONArray data = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/newbooks?salt=df90sdfgl9854gjs54os59gjsogsdf"));
+                Gson gson = new Gson();
+                audios = gson.fromJson(data.toString(),  new TypeToken<List<Audio>>(){}.getType());
+
+                if (audios!= null) {
+
+                    for (int i=0; i<audios.size(); i++)
+                    {
+                        Audio audio = audios.get(i);
+                        itemData.add(audio);
+                    }
+
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                Log.d("myLogs","in ");
+                JSONArray data = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/customCollections?salt=df90sdfgl9854gjs54os59gjsogsdf"));
+                Gson gson = new Gson();
+                audiosVariant = gson.fromJson(data.toString(),  new TypeToken<List<Audio>>(){}.getType());
+
+                if (audiosVariant!= null) {
+
+                    for (int i=0; i<audiosVariant.size(); i++)
+                    {
+                        Audio audio = audiosVariant.get(i);
+                        itemDataVariant.add(audio);
+                    }
+
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            mAdapter = new RecyclerAdapter(getActivity(), itemData);
+            mAdapterVariant = new RecyclerAdapterVariant(getActivity(), itemDataVariant);
+
+            variant.setAdapter(mAdapterVariant);
+            news.setAdapter(mAdapter);
+            top_sale.setAdapter(mAdapter);
+            sale.setAdapter(mAdapter);
+            choice_editor.setAdapter(mAdapter);
+            soon_be.setAdapter(mAdapter);
+
+            pdia.dismiss();
+        }
+    }
     public void clickVariant(String text)
     {
         editor.putString("var", text).apply();
@@ -760,4 +732,85 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         }
 
     }
+    class NewsTask extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            if (sig.contains("id")) {
+                try {
+                    JSONArray data = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/getUserSubscribe?salt=df90sdfgl9854gjs54os59gjsogsdf&user_id=" + sig.getString("id", "")));
+                    if (data.toString().equals("[{}]")) {
+
+                    } else {
+                        Gson gson = new Gson();
+                        audiosSelection = gson.fromJson(data.toString(), new TypeToken<List<Audio>>() {
+                        }.getType());
+
+                        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy.MM.dd hh:mm:ss");
+
+                        if (audiosSelection != null) {
+                            for (int i = 0; i < audiosSelection.size(); i++) {
+                                Audio audio = audiosSelection.get(i);
+
+                                dateSubscription = audiosSelection.get(i).getCreated_at();
+                                dateSubscription = dateSubscription.replace("-", ".");
+                                try {
+                                    dateSub = dateFormat.parse(dateSubscription);
+                                } catch (ParseException e) {
+                                    // TODO Auto-generated catch block
+                                    e.printStackTrace();
+                                }
+                                JSONArray data_selection = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/getCollectionBooks?salt=df90sdfgl9854gjs54os59gjsogsdf&collection_id=" + audio.getModel_id() + "&model=" + audio.getModel()));
+                                Gson gson_selection = new Gson();
+                                audios = gson_selection.fromJson(data_selection.toString(), new TypeToken<List<Audio>>() {
+                                }.getType());
+
+                                if (audios != null) {
+
+                                    for (int j = audios.size() - 1; j >= 0; j--) {
+                                        dateBook = audios.get(j).getCreated_at();
+                                        dateBook = dateBook.replace("-", ".");
+                                        try {
+                                            dateB = dateFormat.parse(dateBook);
+                                        } catch (ParseException e) {
+                                            // TODO Auto-generated catch block
+                                            e.printStackTrace();
+                                        }
+                                        if (dateSub.compareTo(dateB) == -1) {
+                                            newsList.add(audios.get(j));
+                                        }
+                                    }
+                                    audios = null;
+
+                                }
+                            }
+                            edit_sign.putInt("News", newsList.size()).apply();
+                            newsListAdapter = new ChoiceListAdapter(getActivity(), newsList);
+                        }
+                    }
+
+                }catch(JSONException e){
+                    e.printStackTrace();
+                }
+            }
+            else
+            {
+
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+
+        }
+    }
+
 }

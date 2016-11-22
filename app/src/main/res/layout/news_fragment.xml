@@ -14,6 +14,7 @@
         android:id="@+id/news"
         android:layout_width="match_parent"
         style="@style/CustomListView"
+        android:overScrollMode="never"
         android:dividerHeight="2dp"
         android:visibility="gone"
         android:listSelector="#4d545e"

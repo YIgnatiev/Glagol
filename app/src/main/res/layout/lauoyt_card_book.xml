@@ -19,7 +19,7 @@
         <ImageView
             android:layout_width="match_parent"
             android:layout_height="200dp"
-            app:srcCompat="@drawable/cpver"
+            app:srcCompat="@drawable/notcover"
             android:layout_margin="15dp"
             android:id="@+id/cover" />
 
@@ -27,7 +27,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/name_book"
-                android:text="Как разговаривать когда угодно и где угодно"
+                android:text="Название книги"
                 android:layout_gravity="center"
                 android:textSize="18sp"
                 android:textColor="#FFFFFF"
@@ -43,7 +43,7 @@
                     android:visibility="visible"
                     android:layout_margin="15dp"
                     android:background="@drawable/background"
-                    android:text="Купить за 199 р."
+                    android:text="Купить за р."
                     android:textAllCaps="false"
                     />
                 <Button
@@ -191,7 +191,7 @@
                     android:layout_marginBottom="15dp"
                     android:textColor="#FFF"
                     android:layout_weight="1"
-                    android:text="Автор: Larry King"/>
+                    android:text="Автор: "/>
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -221,7 +221,7 @@
                 android:layout_marginRight="15dp"
                 android:layout_height="wrap_content">
                 <TextView
-                    android:text="Чтец: Юрий Абрамов"
+                    android:text="Чтец: "
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/text_reader"
@@ -256,7 +256,7 @@
                 android:layout_marginRight="15dp"
                 android:layout_height="wrap_content">
                 <TextView
-                    android:text="Издательство: Альпина Диджитал"
+                    android:text="Издательство: "
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/text_publisher"
@@ -292,7 +292,7 @@
                 android:layout_marginRight="15dp"
                 android:layout_height="wrap_content">
                 <TextView
-                    android:text="2ч. 1 мин. 45 сек., 215 мб."
+                    android:text=""
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:id="@+id/text_time"

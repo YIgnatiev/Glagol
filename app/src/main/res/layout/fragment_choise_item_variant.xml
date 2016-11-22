@@ -8,6 +8,8 @@
         android:id="@+id/toolbar"/>
     <ListView
         android:layout_width="match_parent"
+        android:overScrollMode="never"
+        android:listSelector="#4d545e"
         android:id="@+id/list_choice_item"
         android:layout_height="match_parent" />
 

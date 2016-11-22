@@ -10,6 +10,7 @@ import android.os.StrictMode;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -419,10 +420,6 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
                 mHandler.removeCallbacks(mUpdateTimeTask);
                 int totalDuration = mp.getDuration();
                 int currentPosition = utils.progressToTimer(seekBar.getProgress(), totalDuration);
-
-                Log.d("MyLog", " current " + currentPosition);
-
-                // forward or backward to certain seconds
                 mp.seekTo(currentPosition - 30000);
                 updateProgressBar();
                 play_pause.setChecked(true);
@@ -434,11 +431,8 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
                 mHandler.removeCallbacks(mUpdateTimeTask);
                 int totalDuration = mp.getDuration();
                 int currentPosition = utils.progressToTimer(seekBar.getProgress(), totalDuration);
-
-                // forward or backward to certain seconds
-                mp.seekTo(currentPosition + 30000);
-
-                // update timer progress again
+                currentPosition = currentPosition + 30000;
+                mp.seekTo(currentPosition);
                 updateProgressBar();
                 play_pause.setChecked(true);
             }
@@ -527,6 +521,15 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
                         from, to);
 
                 playList.setAdapter(sAdapter);
+                playList.setOnTouchListener(new View.OnTouchListener() {
+                    // Setting on Touch Listener for handling the touch inside ScrollView
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        // Disallow the touch request for parent scroll on touch of child view
+                        v.getParent().requestDisallowInterceptTouchEvent(true);
+                        return false;
+                    }
+                });
                 playList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {

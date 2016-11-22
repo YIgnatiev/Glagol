@@ -1,7 +1,9 @@
 package net.pixeltk.glagol.fargment_catalog;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v4.app.Fragment;
@@ -61,6 +63,7 @@ public class ChoiceItemList extends Fragment implements OnBackPressedListener {
     SearchView searchView;
     LinearLayout search_variant;
     ListView list_variant;
+    ProgressDialog pdia;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -134,41 +137,8 @@ public class ChoiceItemList extends Fragment implements OnBackPressedListener {
 
         listView = (ListView)  view.findViewById(R.id.list_choice_item);
 
-        choiceItemFromCatalogs = new ArrayList<Audio>();
-        if (android.os.Build.VERSION.SDK_INT > 9) {
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-            StrictMode.setThreadPolicy(policy);
-        }
-        try {
-            Log.d("myLogs","in ");
-            JSONArray data = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/newbooks?salt=df90sdfgl9854gjs54os59gjsogsdf"));
-            Gson gson = new Gson();
-            audios = gson.fromJson(data.toString(),  new TypeToken<List<Audio>>(){}.getType());
+        new UploadSomeBooks().execute();
 
-            if (audios!= null) {
-
-                for (int i=0; i<audios.size(); i++)
-                {
-                    if (audios.get(i).getCategorys().equals(sharedPreferences.getString("CategoryName", ""))) {
-                        Audio audio = audios.get(i);
-                        choiceItemFromCatalogs.add(audio);
-                    }
-                }
-
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        if (choiceItemFromCatalogs.size()==0)
-        {
-            Toast.makeText(getActivity(), "Список пуст!", Toast.LENGTH_LONG).show();
-        }
-        else
-        {
-            choiceListAdapter = new ChoiceListAdapter(getActivity(), choiceItemFromCatalogs);
-            listView.setAdapter(choiceListAdapter);
-        }
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
             @Override
@@ -323,6 +293,63 @@ public class ChoiceItemList extends Fragment implements OnBackPressedListener {
             editor.clear().apply();
         }
 
+    }
+    class UploadSomeBooks extends AsyncTask<Void, Void, Void> {
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            pdia = new ProgressDialog(getActivity());
+            pdia.setMessage("Загрузка...");
+            pdia.show();
+
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            choiceItemFromCatalogs = new ArrayList<Audio>();
+            if (android.os.Build.VERSION.SDK_INT > 9) {
+                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                StrictMode.setThreadPolicy(policy);
+            }
+            try {
+                Log.d("myLogs","in ");
+                JSONArray data = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/newbooks?salt=df90sdfgl9854gjs54os59gjsogsdf"));
+                Gson gson = new Gson();
+                audios = gson.fromJson(data.toString(),  new TypeToken<List<Audio>>(){}.getType());
+
+                if (audios!= null) {
+
+                    for (int i=0; i<audios.size(); i++)
+                    {
+                        if (audios.get(i).getCategorys().equals(sharedPreferences.getString("CategoryName", ""))) {
+                            Audio audio = audios.get(i);
+                            choiceItemFromCatalogs.add(audio);
+                        }
+                    }
+
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            if (choiceItemFromCatalogs.size()==0)
+            {
+                Toast.makeText(getActivity(), "Список пуст!", Toast.LENGTH_LONG).show();
+            }
+            else
+            {
+                choiceListAdapter = new ChoiceListAdapter(getActivity(), choiceItemFromCatalogs);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            super.onPostExecute(result);
+            listView.setAdapter(choiceListAdapter);
+            pdia.dismiss();
+        }
     }
 
 
