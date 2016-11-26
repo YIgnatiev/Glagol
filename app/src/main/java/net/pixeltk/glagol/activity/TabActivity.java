@@ -55,8 +55,8 @@ public class  TabActivity extends AppCompatActivity {
     LinearLayout main, catalog, player, my_book, other;
     static TabLayout tabLayout;
     SharedPreferences playing;
-    static SharedPreferences idbook;
-    SharedPreferences.Editor editor;
+    static SharedPreferences idbook, sharedPreferences;
+    SharedPreferences.Editor editor, subedit;
     static SharedPreferences.Editor editbook;
     static DownloadManager manager;
     static Context context;
@@ -72,6 +72,8 @@ public class  TabActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tab);
 
+        sharedPreferences = getSharedPreferences("Subscription", Context.MODE_PRIVATE);
+        subedit = sharedPreferences.edit();
         tabLayout = (TabLayout) findViewById(R.id.tab_layout);
 
         tabLayout.addTab(tabLayout.newTab().setCustomView(R.layout.layout_tab_icon_main));
@@ -109,7 +111,15 @@ public class  TabActivity extends AppCompatActivity {
             public void onClick(View view) {
                 replaceFragment(new MainFragment());
                 tabLayout.getTabAt(0).select();
-                editor.remove("play").apply();
+                subedit.remove("play").apply();
+                subedit.remove("author").apply();
+                subedit.remove("reader").apply();
+                subedit.remove("nameCollection");
+                subedit.remove("collection").apply();
+                subedit.remove("name_sel");
+                subedit.remove("nameCollection");
+                subedit.remove("put_selection").apply();
+                subedit.remove("publisher").apply();
             }
         });
 
@@ -120,6 +130,15 @@ public class  TabActivity extends AppCompatActivity {
                 replaceFragment(new ListFragmentGlagol());
                 tabLayout.getTabAt(1).select();
                 editor.remove("play").apply();
+                subedit.remove("play").apply();
+                subedit.remove("author").apply();
+                subedit.remove("reader").apply();
+                subedit.remove("nameCollection");
+                subedit.remove("collection").apply();
+                subedit.remove("name_sel");
+                subedit.remove("nameCollection");
+                subedit.remove("put_selection").apply();
+                subedit.remove("publisher").apply();
             }
         });
 
@@ -139,6 +158,15 @@ public class  TabActivity extends AppCompatActivity {
 
                 }
                 tabLayout.getTabAt(2).select();
+                subedit.remove("play").apply();
+                subedit.remove("author").apply();
+                subedit.remove("reader").apply();
+                subedit.remove("nameCollection");
+                subedit.remove("collection").apply();
+                subedit.remove("name_sel");
+                subedit.remove("nameCollection");
+                subedit.remove("put_selection").apply();
+                subedit.remove("publisher").apply();
             }
         });
 
@@ -149,6 +177,15 @@ public class  TabActivity extends AppCompatActivity {
                 replaceFragment(new MyBooks());
                 tabLayout.getTabAt(3).select();
                 editor.remove("play").apply();
+                subedit.remove("play").apply();
+                subedit.remove("author").apply();
+                subedit.remove("reader").apply();
+                subedit.remove("nameCollection");
+                subedit.remove("collection").apply();
+                subedit.remove("name_sel");
+                subedit.remove("nameCollection");
+                subedit.remove("put_selection").apply();
+                subedit.remove("publisher").apply();
             }
         });
 
@@ -159,6 +196,15 @@ public class  TabActivity extends AppCompatActivity {
                 replaceFragment(new OtherInfoFragment());
                 tabLayout.getTabAt(4).select();
                 editor.remove("play").apply();
+                subedit.remove("play").apply();
+                subedit.remove("author").apply();
+                subedit.remove("reader").apply();
+                subedit.remove("nameCollection");
+                subedit.remove("collection").apply();
+                subedit.remove("name_sel");
+                subedit.remove("nameCollection");
+                subedit.remove("put_selection").apply();
+                subedit.remove("publisher").apply();
             }
         });
 

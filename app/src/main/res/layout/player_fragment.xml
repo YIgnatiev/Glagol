@@ -79,7 +79,7 @@
                     android:layout_gravity="center"
                     android:background="@mipmap/refresh"
                     android:textSize="15sp"
-                    android:text="30"
+                    android:text="15"
                     android:textColor="#FFFFFF"
                     android:gravity="center"/>
                 <Space
@@ -106,7 +106,7 @@
                     android:layout_gravity="center"
                     android:background="@mipmap/refresh_copy"
                     android:textSize="15sp"
-                    android:text="30"
+                    android:text="15"
                     android:textColor="#FFFFFF"
                     android:gravity="center"/>
                 <Space
