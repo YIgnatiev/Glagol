@@ -8,6 +8,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -225,6 +227,26 @@ public class  TabActivity extends AppCompatActivity {
         } else {
         }
     }
+    public static boolean hasConnection(final Context context)
+    {
+        ConnectivityManager cm = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo wifiInfo = cm.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
+        if (wifiInfo != null && wifiInfo.isConnected())
+        {
+            return true;
+        }
+        wifiInfo = cm.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+        if (wifiInfo != null && wifiInfo.isConnected())
+        {
+            return true;
+        }
+        wifiInfo = cm.getActiveNetworkInfo();
+        if (wifiInfo != null && wifiInfo.isConnected())
+        {
+            return true;
+        }
+        return false;
+    }
     private void replaceFragment(Fragment fragment) {
 
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -261,9 +283,9 @@ public class  TabActivity extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        File dir = new File(Environment.getExternalStorageDirectory() + "/Music/" + book_name + "/");
+        File dir = new File(Environment.getExternalStorageDirectory() + "/Glagol/" + book_name + "/");
         dir.mkdir();
-        String destination = Environment.getExternalStorageDirectory() + "/Music/" + book_name + "/";
+        String destination = Environment.getExternalStorageDirectory() + "/Glagol/" + book_name + "/";
 
         destination += name_audio;
         Log.d("MyLog", "destin "  + destination);
@@ -303,12 +325,12 @@ public class  TabActivity extends AppCompatActivity {
                     if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_SUCCESSFUL) {
                         downloading = false;
                     }
-                    calculat_total_size = Integer.parseInt(String.valueOf(total_size / 1000));
+                    calculat_total_size = (int) Math.ceil(total_size / 1000);
                     if (change_mb < bytes_downloaded)
                     {
                         download_mb = download_mb + (bytes_downloaded - change_mb);
                         change_mb = bytes_downloaded;
-                        h1.sendEmptyMessage(Integer.parseInt(String.valueOf(download_mb/1000000)));
+                        h1.sendEmptyMessage((int) Math.floor(download_mb/1000000));
                     }
                     cursor.close();
                 }

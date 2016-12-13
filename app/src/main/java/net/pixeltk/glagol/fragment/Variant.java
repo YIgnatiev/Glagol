@@ -23,6 +23,7 @@ import net.pixeltk.glagol.R;
 import net.pixeltk.glagol.activity.TabActivity;
 import net.pixeltk.glagol.adapter.ChoiceListAdapter;
 import net.pixeltk.glagol.adapter.ChoiceListAdapterVariant;
+import net.pixeltk.glagol.adapter.DataBasesHelper;
 import net.pixeltk.glagol.api.Audio;
 import net.pixeltk.glagol.api.getHttpGet;
 import net.pixeltk.glagol.fargment_catalog.CardBook;
@@ -54,6 +55,7 @@ public class Variant extends Fragment implements OnBackPressedListener {
     SharedPreferences.Editor editor, editorsubscripton;
     ImageView back_arrow, logo;
     TextView name_frag;
+    DataBasesHelper dataBasesHelper;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -76,6 +78,8 @@ public class Variant extends Fragment implements OnBackPressedListener {
 
         back_arrow.setVisibility(View.VISIBLE);
         logo.setVisibility(View.INVISIBLE);
+
+        dataBasesHelper = new DataBasesHelper(getActivity());
 
         name_frag = (TextView) view.findViewById(R.id.name_frag);
         name_frag.setText(sharedPreferences.getString("var", ""));
@@ -128,8 +132,8 @@ public class Variant extends Fragment implements OnBackPressedListener {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                editorsubscripton.putString("nameCollection", choiceItemFromCatalogs.get(i).getName_book());
-                editorsubscripton.putString("collection", choiceItemFromCatalogs.get(i).getId()).apply();
+                dataBasesHelper.insertBackPressed("Variant",  choiceItemFromCatalogs.get(i).getName_book() + ",collection," + choiceItemFromCatalogs.get(i).getId());
+                dataBasesHelper.close();
                 fragment = new FragmentSubscription();
                 if (fragment != null) {
                     android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();

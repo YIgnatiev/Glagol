@@ -75,8 +75,9 @@ public class Splash extends AppCompatActivity {
             String songTitle = String.valueOf(track_name.get(songIndex));
             part.setText(songTitle);
             // set Progress bar values
+
             seekBar.setProgress(0);
-            seekBar.setMax(100);
+            seekBar.setMax(mp.getDuration());
 
             // Updating progress bar
 

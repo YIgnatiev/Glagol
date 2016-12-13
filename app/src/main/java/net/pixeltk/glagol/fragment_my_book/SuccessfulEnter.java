@@ -2,8 +2,10 @@ package net.pixeltk.glagol.fragment_my_book;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -21,6 +23,8 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.ogaclejapan.smarttablayout.SmartTabLayout;
 
 import net.pixeltk.glagol.R;
@@ -32,13 +36,20 @@ import net.pixeltk.glagol.adapter.DrawerListBookMarks;
 import net.pixeltk.glagol.adapter.DrawerListBuy;
 import net.pixeltk.glagol.adapter.DrawerListHistory;
 import net.pixeltk.glagol.adapter.DrawerListListening;
+import net.pixeltk.glagol.api.Audio;
+import net.pixeltk.glagol.api.getHttpGet;
 import net.pixeltk.glagol.fargment_catalog.CardBook;
 import net.pixeltk.glagol.fargment_catalog.OnBackPressedListener;
 import net.pixeltk.glagol.fragment.MainFragment;
 import net.pixeltk.glagol.fragment.PlayerFragment;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import java.util.ArrayList;
 import java.util.List;
+
+import static net.pixeltk.glagol.activity.TabActivity.hasConnection;
 
 /**
  * Created by root on 07.10.16.
@@ -62,6 +73,7 @@ public class SuccessfulEnter extends Fragment implements OnBackPressedListener{
     ListView listView, listHistory, listBuy, listlisten;
     DataBasesHelper dataBookMarks, dataHistory, dataBuy, dataDownload, dataListen;
     BookMarksHelper bookMarksHelper, historyHelper, buyHelper, listenHelper;
+    DataBasesHelper dataBasesHelper;
     ArrayList IdList = new ArrayList();
     ArrayList HistoryListId = new ArrayList();
     ArrayList BuyListId = new ArrayList();
@@ -70,6 +82,10 @@ public class SuccessfulEnter extends Fragment implements OnBackPressedListener{
     SharedPreferences.Editor editor;
     TextView name_frag;
     ImageView back_arrow, logo;
+    public ArrayList<Audio> books = new ArrayList<>();
+    public ArrayList<Audio> audios = new ArrayList<>();
+    getHttpGet request = new getHttpGet();
+    SharedPreferences checklogin;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -81,6 +97,7 @@ public class SuccessfulEnter extends Fragment implements OnBackPressedListener{
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_successful_enter, container, false);
+        checklogin = getActivity().getSharedPreferences("Sign", Context.MODE_PRIVATE);
 
         listen_incl = (LinearLayout) view.findViewById(R.id.listen_incl);
         buy_incl = (LinearLayout) view.findViewById(R.id.buy_incl);
@@ -127,6 +144,7 @@ public class SuccessfulEnter extends Fragment implements OnBackPressedListener{
         dataHistory = new DataBasesHelper(getActivity());
         dataBuy = new DataBasesHelper(getActivity());
         dataListen = new DataBasesHelper(getActivity());
+        dataBasesHelper = new DataBasesHelper(getActivity());
 
         IdList = dataBookMarks.getidRow();
         HistoryListId = dataHistory.getIdHistory();
@@ -146,7 +164,7 @@ public class SuccessfulEnter extends Fragment implements OnBackPressedListener{
         listlisten.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                editor.putString("idbook", navDrawerListenItems.get(i).getId());
+                editor.putString("id_book", navDrawerListenItems.get(i).getId());
                 editor.putString("book_name", navDrawerListenItems.get(i).getName_book());
                 editor.putString("name_author", navDrawerListenItems.get(i).getName_author());
                 editor.putString("intent", "open");
@@ -169,8 +187,9 @@ public class SuccessfulEnter extends Fragment implements OnBackPressedListener{
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-                editor.putString("idbook", navDrawerItems.get(i).getId());
-                editor.putString("intent", "Successful").apply();
+
+                dataBasesHelper.insertBackPressed("Successful", navDrawerItems.get(i).getId());
+                dataBasesHelper.close();
                 Fragment fragment = new CardBook();
                 if (fragment != null) {
                     android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
@@ -182,13 +201,15 @@ public class SuccessfulEnter extends Fragment implements OnBackPressedListener{
         listBuy.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                editor.putString("idbook", navDrawerBuyItems.get(i).getId());
-                editor.putString("intent", "Successful").apply();
-                Fragment fragment = new CardBook();
-                if (fragment != null) {
-                    android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
-                    fragmentManager.beginTransaction()
-                            .replace(R.id.main_frame, fragment).commit();
+                if (hasConnection(getActivity())) {
+                    dataBasesHelper.insertBackPressed("Successful", navDrawerBuyItems.get(i).getId());
+                    dataBasesHelper.close();
+                    Fragment fragment = new CardBook();
+                    if (fragment != null) {
+                        android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
+                        fragmentManager.beginTransaction()
+                                .replace(R.id.main_frame, fragment).commit();
+                    }
                 }
             }
         });
@@ -196,8 +217,8 @@ public class SuccessfulEnter extends Fragment implements OnBackPressedListener{
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-                editor.putString("idbook", navDrawerHistoryItems.get(i).getId());
-                editor.putString("intent", "Successful").apply();
+                dataBasesHelper.insertBackPressed("Successful", navDrawerHistoryItems.get(i).getId());
+                dataBasesHelper.close();
                 Fragment fragment = new CardBook();
                 if (fragment != null) {
                     android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
@@ -260,12 +281,80 @@ public class SuccessfulEnter extends Fragment implements OnBackPressedListener{
                 history_incl.setVisibility(View.GONE);
 
                 navDrawerBuyItems.clear();
-                for (int i = 0; i < BuyListId.size(); i++)
+
+                if (hasConnection(getActivity()))
                 {
-                    buyHelper = dataBuy.getProduct(BuyListId.get(i).toString(), "Buy");
-                    navDrawerBuyItems.add(new DrawItemBookMarks(buyHelper.getName_author(), buyHelper.getName_book(), buyHelper.getName_reader(), buyHelper.getPrice(), buyHelper.getImg_url(), buyHelper.getId_book()));
-                    buyHelper = null;
+                    if (android.os.Build.VERSION.SDK_INT > 9) {
+                        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                        StrictMode.setThreadPolicy(policy);
+                    }
+                    try {
+                        JSONArray dataBooksBuy = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/UserBooks/" + checklogin.getString("id", "") + "?salt=df90sdfgl9854gjs54os59gjsogsdf"));
+                        if (!dataBooksBuy.toString().equals("[{}]")) {
+                            Gson gsonBooksBuy = new Gson();
+                            books = gsonBooksBuy.fromJson(dataBooksBuy.toString(), new TypeToken<List<Audio>>() {
+                            }.getType());
+
+                            if (books != null) {
+                                if (BuyListId.size() < books.size()) {
+                                    for (int i = 0; i < BuyListId.size(); i++) {
+                                        SQLiteDatabase db = dataBuy.getWritableDatabase();
+                                        db.delete("Buy", "id = " + BuyListId.get(i), null);
+                                        db.close();
+                                    }
+                                    BuyListId.clear();
+                                    for (int j = 0; j < books.size(); j++) {
+                                        if (android.os.Build.VERSION.SDK_INT > 9) {
+                                            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                                            StrictMode.setThreadPolicy(policy);
+                                        }
+                                        try {
+                                            JSONArray data = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/getbook?salt=df90sdfgl9854gjs54os59gjsogsdf&book_id=" + books.get(j).getBook_id()));
+
+                                            Gson gson = new Gson();
+                                            audios = gson.fromJson(data.toString(), new TypeToken<List<Audio>>() {
+                                            }.getType());
+
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+
+                                        dataBuy.insertBuy(audios.get(0).getName_authors(), audios.get(0).getName_book(), audios.get(0).getReaders(), audios.get(0).getPrice(), audios.get(0).getIcon(), audios.get(0).getId());
+                                        audios.clear();
+                                    }
+                                    navDrawerBuyItems.clear();
+                                    BuyListId = dataBuy.getIdBuy();
+                                    for (int i = 0; i < books.size(); i++) {
+                                        buyHelper = dataBuy.getProduct(BuyListId.get(i).toString(), "Buy");
+                                        navDrawerBuyItems.add(new DrawItemBookMarks(buyHelper.getName_author(), buyHelper.getName_book(), buyHelper.getName_reader(), buyHelper.getPrice(), buyHelper.getImg_url(), buyHelper.getId_book()));
+                                        buyHelper = null;
+                                    }
+                                } else {
+                                    navDrawerBuyItems.clear();
+                                    for (int i = 0; i < BuyListId.size(); i++) {
+                                        Log.d("MyLog", " id " + BuyListId.get(i));
+                                        buyHelper = dataBuy.getProduct(BuyListId.get(i).toString(), "Buy");
+                                        navDrawerBuyItems.add(new DrawItemBookMarks(buyHelper.getName_author(), buyHelper.getName_book(), buyHelper.getName_reader(), buyHelper.getPrice(), buyHelper.getImg_url(), buyHelper.getId_book()));
+                                        buyHelper = null;
+                                    }
+                                }
+                            }
+
+                        }
+                    }catch(JSONException e){
+                            e.printStackTrace();
+                    }
                 }
+                else {
+                    navDrawerBuyItems.clear();
+                    for (int i = 0; i < BuyListId.size(); i++) {
+                        Log.d("MyLog", " id " + BuyListId.get(i));
+                        buyHelper = dataBuy.getProduct(BuyListId.get(i).toString(), "Buy");
+                        navDrawerBuyItems.add(new DrawItemBookMarks(buyHelper.getName_author(), buyHelper.getName_book(), buyHelper.getName_reader(), buyHelper.getPrice(), buyHelper.getImg_url(), buyHelper.getId_book()));
+                        buyHelper = null;
+                    }
+                }
+
                 buy_adapter = new DrawerListBuy(getActivity(), navDrawerBuyItems);
                 listBuy.setAdapter(buy_adapter);
             }

@@ -26,6 +26,7 @@ public class DataBasesHelper extends SQLiteOpenHelper {
     private static final String TABLE_DOWNLOAD = "Download";
     private static final String TABLE_BUY = "Buy";
     private static final String TABLE_LISTEN = "Listen";
+    private static final String TABLE_BACK_PRESSED = "BackPressed";
 
     private static final String ID = "id";
     private static final String NAME_AUTHOR = "name_author";
@@ -38,6 +39,8 @@ public class DataBasesHelper extends SQLiteOpenHelper {
     private static final String SEEKBAR_VALUE = "seekbar_value";
     private static final String TOTAL_DURATION = "total_duration";
     private static final String NOW_LISTENING = "now_listening";
+    private static final String CLASS_NAME = "class_name";
+    private static final String SOME_INFO = "some_info";
 
 
     ArrayList IdList = new ArrayList();
@@ -63,6 +66,11 @@ public class DataBasesHelper extends SQLiteOpenHelper {
     private static final String CREATE_TABLE_DOWNLOAD = "CREATE TABLE " + TABLE_DOWNLOAD + "("
             + ID + " INTEGER PRIMARY KEY ,"
             + ID_BOOK + " TEXT) ";
+
+    private static final String CREATE_BACK_PRESSED = "CREATE TABLE " + TABLE_BACK_PRESSED + "("
+            + ID + " INTEGER PRIMARY KEY ,"
+            + CLASS_NAME + " TEXT ,"
+            + SOME_INFO + " TEXT) ";
 
     private static final String CREATE_TABLE_BUY = "CREATE TABLE " + TABLE_BUY + "("
             + ID + " INTEGER PRIMARY KEY ,"
@@ -97,8 +105,10 @@ public class DataBasesHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL(CREATE_TABLE_BOOKMARKS);
         sqLiteDatabase.execSQL(CREATE_TABLE_HISTORY);
         sqLiteDatabase.execSQL(CREATE_TABLE_DOWNLOAD);
+        sqLiteDatabase.execSQL(CREATE_BACK_PRESSED);
         sqLiteDatabase.execSQL(CREATE_TABLE_BUY);
         sqLiteDatabase.execSQL(CREATE_TABLE_LISTEN);
+
 
     }
     @Override
@@ -107,8 +117,10 @@ public class DataBasesHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_BOOKMARKS);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_HISTORY);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_DOWNLOAD);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_BACK_PRESSED);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_BUY);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_LISTEN);
+
         onCreate(sqLiteDatabase);
     }
 
@@ -161,6 +173,15 @@ public class DataBasesHelper extends SQLiteOpenHelper {
         db.insert(TABLE_DOWNLOAD, null, values);
         db.close();
     }
+    public void insertBackPressed(String class_name, String some_info) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(CLASS_NAME, class_name);
+        values.put(SOME_INFO, some_info);
+        db.insert(TABLE_BACK_PRESSED, null, values);
+        db.close();
+    }
+
 
 
     public void insertHistory(String name_author, String book_name, String name_reader, String price, String img_url, String id_book) {
@@ -220,6 +241,20 @@ public class DataBasesHelper extends SQLiteOpenHelper {
     public ArrayList getIdDownload() {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor c = db.query(TABLE_DOWNLOAD, null, null, null, null, null, null);
+        if(c!=null&&c.moveToFirst()){
+            do{
+
+                String id = c.getString(c.getColumnIndexOrThrow (ID));
+                IdList.add(id);
+
+            }while(c.moveToNext());
+        }
+        return IdList;
+    }
+
+    public ArrayList getIdBackPressed() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor c = db.query(TABLE_BACK_PRESSED, null, null, null, null, null, null);
         if(c!=null&&c.moveToFirst()){
             do{
 
@@ -321,10 +356,23 @@ public class DataBasesHelper extends SQLiteOpenHelper {
         db.close();
         return bookMarksHelper;
     }
-  /*  public void deleteContact(String book_name) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_BOOKMARKS, BOOK_NAME + " = " + book_name );
+    public BookMarksHelper getBackPressed(String productid) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor2 = db.query(TABLE_BACK_PRESSED,
+                new String[] {ID, CLASS_NAME, SOME_INFO},ID
+                        +" LIKE '"+productid+"%'", null, null, null, null);
+
+        BookMarksHelper bookMarksHelper = new BookMarksHelper();
+        if (cursor2.moveToFirst()) {
+            do {
+                bookMarksHelper.setClass_name(cursor2.getString(1));
+                bookMarksHelper.setSome_info(cursor2.getString(2));
+
+            } while (cursor2.moveToNext());
+        }
+        cursor2.close();
         db.close();
-    }*/
+        return bookMarksHelper;
+    }
 
 }

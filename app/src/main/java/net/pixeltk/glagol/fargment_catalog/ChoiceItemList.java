@@ -3,6 +3,7 @@ package net.pixeltk.glagol.fargment_catalog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -26,7 +27,9 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import net.pixeltk.glagol.R;
+import net.pixeltk.glagol.adapter.BookMarksHelper;
 import net.pixeltk.glagol.adapter.ChoiceListAdapter;
+import net.pixeltk.glagol.adapter.DataBasesHelper;
 import net.pixeltk.glagol.api.Audio;
 import net.pixeltk.glagol.api.getHttpGet;
 import net.pixeltk.glagol.fragment.ListSearchBook;
@@ -65,6 +68,11 @@ public class ChoiceItemList extends Fragment implements OnBackPressedListener {
     ListView list_variant;
     ProgressDialog pdia;
 
+    DataBasesHelper dataBackPressed;
+    BookMarksHelper backPressedHelper;
+    ArrayList BackPressedId = new ArrayList();
+    String categoryDb;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,7 +102,7 @@ public class ChoiceItemList extends Fragment implements OnBackPressedListener {
         logo.setVisibility(View.INVISIBLE);
 
         name_frag = (TextView) view.findViewById(R.id.name_frag);
-        name_frag.setText(sharedPreferences.getString("CategoryName", ""));
+
 
         back_arrow.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -104,6 +112,18 @@ public class ChoiceItemList extends Fragment implements OnBackPressedListener {
                 onBackPressed();
             }
         });
+
+        dataBackPressed = new DataBasesHelper(getActivity());
+
+        BackPressedId = dataBackPressed.getIdBackPressed();
+
+        int last_element = BackPressedId.size() - 1;
+        Log.d("MyLog", "click ok");
+        backPressedHelper = dataBackPressed.getBackPressed(BackPressedId.get(last_element).toString());
+        categoryDb = backPressedHelper.getSome_info();
+
+        name_frag.setText(categoryDb);
+
 
         sort_spinner = (Spinner) view.findViewById(R.id.spinner);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, sort);
@@ -230,8 +250,7 @@ public class ChoiceItemList extends Fragment implements OnBackPressedListener {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                editor.putString("idbook", choiceItemFromCatalogs.get(i).getId()).apply();
-                Log.d("MyLog", " " + choiceItemFromCatalogs.get(i).getId());
+                dataBackPressed.insertBackPressed("ChoiceItemList", choiceItemFromCatalogs.get(i).getId() + "," + categoryDb);
                 fragment = new CardBook();
                 if (fragment != null) {
                     android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
@@ -262,7 +281,7 @@ public class ChoiceItemList extends Fragment implements OnBackPressedListener {
 
                 for (int i=0; i<audios.size(); i++)
                 {
-                    if (audios.get(i).getCategorys().equals(sharedPreferences.getString("CategoryName", ""))) {
+                    if (audios.get(i).getCategorys().equals(categoryDb)) {
                         Audio audio = audios.get(i);
                         choiceItemFromCatalogs.add(audio);
                     }
@@ -285,7 +304,24 @@ public class ChoiceItemList extends Fragment implements OnBackPressedListener {
     }
     @Override
     public void onBackPressed() {
-        fragment = new ListFragmentGlagol();
+        int i = BackPressedId.size() - 1;
+        Log.d("MyLog", "click ok");
+        backPressedHelper = dataBackPressed.getBackPressed(BackPressedId.get(i).toString());
+        Log.d("MyLog", "click ok" + backPressedHelper.getClass_name());
+        if (backPressedHelper.getClass_name().equals("ListFragmentGlagol"))
+        {
+            fragment = new ListFragmentGlagol();
+            SQLiteDatabase db = dataBackPressed.getWritableDatabase();
+            db.delete("BackPressed", "id = " + BackPressedId.get(i), null);
+            db.close();
+        }
+        if (backPressedHelper.getClass_name().equals("CardBook"))
+        {
+            fragment = new CardBook();
+            SQLiteDatabase db = dataBackPressed.getWritableDatabase();
+            db.delete("BackPressed", "id = " + BackPressedId.get(i), null);
+            db.close();
+        }
         if (fragment != null) {
             android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
             fragmentManager.beginTransaction()
@@ -301,7 +337,7 @@ public class ChoiceItemList extends Fragment implements OnBackPressedListener {
             super.onPreExecute();
             pdia = new ProgressDialog(getActivity());
             pdia.setMessage("Загрузка...");
-            pdia.show();
+         //   pdia.show();
 
         }
 
@@ -322,10 +358,15 @@ public class ChoiceItemList extends Fragment implements OnBackPressedListener {
 
                     for (int i=0; i<audios.size(); i++)
                     {
-                        if (audios.get(i).getCategorys().equals(sharedPreferences.getString("CategoryName", ""))) {
-                            Audio audio = audios.get(i);
-                            choiceItemFromCatalogs.add(audio);
+                        String[] category = audios.get(i).getCategorys().split(",");
+                        for (int j = 0; j < category.length; j++)
+                        {
+                            if (category[j].equals(categoryDb)) {
+                                Audio audio = audios.get(i);
+                                choiceItemFromCatalogs.add(audio);
+                            }
                         }
+
                     }
 
                 }
@@ -335,7 +376,8 @@ public class ChoiceItemList extends Fragment implements OnBackPressedListener {
             }
             if (choiceItemFromCatalogs.size()==0)
             {
-                Toast.makeText(getActivity(), "Список пуст!", Toast.LENGTH_LONG).show();
+               // Toast.makeText(getActivity(), "Список пуст!", Toast.LENGTH_LONG).show();
+                pdia.dismiss();
             }
             else
             {

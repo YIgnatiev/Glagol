@@ -33,6 +33,7 @@ import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.stetho.Stetho;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -40,7 +41,9 @@ import com.google.gson.reflect.TypeToken;
 import net.pixeltk.glagol.R;
 import net.pixeltk.glagol.Splash;
 import net.pixeltk.glagol.activity.TabActivity;
+import net.pixeltk.glagol.adapter.BookMarksHelper;
 import net.pixeltk.glagol.adapter.ChoiceListAdapter;
+import net.pixeltk.glagol.adapter.DataBasesHelper;
 import net.pixeltk.glagol.adapter.RecyclerAdapter;
 import net.pixeltk.glagol.adapter.RecyclerAdapterVariant;
 import net.pixeltk.glagol.adapter.RecyclerClickListener;
@@ -102,9 +105,13 @@ public class MainFragment extends Fragment implements View.OnClickListener {
     Date dateSub, dateB;
     ProgressDialog pdia;
 
+    BookMarksHelper backPressedHelper;
+    DataBasesHelper dataBasesHelper;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Stetho.initializeWithDefaults(getActivity());
     }
 
     @Override
@@ -130,6 +137,7 @@ public class MainFragment extends Fragment implements View.OnClickListener {
         edit_sign = sig.edit();
         editorsubscription = subscription.edit();
 
+        dataBasesHelper = new DataBasesHelper(getActivity());
 
         variant_frag = (LinearLayout) view.findViewById(R.id.variant_frag);
         news_frag = (LinearLayout) view.findViewById(R.id.news_frag);
@@ -366,10 +374,8 @@ public class MainFragment extends Fragment implements View.OnClickListener {
                                     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                                         String[] name_sel = selection.get(i).get("text").toString().split("-");
 
-                                        editorsubscription.putString("name_sel", name_sel[0].trim());
-                                        editorsubscription.putString("nameCollection", audiosSelection.get(i).getModel());
-                                        editorsubscription.putString("put_selection", audiosSelection.get(i).getModel_id()).apply();
-                                        editor.apply();
+                                        dataBasesHelper.insertBackPressed("MainFragment",  name_sel[0].trim() + "," + audiosSelection.get(i).getModel() +","+ audiosSelection.get(i).getModel_id());
+                                        dataBasesHelper.close();
                                         fragment = new FragmentSubscription();
                                         if (fragment != null) {
                                             android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
@@ -480,6 +486,9 @@ public class MainFragment extends Fragment implements View.OnClickListener {
                                     list_variant.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                                         @Override
                                         public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                                            InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+                                            imm.hideSoftInputFromWindow(list_variant.getWindowToken(),
+                                                    InputMethodManager.HIDE_NOT_ALWAYS);
                                             search_variant.setVisibility(View.GONE);
                                             SharedPreferences search_line = getActivity().getSharedPreferences("Search", Context.MODE_PRIVATE);
                                             SharedPreferences.Editor serch_edit = search_line.edit();
@@ -676,9 +685,8 @@ public class MainFragment extends Fragment implements View.OnClickListener {
     }
     public void clickCardVariant(int position)
     {
-        editorsubscription.putString("nameCollection", itemDataVariant.get(position).getName_book());
-        editorsubscription.putString("collection", itemDataVariant.get(position).getId()).apply();
-        editor.apply();
+        dataBasesHelper.insertBackPressed("MainFragment",  itemDataVariant.get(position).getName_book() + ",collection," + itemDataVariant.get(position).getId());
+        dataBasesHelper.close();
         fragment = new FragmentSubscription();
         if (fragment != null) {
             android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
@@ -688,11 +696,8 @@ public class MainFragment extends Fragment implements View.OnClickListener {
     }
     public void clickCard(int position)
     {
-        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("Category", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("idbook", itemData.get(position).getId());
-        editor.putString("intent", "Main");
-        editor.apply();
+        dataBasesHelper.insertBackPressed("MainFragment", itemData.get(position).getId());
+        dataBasesHelper.close();
         fragment = new CardBook();
         if (fragment != null) {
             android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();

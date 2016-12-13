@@ -29,9 +29,9 @@ import com.bumptech.glide.Glide;
 import com.facebook.stetho.Stetho;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.mukesh.tinydb.TinyDB;
 
 import net.pixeltk.glagol.R;
-import net.pixeltk.glagol.Splash;
 import net.pixeltk.glagol.activity.TabActivity;
 import net.pixeltk.glagol.adapter.BookMarksHelper;
 import net.pixeltk.glagol.adapter.DataBasesHelper;
@@ -44,18 +44,24 @@ import net.pixeltk.glagol.player.Utilities;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static net.pixeltk.glagol.Splash.mp;
 import static net.pixeltk.glagol.Splash.playSong;
 import static net.pixeltk.glagol.Splash.songsList;
+import static net.pixeltk.glagol.activity.TabActivity.hasConnection;
 
 /**
  * Created by root on 04.10.16.
@@ -93,7 +99,10 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
     DataBasesHelper dataBasesHelper;
     BookMarksHelper listenHelper;
     ArrayList ListenId = new ArrayList();
-    public static ArrayList track_name = new ArrayList();
+    public static ArrayList<String> track_name = new ArrayList<>();
+
+    final String DIR_SD = "MyFiles";
+    String readFileStr = "";
 
 
     @Override
@@ -112,8 +121,8 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
         idbook = getActivity().getSharedPreferences("Category", Context.MODE_PRIVATE);
         playing = getActivity().getSharedPreferences("Playing", Context.MODE_PRIVATE);
         editor = playing.edit();
-        Bundle bundle = this.getArguments();
-        String check_play =  bundle.getString("open");
+
+        track_name.clear();
 
         back_arrow = (ImageView) view.findViewById(R.id.back);
         logo = (ImageView) view.findViewById(R.id.logo);
@@ -123,6 +132,7 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
         playList.setChoiceMode(AbsListView.CHOICE_MODE_SINGLE);
 
         seekBar = (SeekBar) view.findViewById(R.id.seekBar);
+        seekBar.setProgress(0);
 
         now_time = (TextView) view.findViewById(R.id.now_time);
         all_time = (TextView) view.findViewById(R.id.all_time);
@@ -157,7 +167,9 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
 
         songManager = new SongsManager();
         utils = new Utilities();
-        mp.setOnCompletionListener(this);
+
+        seekBar.setMax(mp.getDuration());
+
 
         if (idbook.contains("download_book"))
         {
@@ -169,6 +181,7 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
         }
         else {
             if (idbook.contains("book_name")) {
+                mp.setOnCompletionListener(this);
                 name_book.setText(idbook.getString("book_name", ""));
                 name_author.setText(idbook.getString("name_author", ""));
                 Glide.with(getActivity()).load(idbook.getString("url_img", "")).placeholder(R.drawable.notcover).into(cover);
@@ -184,6 +197,8 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
                                     positon = Integer.parseInt(listenHelper.getCurrent_position());
                                     old_listen = Integer.parseInt(listenHelper.getSeekbar_value());
                                     duration = Integer.parseInt(listenHelper.getTotal_duration());
+                                    String songTitle = String.valueOf(track_name.get(currentSongIndex));
+                                    part.setText(songTitle);
                                     currentSongIndex = positon;
                                     playSong(positon);
                                     updateProgressBar();
@@ -209,9 +224,11 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
                             if (idbook.getString("book_name", "").equals(listenHelper.getName_book())) {
                                 positon = Integer.parseInt(listenHelper.getCurrent_position());
                                 currentSongIndex = positon;
+                                Log.d("MyLog", "seek "  + seekBar.getProgress() + " max seek " + seekBar.getMax());
                                 String songTitle = String.valueOf(track_name.get(currentSongIndex));
                                 part.setText(songTitle);
                                 updateProgressBar();
+                                Log.d("MyLog", "seek1 "  + seekBar.getProgress() + " max seek1 " + seekBar.getMax());
                                 positon = 0;
                                 break;
                             }
@@ -231,11 +248,7 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
         {
             play_pause.setChecked(true);
             mHandler.removeCallbacks(mUpdateTimeTask);
-
-            // forward or bacward to certain seconds
             seekBar.setProgress(mp.getCurrentPosition());
-
-            // update timer progress again
             updateProgressBar();
         }
         play_pause.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -274,29 +287,17 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
                 else
                 {
                     if (mp != null) {
-                        double procent;
+                        double procent = 0;
                         total_duration = mp.getDuration();
-                        now_listening = utils.progressToTimer(seekBar.getProgress(), (int) total_duration);
+                        now_listening = seekBar.getProgress();
 
-                        if (duration == 0)
-                        {
-                            procent = ((old_listen + now_listening)/1000);
-                            Log.d("MyLog", "procent1 " + (seek_value + now_listening)/1000);
-                            procent = procent + old_procent;
-                        }
-                        else
-                        {
-                            procent = ((seek_value + now_listening) / 1000) / duration;
-                            Log.d("MyLog", "procent2 " + (seek_value + now_listening)/1000);
-                            procent = procent + old_procent;
-                        }
                         if (currentSongIndex == 0) {
 
-                            dataBasesHelper.updatedetails(idbook.getString("idbook", ""), String.valueOf(procent), String.valueOf(positon), String.valueOf(old_listen + now_listening));
+                            dataBasesHelper.updatedetails(idbook.getString("id_book", ""), String.valueOf(procent), String.valueOf(positon), String.valueOf(now_listening));
                         }
                         else
                         {
-                            dataBasesHelper.updatedetails(idbook.getString("idbook", ""), String.valueOf(procent), String.valueOf(currentSongIndex), String.valueOf(old_listen + now_listening));
+                            dataBasesHelper.updatedetails(idbook.getString("id_book", ""), String.valueOf(procent), String.valueOf(currentSongIndex), String.valueOf(now_listening));
                         }
                         mp.pause();
                         editor.clear().apply();
@@ -312,7 +313,7 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                if (seekBar.getProgress() == 100)
+                if (seekBar.getProgress() == mp.getDuration())
                 {
                     double now_lsten = 0.0;
                     int total = 0;
@@ -344,7 +345,7 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
                         procent = procent + now_lsten;
                         Log.d("MyLog", "procent " + procent);
                     }
-                    dataBasesHelper.updatedetails(idbook.getString("idbook", ""), String.valueOf(procent), String.valueOf(currentSongIndex), String.valueOf(0));
+                    dataBasesHelper.updatedetails(idbook.getString("id_book", ""), String.valueOf(procent), String.valueOf(currentSongIndex), String.valueOf(0));
 
                 }
             }
@@ -358,11 +359,8 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
                 mHandler.removeCallbacks(mUpdateTimeTask);
-                int totalDuration = mp.getDuration();
-                int currentPosition = utils.progressToTimer(seekBar.getProgress(), totalDuration);
 
-                // forward or backward to certain seconds
-                mp.seekTo(currentPosition);
+                mp.seekTo(seekBar.getProgress());
 
                 // update timer progress again
                 updateProgressBar();
@@ -416,9 +414,8 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
             @Override
             public void onClick(View view) {
                 mHandler.removeCallbacks(mUpdateTimeTask);
-                int totalDuration = mp.getDuration();
-                int currentPosition = utils.progressToTimer(seekBar.getProgress(), totalDuration);
-                mp.seekTo(currentPosition - 15000);
+                int currentPosition = seekBar.getProgress() - 15000;
+                mp.seekTo(currentPosition);
                 updateProgressBar();
                 play_pause.setChecked(true);
             }
@@ -427,9 +424,7 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
             @Override
             public void onClick(View view) {
                 mHandler.removeCallbacks(mUpdateTimeTask);
-                int totalDuration = mp.getDuration();
-                int currentPosition = utils.progressToTimer(seekBar.getProgress(), totalDuration);
-                currentPosition = currentPosition + 15000;
+                int currentPosition = seekBar.getProgress() + 15000;
                 mp.seekTo(currentPosition);
                 updateProgressBar();
                 play_pause.setChecked(true);
@@ -456,7 +451,7 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
             now_time.setText("" + utils.milliSecondsToTimer(currentDuration));
 
             // Updating progress bar
-            int progress = (int) (utils.getProgressPercentage(currentDuration, totalDuration));
+            int progress = (int) (currentDuration);
             //Log.d("Progress", ""+progress);
             seekBar.setProgress(progress);
 
@@ -465,35 +460,110 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
         }
 
     };
+    void writeFileSD(ArrayList arrayList) {
+        // проверяем доступность SD
+        if (!Environment.getExternalStorageState().equals(
+                Environment.MEDIA_MOUNTED)) {
+            Log.d("MyLog", "SD-карта не доступна: " + Environment.getExternalStorageState());
+            return;
+        }
+        // получаем путь к SD
+        File sdPath = Environment.getExternalStorageDirectory();
+        // добавляем свой каталог к пути
+        sdPath = new File(sdPath.getAbsolutePath() + "/" + DIR_SD);
+        // создаем каталог
+        sdPath.mkdirs();
+        // формируем объект File, который содержит путь к файлу
+        File sdFile = new File(sdPath, idbook.getString("id_book", " "));
+        try {
+            // открываем поток для записи
+            BufferedWriter bw = new BufferedWriter(new FileWriter(sdFile));
+            // пишем данные
+            bw.write(String.valueOf(arrayList));
+            // закрываем поток
+            bw.close();
+            Log.d("MyLog", "Файл записан на SD: " + sdFile.getAbsolutePath());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
+    public String readFileSD() {
+        String str = "";
+        // проверяем доступность SD
+        if (!Environment.getExternalStorageState().equals(
+                Environment.MEDIA_MOUNTED)) {
+            Log.d("MyLog", "SD-карта не доступна: " + Environment.getExternalStorageState());
+            return null;
+        }
+        // получаем путь к SD
+        File sdPath = Environment.getExternalStorageDirectory();
+        // добавляем свой каталог к пути
+        sdPath = new File(sdPath.getAbsolutePath() + "/" + DIR_SD);
+        // формируем объект File, который содержит путь к файлу
+        File sdFile = new File(sdPath, idbook.getString("id_book"," "));
+        try {
+            // открываем поток для чтения
+            BufferedReader br = new BufferedReader(new FileReader(sdFile));
+            // читаем содержимое
+            while ((str = br.readLine()) != null) {
+                Log.d("MyLog", str);
+                String str1 = str.replace("[", "");
+                String str2 = str1.replace("]", "");
+                String[] data = str2.split(",");
+                for (String aData : data) {
+                    Log.d("MyLog", aData);
+                    track_name.add(aData);
+                }
+                Log.d("MyLog", "str " + readFileStr + " trak " + track_name);
+            }
+
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return str;
+    }
     public void createPlayList(String book_name) {
-        File dir = new File(Environment.getExternalStorageDirectory() + "/Music/" + book_name);
+        File dir = new File(Environment.getExternalStorageDirectory() + "/Glagol/" + book_name);
         Log.d("Files", "f: " + dir);
         if (dir.exists()) {
-            if (android.os.Build.VERSION.SDK_INT > 9) {
-                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-                StrictMode.setThreadPolicy(policy);
+            if(!hasConnection(getActivity()))
+            {
+               readFileSD();
+
             }
-            try {
-                JSONArray data = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/getbookfiles?salt=df90sdfgl9854gjs54os59gjsogsdf&book_id=" + idbook.getString("idbook", "")));
-
-                Gson gson = new Gson();
-                audios = gson.fromJson(data.toString(),  new TypeToken<List<Audio>>(){}.getType());
-                if (audios!= null) {
-
-                    for (int i = 0; i < audios.size(); i++) {
-                        Audio audio = audios.get(i);
-                        track_name.add(audio.getDescription());
-                    }
+            else {
+                if (android.os.Build.VERSION.SDK_INT > 9) {
+                    StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                    StrictMode.setThreadPolicy(policy);
                 }
+                try {
+                    JSONArray data = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/getbookfiles?salt=df90sdfgl9854gjs54os59gjsogsdf&book_id=" + idbook.getString("id_book", "")));
 
-            } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (Exception e) {
-                e.printStackTrace();
+                    Gson gson = new Gson();
+                    audios = gson.fromJson(data.toString(), new TypeToken<List<Audio>>() {
+                    }.getType());
+                    if (audios != null) {
+
+                        for (int i = 0; i < audios.size(); i++) {
+                            Audio audio = audios.get(i);
+                            track_name.add(audio.getDescription());
+                        }
+                        writeFileSD(track_name);
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
 
-            final String path = Environment.getExternalStorageDirectory().toString() + "/Music/" + book_name;
+            final String path = Environment.getExternalStorageDirectory().toString() + "/Glagol/" + book_name;
 
             File f = new File(path);
             File file[] = f.listFiles();
@@ -502,7 +572,7 @@ public class PlayerFragment extends Fragment implements OnBackPressedListener, M
 
                 ArrayList<Map<String, Object>> data = new ArrayList<Map<String, Object>>(file.length);
                 Map<String, Object> m;
-                for (int i = 0; i < file.length; i++) {
+                for (int i = 0; i < track_name.size(); i++) {
                     m = new HashMap<String, Object>();
                     m.put(ATTRIBUTE_NAME_TEXT, track_name.get(i));
                     data.add(m);

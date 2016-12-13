@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.StrictMode;
 import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,7 +47,7 @@ public class FragmentPayment extends Fragment implements OnBackPressedListener{
 
     Button buy;
     Fragment fragment = null;
-    SharedPreferences idbook;
+    SharedPreferences idbook, sharedPreferences;
     DataBasesHelper dataBuy, dataBookMarks;
     ArrayList BuiId = new ArrayList();
     ArrayList BookMarksId = new ArrayList();
@@ -55,6 +56,7 @@ public class FragmentPayment extends Fragment implements OnBackPressedListener{
     BookMarksHelper buyHelper, bookMarksHelper;
     private ArrayList<Audio> audios = new ArrayList<>();
     getHttpGet request = new getHttpGet();
+    String idBook;
 
 
     @Override
@@ -64,11 +66,13 @@ public class FragmentPayment extends Fragment implements OnBackPressedListener{
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+                             final Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.layout_fragment_payment, container, false);
 
         idbook = getActivity().getSharedPreferences("Category", Context.MODE_PRIVATE);
+
+        sharedPreferences = getActivity().getSharedPreferences("Sign", Context.MODE_PRIVATE);
 
 
         dataBuy = new DataBasesHelper(getActivity());
@@ -82,6 +86,10 @@ public class FragmentPayment extends Fragment implements OnBackPressedListener{
 
         name_frag = (TextView) view.findViewById(R.id.name_frag);
         name_frag.setText("Оплата");
+        Bundle bundle = getArguments();
+        if (bundle != null) {
+            idBook = bundle.getString("idbook");
+        }
 
         back_arrow.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -99,8 +107,8 @@ public class FragmentPayment extends Fragment implements OnBackPressedListener{
             StrictMode.setThreadPolicy(policy);
         }
         try {
-            JSONArray data = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/getbook?salt=df90sdfgl9854gjs54os59gjsogsdf&book_id=" + idbook.getString("idbook", "")));
-
+            JSONArray data = new JSONArray(request.getHttpGet("http://www.glagolapp.ru/api/getbook?salt=df90sdfgl9854gjs54os59gjsogsdf&book_id=" + idBook));
+            Log.d("MyLog", String.valueOf(data));
             Gson gson = new Gson();
             audios = gson.fromJson(data.toString(),  new TypeToken<List<Audio>>(){}.getType());
 
@@ -113,6 +121,13 @@ public class FragmentPayment extends Fragment implements OnBackPressedListener{
         buy.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (android.os.Build.VERSION.SDK_INT > 9) {
+                    StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                    StrictMode.setThreadPolicy(policy);
+                }
+                request.getHttpGet("http://www.glagolapp.ru/api/buyBook?salt=df90sdfgl9854gjs54os59gjsogsdf&user_id=" + sharedPreferences.getString("id","") + "&book_id=" + idBook);
+
+
                 if (BuiId.size() == 0)
                 {
                     for (int i = 0; i < BookMarksId.size(); i++) {
@@ -131,7 +146,6 @@ public class FragmentPayment extends Fragment implements OnBackPressedListener{
                     int check = 0;
                     for (int i = 0; i < BuiId.size(); i++) {
                         buyHelper = dataBuy.getProduct(BuiId.get(i).toString(), "Buy");
-
                         if (audios.get(0).getId().equals(buyHelper.getId_book())) {
                             check=1;
                             break;

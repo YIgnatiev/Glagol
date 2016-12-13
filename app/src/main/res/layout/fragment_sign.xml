@@ -36,6 +36,8 @@
         android:layout_height="wrap_content"
         android:id="@+id/enter_mail"
         android:textColor="#FFFFFF"
+        android:imeOptions="actionDone"
+        android:inputType="textEmailAddress"
         android:textCursorDrawable="@drawable/cursor"
         android:background="@android:color/transparent"
         android:layout_below="@+id/line1"

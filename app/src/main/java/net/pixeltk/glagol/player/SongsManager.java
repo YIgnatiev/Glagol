@@ -38,7 +38,7 @@ public class SongsManager {
     public ArrayList<HashMap<String, String>> getPlayList(String book_name) {
 
 
-        String path = Environment.getExternalStorageDirectory().toString() + "/Music/" + book_name + "/";
+        String path = Environment.getExternalStorageDirectory().toString() + "/Glagol/" + book_name + "/";
 
         File f = new File(path);
         File file[] = f.listFiles();

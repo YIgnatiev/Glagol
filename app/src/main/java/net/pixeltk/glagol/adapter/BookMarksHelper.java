@@ -16,6 +16,8 @@ public class BookMarksHelper {
     private String total_duration;
     private String now_listening;
     private String id_book;
+    private String class_name;
+    private String some_info;
 
     public String getName_book()
     {
@@ -96,5 +98,21 @@ public class BookMarksHelper {
 
     public void setNow_listening(String now_listening) {
         this.now_listening = now_listening;
+    }
+
+    public String getClass_name() {
+        return class_name;
+    }
+
+    public void setClass_name(String class_name) {
+        this.class_name = class_name;
+    }
+
+    public String getSome_info() {
+        return some_info;
+    }
+
+    public void setSome_info(String some_info) {
+        this.some_info = some_info;
     }
 }

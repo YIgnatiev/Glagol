@@ -18,6 +18,14 @@ public class Audio {
         this.id = id;
     }
 
+    @SerializedName("book_id") String book_id;
+    public String getBook_id() {
+        return book_id;
+    }
+    public void setBook_id(String book_id) {
+        this.book_id = book_id;
+    }
+
     @SerializedName("name") String name_book;
     public String getName_book(){
         return name_book;

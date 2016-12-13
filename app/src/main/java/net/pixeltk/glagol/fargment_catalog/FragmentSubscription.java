@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -26,7 +27,9 @@ import com.google.gson.reflect.TypeToken;
 import net.pixeltk.glagol.R;
 import net.pixeltk.glagol.Splash;
 import net.pixeltk.glagol.activity.TabActivity;
+import net.pixeltk.glagol.adapter.BookMarksHelper;
 import net.pixeltk.glagol.adapter.ChoiceListAdapter;
+import net.pixeltk.glagol.adapter.DataBasesHelper;
 import net.pixeltk.glagol.api.Audio;
 import net.pixeltk.glagol.api.getHttpGet;
 import net.pixeltk.glagol.fragment.MainFragment;
@@ -64,6 +67,10 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
     TextView name_frag;
     ProgressDialog pdia;
 
+    DataBasesHelper dataBackPressed;
+    BookMarksHelper backPressedHelper;
+    ArrayList BackPressedId = new ArrayList();
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,40 +106,48 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
         subscription = (Button) view.findViewById(R.id.subscription);
         cancel_subscription = (Button) view.findViewById(R.id.cancel_subscription);
 
+        dataBackPressed = new DataBasesHelper(getActivity());
+
+        BackPressedId = dataBackPressed.getIdBackPressed();
+
+        int last_element = BackPressedId.size() - 1;
+        Log.d("MyLog", "click ok");
+        backPressedHelper = dataBackPressed.getBackPressed(BackPressedId.get(last_element).toString());
+        final String[] someInformation = backPressedHelper.getSome_info().split(",");
+        collection = someInformation[1];
+
+        Log.d("MyLog", "colection " + someInformation[1] + " name " + someInformation[2]);
+
 
         choiceItemFromCatalogs = new ArrayList<Audio>();
 
-        if (sharedPreferences.contains("author"))
+        if (collection.equals("author"))
         {
-            collection = "author";
-            author = sharedPreferences.getString("author", "");
+            author = someInformation[2];
             name_frag.setText(author);
             new getBooksAuthor().execute();
 
         }
-        else  if (sharedPreferences.contains("reader"))
+        else  if (collection.equals("reader"))
         {
-            collection = "reader";
-            reader = sharedPreferences.getString("reader", "");
+            reader = someInformation[2];
             name_frag.setText(reader);
 
             new getBooksReader().execute();
 
         }
-        else  if (sharedPreferences.contains("publisher"))
+        else  if (collection.equals("publisher"))
         {
-            collection = "publisher";
-            publisher = sharedPreferences.getString("publisher", "");
+            publisher = someInformation[2];
             name_frag.setText(publisher);
             new getBooksPublishers().execute();
 
         }
-        else  if (sharedPreferences.contains("collection"))
+        else  if (collection.equals("collection"))
         {
-            collection = "collection";
-            id = sharedPreferences.getString("collection", "");
-            name_collection = sharedPreferences.getString("nameCollection", "");
-            name_frag.setText(sharedPreferences.getString("nameCollection", ""));
+            id = someInformation[2];
+            name_collection = someInformation[0];
+            name_frag.setText(name_collection);
             Log.d("MyLog", name_collection);
             subscribe_collection = name_collection;
             if (sharedPreferences.contains(subscribe_collection))
@@ -143,11 +158,10 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
             new getCollections().execute();
 
         }
-        else  if (sharedPreferences.contains("name_sel"))
+        else
         {
-            collection = sharedPreferences.getString("nameCollection", "");
-            id = sharedPreferences.getString("put_selection", "");
-            name_collection = sharedPreferences.getString("name_sel", "");
+            id = someInformation[2];
+            name_collection = someInformation[0];
 
             name_frag.setText(name_collection);
             subscribe_collection = name_collection;
@@ -210,10 +224,7 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-               SharedPreferences subscription = getActivity().getSharedPreferences("Category", Context.MODE_PRIVATE);
-               SharedPreferences.Editor editor = subscription.edit();
-                editor.putString("idbook", choiceItemFromCatalogs.get(i).getId());
-                editor.putString("intent", "Subscription").apply();
+                dataBackPressed.insertBackPressed("FragmentSubscription", choiceItemFromCatalogs.get(i).getId() + "," + collection + "," + someInformation[2]);
                 fragment = new CardBook();
                 if (fragment != null) {
                     android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
@@ -228,33 +239,34 @@ public class FragmentSubscription extends Fragment implements OnBackPressedListe
     @Override
     public void onBackPressed() {
 
-        if (sharedPreferences.contains("author"))
+        int i = BackPressedId.size() - 1;
+        Log.d("MyLog", "click ok");
+        backPressedHelper = dataBackPressed.getBackPressed(BackPressedId.get(i).toString());
+        Log.d("MyLog", "click ok" + backPressedHelper.getClass_name());
+
+        if (backPressedHelper.getClass_name().equals("CardBook"))
         {
-            editor.remove("author").apply();
             fragment = new CardBook();
+
+            SQLiteDatabase db = dataBackPressed.getWritableDatabase();
+            db.delete("BackPressed", "id = " + BackPressedId.get(i), null);
+            db.close();
         }
-        else  if (sharedPreferences.contains("reader"))
+        else  if (backPressedHelper.getClass_name().equals("MainFragment"))
         {
-            fragment = new CardBook();
-            editor.remove("reader").apply();
+            fragment = new MainFragment();
+            SQLiteDatabase db = dataBackPressed.getWritableDatabase();
+            db.delete("BackPressed", "id = " + BackPressedId.get(i), null);
+            db.close();
         }
-        else  if (sharedPreferences.contains("collection"))
+        else  if (backPressedHelper.getClass_name().equals("Variant"))
         {
             fragment = new Variant();
-            editor.remove("nameCollection");
-            editor.remove("collection").apply();
-        }
-        else  if (sharedPreferences.contains("put_selection")) {
-            fragment = new MainFragment();
-            editor.remove("name_sel");
-            editor.remove("nameCollection");
-            editor.remove("put_selection").apply();
+            SQLiteDatabase db = dataBackPressed.getWritableDatabase();
+            db.delete("BackPressed", "id = " + BackPressedId.get(i), null);
+            db.close();
         }
 
-        else {
-        fragment = new CardBook();
-        editor.remove("publisher").apply();
-        }
         if (fragment != null) {
             android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
             fragmentManager.beginTransaction()

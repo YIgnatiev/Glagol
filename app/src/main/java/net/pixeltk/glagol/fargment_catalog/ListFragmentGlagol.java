@@ -20,6 +20,8 @@ import com.google.gson.reflect.TypeToken;
 
 import net.pixeltk.glagol.R;
 import net.pixeltk.glagol.activity.TabActivity;
+import net.pixeltk.glagol.adapter.BookMarksHelper;
+import net.pixeltk.glagol.adapter.DataBasesHelper;
 import net.pixeltk.glagol.adapter.NavDrawerItem;
 import net.pixeltk.glagol.adapter.NavDrawerListAdapter;
 import net.pixeltk.glagol.api.Audio;
@@ -55,6 +57,10 @@ public class ListFragmentGlagol extends Fragment implements OnBackPressedListene
     ImageView back_arrow, logo;
     TextView name_frag;
 
+    DataBasesHelper dataBackPressed;
+    BookMarksHelper backPressedHelper;
+    ArrayList BackPressedId = new ArrayList();
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,6 +83,11 @@ public class ListFragmentGlagol extends Fragment implements OnBackPressedListene
 
         name_frag = (TextView) view.findViewById(R.id.name_frag);
         name_frag.setText("Каталог");
+
+        dataBackPressed = new DataBasesHelper(getActivity());
+
+        BackPressedId = dataBackPressed.getIdBackPressed();
+
 
         back_arrow.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -124,7 +135,7 @@ public class ListFragmentGlagol extends Fragment implements OnBackPressedListene
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
-                editor.putString("CategoryName", navDrawerItems.get(i).getTitle()).apply();
+                dataBackPressed.insertBackPressed("ListFragmentGlagol",navDrawerItems.get(i).getTitle());
                 fragment = new ChoiceItemList();
                 if (fragment != null) {
                     android.support.v4.app.FragmentManager fragmentManager = getFragmentManager();
